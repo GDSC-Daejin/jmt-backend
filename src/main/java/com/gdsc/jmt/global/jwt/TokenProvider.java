@@ -5,6 +5,8 @@ import com.gdsc.jmt.global.role.RoleType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,10 +21,10 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Component
 public class TokenProvider {
+    private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
@@ -66,7 +68,7 @@ public class TokenProvider {
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+                        .toList();
 
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
@@ -78,14 +80,14 @@ public class TokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            // TODO : Logger 세팅을 해야될지??? , Sentry를 제대로 써볼지??
-            // "잘못된 JWT 서명입니다."
+            //TODO : 나중에 되면 sentry 해보기
+            logger.warn("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            // "만료된 JWT 토큰입니다."
+            logger.warn("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            // "지원되지 않는 JWT 토큰입니다."
+            logger.warn("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            // "JWT 토큰이 잘못되었습니다."
+            logger.warn("JWT 토큰이 잘못되었습니다.");
         }
         return false;
     }
