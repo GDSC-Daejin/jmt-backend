@@ -1,9 +1,9 @@
 package com.gdsc.jmt.global.messege;
 
-import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 
 public interface ResponseMessage {
     String getMessage();
-    Integer getStatusCode();
+    HttpStatus getStatus();
 }
