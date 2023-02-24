@@ -28,11 +28,15 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 
+	//db
+	implementation("org.mariadb.jdbc:mariadb-java-client:_")
+	//Hibernate Validator
+	implementation('org.hibernate.validator:hibernate-validator:_')
+//	implementation('org.glassfish:jakarta.el:_')
 
 	implementation("org.axonframework:axon-spring-boot-starter:_")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("io.springfox:springfox-swagger2:_")
-	implementation("io.springfox:springfox-swagger-ui:_")
+	implementation("org.springdoc:springdoc-openapi-ui:_")
 
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:_")

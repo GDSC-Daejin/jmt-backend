@@ -1,4 +1,4 @@
-package com.gdsc.jmt.global.role;
+package com.gdsc.jmt.domain.user.common;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
