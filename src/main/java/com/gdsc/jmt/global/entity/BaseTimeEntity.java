@@ -6,12 +6,11 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 
 @MappedSuperclass
-public class BaseTimeEntity {
+public abstract class BaseTimeEntity {
     @CreationTimestamp
     @Column(name = "created_time", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     public LocalDateTime createdTime;
 
-//    @UpdateTimestamp
     @Column(name = "modified_time", nullable = false, updatable = true, columnDefinition = "TIMESTAMP ON UPDATE CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     public LocalDateTime modifiedTime;
 }
