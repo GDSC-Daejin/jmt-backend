@@ -35,6 +35,8 @@ dependencies {
 //	implementation('org.glassfish:jakarta.el:_')
 
 	implementation("org.axonframework:axon-spring-boot-starter:_")
+	implementation("org.axonframework:axon-configuration:_")
+
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springdoc:springdoc-openapi-ui:_")
 
