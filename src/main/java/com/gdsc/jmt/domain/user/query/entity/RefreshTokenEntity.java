@@ -2,11 +2,13 @@ package com.gdsc.jmt.domain.user.query.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
-@Entity
+@RequiredArgsConstructor
+@Entity @Table(name = "tb_refresh_token")
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
