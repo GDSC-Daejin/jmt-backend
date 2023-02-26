@@ -38,7 +38,7 @@ dependencies {
 	implementation("org.axonframework:axon-configuration:_")
 
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springdoc:springdoc-openapi-ui:_")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:_")
 	implementation("com.google.api-client:google-api-client:_")
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:_")

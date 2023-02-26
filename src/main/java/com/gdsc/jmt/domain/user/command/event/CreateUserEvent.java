@@ -1,10 +1,9 @@
 package com.gdsc.jmt.domain.user.command.event;
 
-import com.gdsc.jmt.global.event.BaseEvent;
 import lombok.Getter;
 
 @Getter
-public class CreateUserEvent extends BaseEvent<String> {
+public class CreateUserEvent extends BaseUserEvent<String> {
     private final String email;
 
     public CreateUserEvent(String id, String email) {

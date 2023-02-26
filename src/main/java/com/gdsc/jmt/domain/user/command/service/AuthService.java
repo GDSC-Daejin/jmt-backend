@@ -1,9 +1,15 @@
 package com.gdsc.jmt.domain.user.command.service;
 
 import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
+import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
+import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.jwt.TokenProvider;
+import com.gdsc.jmt.global.jwt.dto.TokenResponse;
 import com.gdsc.jmt.global.messege.AuthMessage;
+import com.gdsc.jmt.global.messege.DefaultMessage;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -20,21 +26,20 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     @Value("${google.client.id}")
-    private final String googleClientId;
+    private String googleClientId;
 
+    private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
 
     @Transactional
-    public CompletableFuture<String> googleLogin(String idToken) {
-        // 1. 구글 사용자 정보 가져오기 (얘는 Service에서 해야 할듯?) 완료.
-        // 2. 사용자 생성 (Command 실행 시키면 될듯?)
-        // 3. 성공 or 실패 Response 보내기 (?????)
+    public TokenResponse googleLogin(String idToken) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
@@ -46,19 +51,32 @@ public class AuthService {
             } else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
 
-                // 이 부분 Command로 Send 하기
-                CompletableFuture<String> test = commandGateway.send(new GoogleLoginCommand(
+                // 실제 유저 생성
+                CompletableFuture<UserEntity> userResult = commandGateway.send(new GoogleLoginCommand(
                         UUID.randomUUID().toString(),
                         userInfo
                 ));
 
                 // JWT 발급 및 Response 반환
-                return createToken(user);
-            }
-        } catch (HttpClientErrorException | GeneralSecurityException | IOException e) {
-            throw new ApiException(AuthMessage.INVALID_TOKEN);
-        }
+                TokenResponse tokenResponse = createToken(userResult.get());
 
-        return commandGateway.send();
+                // JWT 발급 받고 Response 쏘는게 가장 문제인듯
+                commandGateway.send(new PersistRefreshTokenCommand(
+                        UUID.randomUUID().toString(),
+                        userResult.get().getId(),
+                        tokenResponse.refreshToken()
+                ));
+
+                return tokenResponse;
+            }
+        } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
+            throw new ApiException(AuthMessage.INVALID_TOKEN);
+        } catch (ExecutionException | InterruptedException e) {
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private TokenResponse createToken(UserEntity user) {
+        return tokenProvider.generateJwtToken(user.getId().toString(), RoleType.MEMBER);
     }
 }
