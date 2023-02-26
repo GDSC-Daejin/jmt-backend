@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.user.query.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,12 @@ public class RefreshTokenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name="id", nullable = false)
+    @JoinColumn(name="user_id", insertable = false, updatable = false)
     private UserEntity user;
+
+    @Column(name = "user_id")
     private Long userId;
 
     private String refreshToken;
