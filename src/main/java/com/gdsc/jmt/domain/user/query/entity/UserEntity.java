@@ -12,10 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class User extends BaseTimeEntity {
+public class UserEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+
+    // 컬럼이름 흐음
+    public String userAggregateId;
 
     public String email;
     public String profileImageUrl;

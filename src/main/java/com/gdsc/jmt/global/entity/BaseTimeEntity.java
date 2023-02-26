@@ -3,7 +3,6 @@ package com.gdsc.jmt.global.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
 
 @MappedSuperclass
 public abstract class BaseTimeEntity {
