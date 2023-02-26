@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @MappedSuperclass
 public abstract class BaseTimeEntity {
-    @CreationTimestamp
     @Column(name = "created_time", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     public LocalDateTime createdTime;
 
