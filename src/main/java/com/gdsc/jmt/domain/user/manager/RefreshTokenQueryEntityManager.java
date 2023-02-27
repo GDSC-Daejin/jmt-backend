@@ -3,7 +3,9 @@ package com.gdsc.jmt.domain.user.manager;
 import com.gdsc.jmt.domain.user.command.aggregate.RefreshTokenAggregate;
 import com.gdsc.jmt.domain.user.command.event.BaseRefreshTokenEvent;
 import com.gdsc.jmt.domain.user.query.entity.RefreshTokenEntity;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.RefreshTokenRepository;
+import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.UserMessage;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +18,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenQueryEntityManager {
+    private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-
     private final EventSourcingRepository<RefreshTokenAggregate> refreshTokenAggregateEventSourcingRepository;
 
     @EventSourcingHandler
@@ -31,17 +33,19 @@ public class RefreshTokenQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private void checkExisting(Long userId) {
-        Optional<RefreshTokenEntity> result = refreshTokenRepository.findByUserId(userId);
+    private UserEntity checkExistingUser(String userId) {
+        Optional<UserEntity> result = userRepository.findByUserAggregateId(userId);
         if(result.isPresent())
-            throw new ApiException(UserMessage.LOGIN_CONFLICT);
+            return result.get();
+        else
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
     }
 
     private RefreshTokenEntity buildQueryAccount(RefreshTokenAggregate refreshTokenAggregate) {
-        checkExisting(refreshTokenAggregate.userId);
+        UserEntity userEntity = checkExistingUser(refreshTokenAggregate.userId);
 
         return new RefreshTokenEntity(
-                refreshTokenAggregate.userId,
+                userEntity.getId(),
                 refreshTokenAggregate.refreshToken
         );
     }

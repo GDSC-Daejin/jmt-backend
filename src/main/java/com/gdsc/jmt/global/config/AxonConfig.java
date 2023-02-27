@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AxonConfig {
+
     @Bean
     public EventSourcingRepository<UserAggregate> userAggregateEventSourcingRepository(EventStore eventStore) {
         return EventSourcingRepository.builder(UserAggregate.class).eventStore(eventStore).build();

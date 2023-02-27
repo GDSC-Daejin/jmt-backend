@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 public class PersistRefreshTokenCommand extends BaseCommand<String> {
-    private final Long userId;
+    private final String userId;
     private final String refreshToken;
 
-    public PersistRefreshTokenCommand(String id, Long userId, String refreshToken) {
+    public PersistRefreshTokenCommand(String id, String userId, String refreshToken) {
         super(id);
         this.userId = userId;
         this.refreshToken = refreshToken;

@@ -4,12 +4,10 @@ import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
-import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
 import com.gdsc.jmt.global.messege.AuthMessage;
-import com.gdsc.jmt.global.messege.DefaultMessage;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -25,8 +23,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -50,20 +46,18 @@ public class AuthService {
                 throw new ApiException(AuthMessage.INVALID_TOKEN);
             } else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
+                String userId = UUID.randomUUID().toString();
 
-                // 실제 유저 생성
-                CompletableFuture<UserEntity> userResult = commandGateway.send(new GoogleLoginCommand(
-                        UUID.randomUUID().toString(),
+                commandGateway.sendAndWait(new GoogleLoginCommand(
+                        userId,
                         userInfo
                 ));
 
                 // JWT 발급 및 Response 반환
-                TokenResponse tokenResponse = createToken(userResult.get());
-
-                // JWT 발급 받고 Response 쏘는게 가장 문제인듯
-                commandGateway.send(new PersistRefreshTokenCommand(
+                TokenResponse tokenResponse = createToken(userId);
+                commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                         UUID.randomUUID().toString(),
-                        userResult.get().getId(),
+                        userId,
                         tokenResponse.refreshToken()
                 ));
 
@@ -71,12 +65,10 @@ public class AuthService {
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
-        } catch (ExecutionException | InterruptedException e) {
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private TokenResponse createToken(UserEntity user) {
-        return tokenProvider.generateJwtToken(user.getId().toString(), RoleType.MEMBER);
+    private TokenResponse createToken(String userId) {
+        return tokenProvider.generateJwtToken(userId, RoleType.MEMBER);
     }
 }

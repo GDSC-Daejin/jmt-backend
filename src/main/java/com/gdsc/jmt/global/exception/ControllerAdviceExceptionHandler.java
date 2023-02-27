@@ -58,7 +58,7 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException(final Exception ex) {
-
+        System.out.println(ex.getMessage());
         final ResponseMessage errorMessage = DefaultMessage.INTERNAL_SERVER_ERROR;
         return makeErrorResponse(errorMessage);
     }

@@ -17,9 +17,9 @@ public class UserEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // 컬럼이름 흐음
+    @Column(nullable = false, unique = true)
     private String userAggregateId;
+    @Column(nullable = false, unique = true)
     private String email;
     private String profileImageUrl;
     @Nullable

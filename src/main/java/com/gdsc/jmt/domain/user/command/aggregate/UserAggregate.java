@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.common.Status;
+import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -11,6 +12,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 @Aggregate
+@RequiredArgsConstructor
 public class UserAggregate {
     // TODO : 해당 id를 query DB에서 pk로 사용을 해야될지, 아니면 특정 컬럼으로 넣어야 할지 고민
     @AggregateIdentifier
@@ -24,18 +26,18 @@ public class UserAggregate {
     public RoleType roleType;
     public Status status;
 
+    @CommandHandler
+    public UserAggregate(GoogleLoginCommand googleLoginCommand) {
+        AggregateLifecycle.apply(new CreateUserEvent(
+                googleLoginCommand.getId(),
+                googleLoginCommand.getUserInfo().getEmail()
+        ));
+    }
+
     @EventSourcingHandler
     public void on(CreateUserEvent createUserEvent) {
         this.id = createUserEvent.getId();
         this.email = createUserEvent.getEmail();
         this.status = Status.ACTIVE;
-    }
-
-    @CommandHandler
-    public void on(GoogleLoginCommand googleLoginCommand) {
-        AggregateLifecycle.apply(new CreateUserEvent(
-                googleLoginCommand.getId(),
-                googleLoginCommand.getUserInfo().getEmail()
-        ));
     }
 }
