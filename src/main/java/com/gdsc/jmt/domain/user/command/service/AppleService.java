@@ -1,4 +1,4 @@
-package com.gdsc.jmt.domain.user.service;
+package com.gdsc.jmt.domain.user.command.service;
 
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonArray;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AppleCommand {
+public class AppleService {
     /**
      * 1. apple로 부터 공개키 3개 가져옴
      * 2. 내가 클라에서 가져온 token String과 비교해서 써야할 공개키 확인 (kid,alg 값 같은 것)
