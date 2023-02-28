@@ -1,7 +1,7 @@
 package com.gdsc.jmt.global.jwt;
 
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
-import com.gdsc.jmt.global.role.RoleType;
+import com.gdsc.jmt.domain.user.common.RoleType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

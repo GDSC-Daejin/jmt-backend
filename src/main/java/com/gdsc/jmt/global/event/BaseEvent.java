@@ -1,5 +1,10 @@
 package com.gdsc.jmt.global.event;
 
-public class BaseEvent<T> {
-    T id;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public abstract class BaseEvent<T> {
+    protected final T id;
 }

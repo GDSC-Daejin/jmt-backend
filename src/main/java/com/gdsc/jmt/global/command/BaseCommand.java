@@ -1,7 +1,12 @@
 package com.gdsc.jmt.global.command;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
-public class BaseCommand<T> {
+
+@Getter
+@RequiredArgsConstructor
+public abstract class BaseCommand<T> {
     @TargetAggregateIdentifier
-    T id;
+    protected final T id;
 }
