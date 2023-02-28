@@ -37,7 +37,7 @@ public class AuthService {
     @Transactional
     public TokenResponse googleLogin(String idToken) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(googleClientId))
+//                .setAudience(Collections.singletonList(googleClientId))
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(idToken);
@@ -46,18 +46,18 @@ public class AuthService {
                 throw new ApiException(AuthMessage.INVALID_TOKEN);
             } else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
-                String userId = UUID.randomUUID().toString();
 
                 commandGateway.sendAndWait(new GoogleLoginCommand(
-                        userId,
+                        UUID.randomUUID().toString(),
                         userInfo
                 ));
 
-                // JWT 발급 및 Response 반환
-                TokenResponse tokenResponse = createToken(userId);
+                // TODO : JWT Payload를 애플과 공통된 email 혹은 sub로 해야함.
+                // 왜 다양한 서비스들이 회원가입할때 아이디를 이메일로 쓰는지 알겠음
+                TokenResponse tokenResponse = createToken(userInfo.getEmail());
                 commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                         UUID.randomUUID().toString(),
-                        userId,
+                        userInfo.getEmail(),
                         tokenResponse.refreshToken()
                 ));
 
@@ -68,7 +68,7 @@ public class AuthService {
         }
     }
 
-    private TokenResponse createToken(String userId) {
-        return tokenProvider.generateJwtToken(userId, RoleType.MEMBER);
+    private TokenResponse createToken(String email) {
+        return tokenProvider.generateJwtToken(email, RoleType.MEMBER);
     }
 }

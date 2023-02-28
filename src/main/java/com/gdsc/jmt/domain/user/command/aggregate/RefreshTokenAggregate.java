@@ -16,14 +16,14 @@ import org.axonframework.spring.stereotype.Aggregate;
 public class RefreshTokenAggregate {
     @AggregateIdentifier
     public String id;
-    public String userId;
+    public String email;
     public String refreshToken;
 
     @CommandHandler
     public RefreshTokenAggregate(PersistRefreshTokenCommand persistRefreshTokenCommand) {
         AggregateLifecycle.apply(new PersistRefreshTokenEvent(
                 persistRefreshTokenCommand.getId(),
-                persistRefreshTokenCommand.getUserId(),
+                persistRefreshTokenCommand.getEmail(),
                 persistRefreshTokenCommand.getRefreshToken()
         ));
     }
@@ -31,7 +31,7 @@ public class RefreshTokenAggregate {
     @EventSourcingHandler
     public void on(PersistRefreshTokenEvent persistRefreshTokenEvent) {
         this.id = persistRefreshTokenEvent.getId();
-        this.userId = persistRefreshTokenEvent.getUserId();
+        this.email = persistRefreshTokenEvent.getEmail();
         this.refreshToken = persistRefreshTokenEvent.getRefreshToken();
     }
 }

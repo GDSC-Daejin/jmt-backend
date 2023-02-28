@@ -3,10 +3,12 @@ package com.gdsc.jmt.domain.user.query.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
+@Setter
 @RequiredArgsConstructor
 @Entity @Table(name = "tb_refresh_token")
 public class RefreshTokenEntity {

@@ -5,12 +5,12 @@ import lombok.Getter;
 @Getter
 public class PersistRefreshTokenEvent extends BaseRefreshTokenEvent<String> {
 
-    private final String userId;
+    private final String email;
     private final String refreshToken;
 
-    public PersistRefreshTokenEvent(String id, String userId, String refreshToken) {
+    public PersistRefreshTokenEvent(String id, String email, String refreshToken) {
         super(id);
-        this.userId = userId;
+        this.email = email;
         this.refreshToken = refreshToken;
     }
 }

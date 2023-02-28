@@ -33,21 +33,33 @@ public class RefreshTokenQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private UserEntity checkExistingUser(String userId) {
-        Optional<UserEntity> result = userRepository.findByUserAggregateId(userId);
+    private UserEntity checkExistingUserByEmail(String email) {
+        Optional<UserEntity> result = userRepository.findByEmail(email);
         if(result.isPresent())
             return result.get();
         else
             throw new ApiException(UserMessage.USER_NOT_FOUND);
     }
 
-    private RefreshTokenEntity buildQueryAccount(RefreshTokenAggregate refreshTokenAggregate) {
-        UserEntity userEntity = checkExistingUser(refreshTokenAggregate.userId);
+    private RefreshTokenEntity checkExistingRefreshToken(Long userId) {
+        Optional<RefreshTokenEntity> result = refreshTokenRepository.findByUserId(userId);
+        return result.orElse(null);
+    }
 
-        return new RefreshTokenEntity(
-                userEntity.getId(),
-                refreshTokenAggregate.refreshToken
-        );
+    private RefreshTokenEntity buildQueryAccount(RefreshTokenAggregate refreshTokenAggregate) {
+        UserEntity userEntity = checkExistingUserByEmail(refreshTokenAggregate.email);
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(userEntity.getId());
+
+        if(refreshTokenEntity == null) {
+            return new RefreshTokenEntity(
+                    userEntity.getId(),
+                    refreshTokenAggregate.refreshToken
+            );
+        }
+        else {
+            refreshTokenEntity.setRefreshToken(refreshTokenAggregate.refreshToken);
+            return refreshTokenEntity;
+        }
     }
 
     private void persistRefreshToken(RefreshTokenEntity refreshTokenEntity) {
