@@ -49,13 +49,14 @@ public class AuthService {
             } else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
 
+                String userAggregateId = UUID.randomUUID().toString();
                 commandGateway.sendAndWait(new GoogleLoginCommand(
-                        UUID.randomUUID().toString(),
+                        userAggregateId,
                         userInfo
                 ));
 
                 String refreshTokenAggregateId = UUID.randomUUID().toString();
-                TokenResponse tokenResponse = createToken(userInfo.getEmail(), refreshTokenAggregateId);
+                TokenResponse tokenResponse = createToken(userAggregateId, refreshTokenAggregateId);
                 commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                         refreshTokenAggregateId,
                         userInfo.getEmail(),
@@ -88,7 +89,7 @@ public class AuthService {
         }
     }
 
-    private TokenResponse createToken(String email, String refreshTokenAggregateId) {
-        return tokenProvider.generateJwtToken(email, refreshTokenAggregateId, RoleType.MEMBER);
+    private TokenResponse createToken(String userAggregateId, String refreshTokenAggregateId) {
+        return tokenProvider.generateJwtToken(userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
     }
 }
