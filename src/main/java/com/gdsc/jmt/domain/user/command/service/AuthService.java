@@ -14,6 +14,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,9 +54,10 @@ public class AuthService {
                         userInfo
                 ));
 
-                TokenResponse tokenResponse = createToken(userInfo.getEmail());
+                String refreshTokenAggregateId = UUID.randomUUID().toString();
+                TokenResponse tokenResponse = createToken(userInfo.getEmail(), refreshTokenAggregateId);
                 commandGateway.sendAndWait(new PersistRefreshTokenCommand(
-                        UUID.randomUUID().toString(),
+                        refreshTokenAggregateId,
                         userInfo.getEmail(),
                         tokenResponse.refreshToken()
                 ));
@@ -67,10 +69,17 @@ public class AuthService {
         }
     }
 
-    public void logout(String email, String tokenAggregateId , String refreshToken) {
+    public void logout(String email, String refreshToken) {
         try {
-            if(tokenProvider.validateToken(refreshToken))
-                commandGateway.sendAndWait(new LogoutCommand(tokenAggregateId, email, refreshToken));
+            if(tokenProvider.validateToken(refreshToken)) {
+                Claims claims = tokenProvider.parseClaims(refreshToken);
+
+                commandGateway.sendAndWait(new LogoutCommand(
+                        claims.getSubject(),
+                        email,
+                        refreshToken)
+                );
+            }
             else
                 throw new ApiException(UserMessage.LOGOUT_FAIL);
         }
@@ -79,7 +88,7 @@ public class AuthService {
         }
     }
 
-    private TokenResponse createToken(String email) {
-        return tokenProvider.generateJwtToken(email, RoleType.MEMBER);
+    private TokenResponse createToken(String email, String refreshTokenAggregateId) {
+        return tokenProvider.generateJwtToken(email, refreshTokenAggregateId, RoleType.MEMBER);
     }
 }

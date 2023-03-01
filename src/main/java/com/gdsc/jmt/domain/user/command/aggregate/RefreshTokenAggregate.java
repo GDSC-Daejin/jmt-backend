@@ -33,6 +33,7 @@ public class RefreshTokenAggregate {
     @CommandHandler
     public void logout(LogoutCommand logoutCommand) {
         AggregateLifecycle.apply(new LogoutEvent(
+                logoutCommand.getId(),
                 logoutCommand.getEmail(),
                 logoutCommand.getRefreshToken()
         ));

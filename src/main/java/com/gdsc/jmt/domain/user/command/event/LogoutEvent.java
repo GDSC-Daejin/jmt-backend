@@ -4,8 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
-public class LogoutEvent {
+public class LogoutEvent extends BaseRefreshTokenEvent<String>{
     private final String email;
     private final String refreshToken;
+
+    public LogoutEvent(String id, String email, String refreshToken) {
+        super(id);
+        this.email = email;
+        this.refreshToken = refreshToken;
+    }
 }

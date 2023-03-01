@@ -27,7 +27,7 @@ public class AuthController {
 
     @DeleteMapping("/user")
     public ApiResponse<?> logout(@AuthenticationPrincipal User user, @RequestBody LogoutRequest logoutRequest) {
-//        authService.logout(user.getUsername() , logoutRequest.refreshToken());
+        authService.logout(user.getUsername() , logoutRequest.refreshToken());
         return ApiResponse.createResponseWithMessage(null, UserMessage.LOGOUT_SUCCESS);
     }
 }
