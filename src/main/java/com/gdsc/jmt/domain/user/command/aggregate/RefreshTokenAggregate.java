@@ -1,6 +1,8 @@
 package com.gdsc.jmt.domain.user.command.aggregate;
 
+import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
+import com.gdsc.jmt.domain.user.command.event.LogoutEvent;
 import com.gdsc.jmt.domain.user.command.event.PersistRefreshTokenEvent;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
@@ -25,6 +27,14 @@ public class RefreshTokenAggregate {
                 persistRefreshTokenCommand.getId(),
                 persistRefreshTokenCommand.getEmail(),
                 persistRefreshTokenCommand.getRefreshToken()
+        ));
+    }
+
+    @CommandHandler
+    public void logout(LogoutCommand logoutCommand) {
+        AggregateLifecycle.apply(new LogoutEvent(
+                logoutCommand.getEmail(),
+                logoutCommand.getRefreshToken()
         ));
     }
 

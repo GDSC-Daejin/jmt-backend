@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.user.command.service;
 
 import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
+import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
@@ -8,6 +9,7 @@ import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
 import com.gdsc.jmt.global.messege.AuthMessage;
+import com.gdsc.jmt.global.messege.UserMessage;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -21,7 +23,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -52,8 +53,6 @@ public class AuthService {
                         userInfo
                 ));
 
-                // TODO : JWT Payload를 애플과 공통된 email 혹은 sub로 해야함.
-                // 왜 다양한 서비스들이 회원가입할때 아이디를 이메일로 쓰는지 알겠음
                 TokenResponse tokenResponse = createToken(userInfo.getEmail());
                 commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                         UUID.randomUUID().toString(),
@@ -65,6 +64,18 @@ public class AuthService {
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
+        }
+    }
+
+    public void logout(String email, String tokenAggregateId , String refreshToken) {
+        try {
+            if(tokenProvider.validateToken(refreshToken))
+                commandGateway.sendAndWait(new LogoutCommand(tokenAggregateId, email, refreshToken));
+            else
+                throw new ApiException(UserMessage.LOGOUT_FAIL);
+        }
+        catch (Exception e) {
+            throw new ApiException(UserMessage.LOGOUT_FAIL);
         }
     }
 
