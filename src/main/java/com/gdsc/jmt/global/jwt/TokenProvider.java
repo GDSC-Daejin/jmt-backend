@@ -38,7 +38,7 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenResponse generateJwtToken(String id, RoleType role) {
+    public TokenResponse generateJwtToken(String id, String refreshTokenAggregateId, RoleType role) {
         long now = (new Date()).getTime();
 
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
@@ -50,6 +50,7 @@ public class TokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(refreshTokenAggregateId)
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -92,7 +93,7 @@ public class TokenProvider {
         return false;
     }
 
-    private Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {

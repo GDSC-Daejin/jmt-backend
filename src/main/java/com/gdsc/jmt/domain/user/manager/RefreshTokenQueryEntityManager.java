@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.user.manager;
 
 import com.gdsc.jmt.domain.user.command.aggregate.RefreshTokenAggregate;
 import com.gdsc.jmt.domain.user.command.event.BaseRefreshTokenEvent;
+import com.gdsc.jmt.domain.user.command.event.LogoutEvent;
 import com.gdsc.jmt.domain.user.query.entity.RefreshTokenEntity;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.RefreshTokenRepository;
@@ -23,8 +24,19 @@ public class RefreshTokenQueryEntityManager {
     private final EventSourcingRepository<RefreshTokenAggregate> refreshTokenAggregateEventSourcingRepository;
 
     @EventSourcingHandler
-    public void on(BaseRefreshTokenEvent<String> event) {
+    public void login(BaseRefreshTokenEvent<String> event) {
         persistRefreshToken(buildQueryAccount(getRefreshTokenFromEvent(event)));
+    }
+
+    @EventSourcingHandler
+    public void logout(LogoutEvent event) {
+        UserEntity userEntity = checkExistingUserByEmail(event.getEmail());
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(userEntity.getId());
+
+        if(event.getRefreshToken().equals(refreshTokenEntity.getRefreshToken()))
+            deleteRefreshToken(refreshTokenEntity);
+        else
+            throw new ApiException(UserMessage.LOGOUT_FAIL);
     }
 
     private RefreshTokenAggregate getRefreshTokenFromEvent(BaseRefreshTokenEvent<String> event) {
@@ -64,5 +76,9 @@ public class RefreshTokenQueryEntityManager {
 
     private void persistRefreshToken(RefreshTokenEntity refreshTokenEntity) {
         refreshTokenRepository.save(refreshTokenEntity);
+    }
+
+    private void deleteRefreshToken(RefreshTokenEntity refreshTokenEntity) {
+        refreshTokenRepository.delete(refreshTokenEntity);
     }
 }
