@@ -3,6 +3,8 @@ package com.gdsc.jmt.domain.user.manager;
 import com.gdsc.jmt.domain.user.command.aggregate.RefreshTokenAggregate;
 import com.gdsc.jmt.domain.user.command.event.BaseRefreshTokenEvent;
 import com.gdsc.jmt.domain.user.command.event.LogoutEvent;
+import com.gdsc.jmt.domain.user.command.event.PersistRefreshTokenEvent;
+import com.gdsc.jmt.domain.user.command.info.Reissue;
 import com.gdsc.jmt.domain.user.query.entity.RefreshTokenEntity;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.RefreshTokenRepository;
@@ -24,16 +26,25 @@ public class RefreshTokenQueryEntityManager {
     private final EventSourcingRepository<RefreshTokenAggregate> refreshTokenAggregateEventSourcingRepository;
 
     @EventSourcingHandler
-    public void login(BaseRefreshTokenEvent<String> event) {
-        persistRefreshToken(buildQueryAccount(getRefreshTokenFromEvent(event)));
+    public void login(PersistRefreshTokenEvent event) {
+        if(event.getReissue() != null) {
+            validateReissue(event.getEmail(), event.getReissue());
+        }
+
+        persistRefreshToken(buildQueryAccount(getRefreshTokenFromEvent(event), event.getEmail()));
+    }
+
+    public void validateReissue(String email , Reissue reissue) {
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(email);
+        if(!isValidateRefreshToken(reissue.getOldRefreshToken(), refreshTokenEntity.getRefreshToken()))
+            throw new ApiException(UserMessage.REISSUE_FAIL);
     }
 
     @EventSourcingHandler
     public void logout(LogoutEvent event) {
-        UserEntity userEntity = checkExistingUserByEmail(event.getEmail());
-        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(userEntity.getId());
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(event.getEmail());
 
-        if(event.getRefreshToken().equals(refreshTokenEntity.getRefreshToken()))
+        if(isValidateRefreshToken(event.getRefreshToken(), refreshTokenEntity.getRefreshToken()))
             deleteRefreshToken(refreshTokenEntity);
         else
             throw new ApiException(UserMessage.LOGOUT_FAIL);
@@ -45,7 +56,12 @@ public class RefreshTokenQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private UserEntity checkExistingUserByEmail(String email) {
+    private RefreshTokenEntity checkExistingRefreshTokenByEmail(String email) {
+        UserEntity userEntity = checkExistingUserByUserEmail(email);
+        return checkExistingRefreshToken(userEntity.getId());
+    }
+
+    private UserEntity checkExistingUserByUserEmail(String email) {
         Optional<UserEntity> result = userRepository.findByEmail(email);
         if(result.isPresent())
             return result.get();
@@ -58,8 +74,8 @@ public class RefreshTokenQueryEntityManager {
         return result.orElse(null);
     }
 
-    private RefreshTokenEntity buildQueryAccount(RefreshTokenAggregate refreshTokenAggregate) {
-        UserEntity userEntity = checkExistingUserByEmail(refreshTokenAggregate.email);
+    private RefreshTokenEntity buildQueryAccount(RefreshTokenAggregate refreshTokenAggregate, String email) {
+        UserEntity userEntity = checkExistingUserByUserEmail(email);
         RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(userEntity.getId());
 
         if(refreshTokenEntity == null) {
@@ -72,6 +88,10 @@ public class RefreshTokenQueryEntityManager {
             refreshTokenEntity.setRefreshToken(refreshTokenAggregate.refreshToken);
             return refreshTokenEntity;
         }
+    }
+
+    private boolean isValidateRefreshToken(String aggregateRefreshToken , String queryRefreshToken) {
+        return aggregateRefreshToken.equals(queryRefreshToken);
     }
 
     private void persistRefreshToken(RefreshTokenEntity refreshTokenEntity) {

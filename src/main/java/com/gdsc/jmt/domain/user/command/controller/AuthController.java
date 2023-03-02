@@ -25,6 +25,12 @@ public class AuthController {
         return ApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
     }
 
+    @PostMapping("/token")
+    public ApiResponse<TokenResponse> reissue(@AuthenticationPrincipal User user, @RequestBody LogoutRequest logoutRequest) {
+        TokenResponse tokenResponse = authService.reissue(user.getUsername(), logoutRequest.refreshToken());
+        return ApiResponse.createResponseWithMessage(tokenResponse, UserMessage.REISSUE_SUCCESS);
+    }
+
     @DeleteMapping("/user")
     public ApiResponse<?> logout(@AuthenticationPrincipal User user, @RequestBody LogoutRequest logoutRequest) {
         authService.logout(user.getUsername() , logoutRequest.refreshToken());

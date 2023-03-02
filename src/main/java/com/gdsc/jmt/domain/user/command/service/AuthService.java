@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.user.command.service;
 import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
 import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
+import com.gdsc.jmt.domain.user.command.info.Reissue;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -57,11 +58,12 @@ public class AuthService {
                 ));
 
                 String refreshTokenAggregateId = UUID.randomUUID().toString();
-                TokenResponse tokenResponse = createToken(userAggregateId, refreshTokenAggregateId);
+                TokenResponse tokenResponse = createToken(userInfo.getEmail(), refreshTokenAggregateId);
                 commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                         refreshTokenAggregateId,
                         userInfo.getEmail(),
-                        tokenResponse.refreshToken()
+                        tokenResponse.refreshToken(),
+                        null
                 ));
 
                 return tokenResponse;
@@ -69,6 +71,25 @@ public class AuthService {
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
+    }
+
+    public TokenResponse reissue(String email, String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken)) {
+            throw new ApiException(UserMessage.REISSUE_FAIL);
+        }
+
+        String refreshTokenAggregateId = UUID.randomUUID().toString();
+        TokenResponse tokenResponse =createToken(email, refreshTokenAggregateId);
+
+        Reissue reissue = new Reissue(true, refreshToken, tokenResponse.refreshToken());
+        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
+                refreshTokenAggregateId,
+                email,
+                null,
+                reissue
+        ));
+
+        return tokenResponse;
     }
 
     public void logout(String email, String refreshToken) {
@@ -90,7 +111,7 @@ public class AuthService {
         }
     }
 
-    private TokenResponse createToken(String userAggregateId, String refreshTokenAggregateId) {
-        return tokenProvider.generateJwtToken(userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
+    private TokenResponse createToken(String email, String refreshTokenAggregateId) {
+        return tokenProvider.generateJwtToken(email, refreshTokenAggregateId, RoleType.MEMBER);
     }
 }

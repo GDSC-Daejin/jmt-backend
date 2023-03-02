@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
 import com.gdsc.jmt.domain.user.command.event.LogoutEvent;
 import com.gdsc.jmt.domain.user.command.event.PersistRefreshTokenEvent;
+import com.gdsc.jmt.domain.user.command.info.Reissue;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -18,15 +19,16 @@ import org.axonframework.spring.stereotype.Aggregate;
 public class RefreshTokenAggregate {
     @AggregateIdentifier
     public String id;
-    public String email;
     public String refreshToken;
+    public Reissue reissue;
 
     @CommandHandler
     public RefreshTokenAggregate(PersistRefreshTokenCommand persistRefreshTokenCommand) {
         AggregateLifecycle.apply(new PersistRefreshTokenEvent(
                 persistRefreshTokenCommand.getId(),
                 persistRefreshTokenCommand.getEmail(),
-                persistRefreshTokenCommand.getRefreshToken()
+                persistRefreshTokenCommand.getRefreshToken(),
+                persistRefreshTokenCommand.getReissue()
         ));
     }
 
@@ -42,7 +44,11 @@ public class RefreshTokenAggregate {
     @EventSourcingHandler
     public void on(PersistRefreshTokenEvent persistRefreshTokenEvent) {
         this.id = persistRefreshTokenEvent.getId();
-        this.email = persistRefreshTokenEvent.getEmail();
-        this.refreshToken = persistRefreshTokenEvent.getRefreshToken();
+        this.reissue = persistRefreshTokenEvent.getReissue();
+
+        if(this.reissue != null)
+            this.refreshToken = this.reissue.getNewRefreshToken();
+        else
+            this.refreshToken = persistRefreshTokenEvent.getRefreshToken();
     }
 }
