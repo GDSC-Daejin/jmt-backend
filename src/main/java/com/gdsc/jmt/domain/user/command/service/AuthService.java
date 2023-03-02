@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.user.command.service;
 import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
 import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
+import com.gdsc.jmt.domain.user.command.info.Reissue;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -33,12 +34,12 @@ public class AuthService {
 
     @Value("${google.client.id}")
     private String googleClientId;
-
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {
+        // TODO : GoogleIdTokenVerifier는 Bean으로 등록하고 써도 될듯???
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
@@ -47,7 +48,8 @@ public class AuthService {
 
             if (googleIdToken == null) {
                 throw new ApiException(AuthMessage.INVALID_TOKEN);
-            } else {
+            }
+            else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
 
                 String userAggregateId = UUID.randomUUID().toString();
@@ -57,11 +59,12 @@ public class AuthService {
                 ));
 
                 String refreshTokenAggregateId = UUID.randomUUID().toString();
-                TokenResponse tokenResponse = createToken(userAggregateId, refreshTokenAggregateId);
+                TokenResponse tokenResponse = createToken(userInfo.getEmail(), refreshTokenAggregateId);
                 commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                         refreshTokenAggregateId,
                         userInfo.getEmail(),
-                        tokenResponse.refreshToken()
+                        tokenResponse.refreshToken(),
+                        null
                 ));
 
                 return tokenResponse;
@@ -71,26 +74,39 @@ public class AuthService {
         }
     }
 
-    public void logout(String email, String refreshToken) {
-        try {
-            if(tokenProvider.validateToken(refreshToken)) {
-                Claims claims = tokenProvider.parseClaims(refreshToken);
+    public TokenResponse reissue(String email, String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken)) {
+            throw new ApiException(UserMessage.REISSUE_FAIL);
+        }
 
-                commandGateway.sendAndWait(new LogoutCommand(
-                        claims.getSubject(),
-                        email,
-                        refreshToken)
-                );
-            }
-            else
-                throw new ApiException(UserMessage.LOGOUT_FAIL);
-        }
-        catch (Exception e) {
-            throw new ApiException(UserMessage.LOGOUT_FAIL);
-        }
+        String refreshTokenAggregateId = UUID.randomUUID().toString();
+        TokenResponse tokenResponse =createToken(email, refreshTokenAggregateId);
+        Reissue reissue = new Reissue(true, refreshToken, tokenResponse.refreshToken());
+        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
+                refreshTokenAggregateId,
+                email,
+                null,
+                reissue
+        ));
+
+        return tokenResponse;
     }
 
-    private TokenResponse createToken(String userAggregateId, String refreshTokenAggregateId) {
-        return tokenProvider.generateJwtToken(userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
+    public void logout(String email, String refreshToken) {
+        if(tokenProvider.validateToken(refreshToken)) {
+            Claims claims = tokenProvider.parseClaims(refreshToken);
+
+            commandGateway.sendAndWait(new LogoutCommand(
+                    claims.getSubject(),
+                    email,
+                    refreshToken)
+            );
+        }
+        else
+            throw new ApiException(UserMessage.LOGOUT_FAIL);
+    }
+
+    private TokenResponse createToken(String email, String refreshTokenAggregateId) {
+        return tokenProvider.generateJwtToken(email, refreshTokenAggregateId, RoleType.MEMBER);
     }
 }

@@ -11,7 +11,9 @@ public enum UserMessage implements ResponseMessage{
     LOGIN_CONFLICT("이미 로그인이 되어있습니다.", HttpStatus.CONFLICT),
     LOGIN_SUCCESS("로그인에 성공했습니다.", HttpStatus.OK),
     LOGOUT_SUCCESS("로그아웃에 성공했습니다.", HttpStatus.OK),
-    LOGOUT_FAIL("RefreshToken이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED);
+    LOGOUT_FAIL("RefreshToken이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED),
+    REISSUE_SUCCESS("토큰 재발급에 성공하였습니다.", HttpStatus.CREATED),
+    REISSUE_FAIL("RefreshToken이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED);
 
     private final String message;
     private final HttpStatus status;
