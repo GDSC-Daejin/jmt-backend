@@ -34,12 +34,12 @@ public class AuthService {
 
     @Value("${google.client.id}")
     private String googleClientId;
-
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {
+        // TODO : GoogleIdTokenVerifier는 Bean으로 등록하고 써도 될듯???
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
@@ -48,7 +48,8 @@ public class AuthService {
 
             if (googleIdToken == null) {
                 throw new ApiException(AuthMessage.INVALID_TOKEN);
-            } else {
+            }
+            else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
 
                 String userAggregateId = UUID.randomUUID().toString();
@@ -80,7 +81,6 @@ public class AuthService {
 
         String refreshTokenAggregateId = UUID.randomUUID().toString();
         TokenResponse tokenResponse =createToken(email, refreshTokenAggregateId);
-
         Reissue reissue = new Reissue(true, refreshToken, tokenResponse.refreshToken());
         commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                 refreshTokenAggregateId,
@@ -93,22 +93,17 @@ public class AuthService {
     }
 
     public void logout(String email, String refreshToken) {
-        try {
-            if(tokenProvider.validateToken(refreshToken)) {
-                Claims claims = tokenProvider.parseClaims(refreshToken);
+        if(tokenProvider.validateToken(refreshToken)) {
+            Claims claims = tokenProvider.parseClaims(refreshToken);
 
-                commandGateway.sendAndWait(new LogoutCommand(
-                        claims.getSubject(),
-                        email,
-                        refreshToken)
-                );
-            }
-            else
-                throw new ApiException(UserMessage.LOGOUT_FAIL);
+            commandGateway.sendAndWait(new LogoutCommand(
+                    claims.getSubject(),
+                    email,
+                    refreshToken)
+            );
         }
-        catch (Exception e) {
+        else
             throw new ApiException(UserMessage.LOGOUT_FAIL);
-        }
     }
 
     private TokenResponse createToken(String email, String refreshTokenAggregateId) {

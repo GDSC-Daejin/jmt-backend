@@ -34,12 +34,6 @@ public class RefreshTokenQueryEntityManager {
         persistRefreshToken(buildQueryAccount(getRefreshTokenFromEvent(event), event.getEmail()));
     }
 
-    public void validateReissue(String email , Reissue reissue) {
-        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(email);
-        if(!isValidateRefreshToken(reissue.getOldRefreshToken(), refreshTokenEntity.getRefreshToken()))
-            throw new ApiException(UserMessage.REISSUE_FAIL);
-    }
-
     @EventSourcingHandler
     public void logout(LogoutEvent event) {
         RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(event.getEmail());
@@ -48,6 +42,12 @@ public class RefreshTokenQueryEntityManager {
             deleteRefreshToken(refreshTokenEntity);
         else
             throw new ApiException(UserMessage.LOGOUT_FAIL);
+    }
+
+    private void validateReissue(String email , Reissue reissue) {
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(email);
+        if(!isValidateRefreshToken(reissue.getOldRefreshToken(), refreshTokenEntity.getRefreshToken()))
+            throw new ApiException(UserMessage.REISSUE_FAIL);
     }
 
     private RefreshTokenAggregate getRefreshTokenFromEvent(BaseRefreshTokenEvent<String> event) {
