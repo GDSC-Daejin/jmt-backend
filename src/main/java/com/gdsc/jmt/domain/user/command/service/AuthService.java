@@ -24,6 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -39,7 +40,7 @@ public class AuthService {
     @Transactional
     public TokenResponse googleLogin(String idToken) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-//                .setAudience(Collections.singletonList(googleClientId))
+                .setAudience(Collections.singletonList(googleClientId))
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(idToken);
