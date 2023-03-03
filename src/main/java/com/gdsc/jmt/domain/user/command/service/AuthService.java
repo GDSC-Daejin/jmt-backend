@@ -74,10 +74,9 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public TokenResponse reissue(String email, String refreshToken) {
-        if(!tokenProvider.validateToken(refreshToken)) {
-            throw new ApiException(UserMessage.REISSUE_FAIL);
-        }
+        validateRefreshToken(refreshToken);
 
         String refreshTokenAggregateId = UUID.randomUUID().toString();
         TokenResponse tokenResponse =createToken(email, refreshTokenAggregateId);
@@ -92,18 +91,21 @@ public class AuthService {
         return tokenResponse;
     }
 
+    @Transactional
     public void logout(String email, String refreshToken) {
-        if(tokenProvider.validateToken(refreshToken)) {
-            Claims claims = tokenProvider.parseClaims(refreshToken);
+        validateRefreshToken(refreshToken);
 
-            commandGateway.sendAndWait(new LogoutCommand(
-                    claims.getSubject(),
-                    email,
-                    refreshToken)
-            );
-        }
-        else
-            throw new ApiException(UserMessage.LOGOUT_FAIL);
+        Claims claims = tokenProvider.parseClaims(refreshToken);
+        commandGateway.sendAndWait(new LogoutCommand(
+                claims.getSubject(),
+                email,
+                refreshToken)
+        );
+    }
+
+    private void validateRefreshToken(String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken))
+            throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
 
     private TokenResponse createToken(String email, String refreshTokenAggregateId) {

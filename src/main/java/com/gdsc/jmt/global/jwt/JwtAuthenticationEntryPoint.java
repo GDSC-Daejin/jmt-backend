@@ -1,7 +1,7 @@
 package com.gdsc.jmt.global.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gdsc.jmt.global.dto.ApiResponse;
+import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.DefaultMessage;
 import com.gdsc.jmt.global.messege.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,10 +19,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         // 유효한 자격증명을 제공하지 않고 접근하려 할때 401
         ResponseMessage errorMessage = DefaultMessage.UNAUTHORIZED;
-        ApiResponse apiResponse = ApiResponse.createResponseWithMessage(null, errorMessage);
+        JMTApiResponse jmtApiResponse = JMTApiResponse.createResponseWithMessage(null, errorMessage);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(apiResponse);
+        String json = objectMapper.writeValueAsString(jmtApiResponse);
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(errorMessage.getStatus().value());
