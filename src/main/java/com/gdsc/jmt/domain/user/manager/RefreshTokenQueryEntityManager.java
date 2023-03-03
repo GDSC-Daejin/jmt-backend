@@ -41,13 +41,13 @@ public class RefreshTokenQueryEntityManager {
         if(isValidateRefreshToken(event.getRefreshToken(), refreshTokenEntity.getRefreshToken()))
             deleteRefreshToken(refreshTokenEntity);
         else
-            throw new ApiException(UserMessage.LOGOUT_FAIL);
+            throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
 
     private void validateReissue(String email , Reissue reissue) {
         RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(email);
         if(!isValidateRefreshToken(reissue.getOldRefreshToken(), refreshTokenEntity.getRefreshToken()))
-            throw new ApiException(UserMessage.REISSUE_FAIL);
+            throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
 
     private RefreshTokenAggregate getRefreshTokenFromEvent(BaseRefreshTokenEvent<String> event) {

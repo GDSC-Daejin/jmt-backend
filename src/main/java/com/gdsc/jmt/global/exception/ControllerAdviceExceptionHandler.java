@@ -1,6 +1,6 @@
 package com.gdsc.jmt.global.exception;
 
-import com.gdsc.jmt.global.dto.ApiResponse;
+import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.DefaultMessage;
 import com.gdsc.jmt.global.messege.ResponseMessage;
 import org.springframework.http.HttpHeaders;
@@ -64,7 +64,7 @@ public class ControllerAdviceExceptionHandler extends ResponseEntityExceptionHan
     }
 
     private ResponseEntity<Object> makeErrorResponse(ResponseMessage errorMessage) {
-        ApiResponse<?> errorResponse = ApiResponse.createResponseWithMessage(null, errorMessage);
+        JMTApiResponse<?> errorResponse = JMTApiResponse.createResponseWithMessage(null, errorMessage);
         return ResponseEntity.status(errorMessage.getStatus()).body(errorResponse);
     }
 }
