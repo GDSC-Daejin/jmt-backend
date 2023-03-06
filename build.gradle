@@ -22,24 +22,25 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	compileOnly("org.projectlombok:lombok")
+	implementation("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("org.axonframework:axon-test:_")
 
 	//db
 	implementation("org.mariadb.jdbc:mariadb-java-client:_")
 	//Hibernate Validator
 	implementation('org.hibernate.validator:hibernate-validator:_')
-//	implementation('org.glassfish:jakarta.el:_')
 
+	// axon
 	implementation("org.axonframework:axon-spring-boot-starter:_")
 	implementation("org.axonframework:axon-configuration:_")
 
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springdoc:springdoc-openapi-ui:_")
-
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:_")
+	implementation("com.google.api-client:google-api-client:_")
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:_")
 	implementation("io.jsonwebtoken:jjwt-impl:_")

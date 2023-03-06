@@ -1,5 +1,11 @@
 package com.gdsc.jmt.domain.user.command.service;
 
+import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
+import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.jwt.TokenProvider;
+import com.gdsc.jmt.global.jwt.dto.TokenResponse;
+import com.gdsc.jmt.global.messege.AuthMessage;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonArray;
 import com.nimbusds.jose.shaded.gson.JsonElement;
@@ -18,8 +24,10 @@ import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,8 +39,11 @@ public class AppleService {
      * 3. 그 공개키 재료들로 공개키 만들고, 이 공개키로 JWT토큰 부분의 바디 부분의 decode하면 유저 정보
      */
 
-    public String userIdFromApple(String idToken) {
-        StringBuffer result = new StringBuffer();
+    private final TokenProvider tokenProvider;
+    private final CommandGateway commandGateway;
+
+    public TokenResponse appleLogin(String idToken) {
+        StringBuilder result = new StringBuilder();
         try {
             URL url = new URL("https://appleid.apple.com/auth/keys");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -73,9 +84,8 @@ public class AppleService {
         }
         //일치하는 공개키 없음
         if (ObjectUtils.isEmpty(avaliableObject)) {
-            System.out.println("ERROR");
+            throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
-//            throw new BusinessException(ErrorCode.FAILED_TO_FIND_AVALIABLE_RSA);
 
         assert avaliableObject != null;
         PublicKey publicKey = this.getPublicKey(avaliableObject);
@@ -87,7 +97,15 @@ public class AppleService {
         JsonElement appleAlg = userInfoObject.get("sub");
         String userId = appleAlg.getAsString();
 
-        return userId;
+        // JWT 발급 및 Response 반환
+        TokenResponse tokenResponse = createToken(userId);
+        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
+                UUID.randomUUID().toString(),
+                userId,
+                tokenResponse.refreshToken()
+        ));
+
+        return tokenResponse;
     }
     public PublicKey getPublicKey(JsonObject object) {
         String nStr = object.get("n").toString();
@@ -104,8 +122,11 @@ public class AppleService {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePublic(publicKeySpec);
         } catch (Exception exception) {
-//            throw new BusinessException(ErrorCode.FAILED_TO_FIND_AVALIABLE_RSA);
+            throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
-        return null;
+    }
+
+    private TokenResponse createToken(String userId) {
+        return tokenProvider.generateJwtToken(userId, RoleType.MEMBER);
     }
 }
