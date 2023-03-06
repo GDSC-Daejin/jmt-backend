@@ -5,6 +5,7 @@ import com.gdsc.jmt.domain.user.command.controller.springdocs.LogoutSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.ReissueSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.LogoutRequest;
 import com.gdsc.jmt.domain.user.command.dto.SocialLoginRequest;
+import com.gdsc.jmt.domain.user.command.service.AppleService;
 import com.gdsc.jmt.domain.user.command.service.AuthService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final AppleService appleService;
 
     @PostMapping("/auth/google")
     @GoogleLoginSpringDocs
@@ -46,5 +48,11 @@ public class AuthController {
     public JMTApiResponse<?> logout(@AuthenticationPrincipal User user, @RequestBody LogoutRequest logoutRequest) {
         authService.logout(user.getUsername() , logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.LOGOUT_SUCCESS);
+    }
+
+    @PostMapping("/auth/apple")
+    public ApiResponse<TokenResponse> appleLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
+        TokenResponse tokenResponse = appleService.appleLogin(socialLoginRequest.token());
+        return ApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
     }
 }

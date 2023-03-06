@@ -45,6 +45,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:_")
 	implementation("io.jsonwebtoken:jjwt-impl:_")
 	implementation("io.jsonwebtoken:jjwt-jackson:_")
+	implementation("com.nimbusds:nimbus-jose-jwt:_")
 }
 
 tasks.named('test') {
