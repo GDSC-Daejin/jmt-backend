@@ -37,11 +37,10 @@ public class RefreshTokenQueryEntityManager {
     @EventSourcingHandler
     public void logout(LogoutEvent event) {
         RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(event.getEmail());
-
-        if(isValidateRefreshToken(event.getRefreshToken(), refreshTokenEntity.getRefreshToken()))
-            deleteRefreshToken(refreshTokenEntity);
-        else
+        if(refreshTokenEntity == null || !isValidateRefreshToken(event.getRefreshToken(), refreshTokenEntity.getRefreshToken()))
             throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
+
+        deleteRefreshToken(refreshTokenEntity);
     }
 
     private void validateReissue(String email , Reissue reissue) {
