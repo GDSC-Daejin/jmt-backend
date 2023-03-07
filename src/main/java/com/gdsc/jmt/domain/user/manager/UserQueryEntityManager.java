@@ -61,6 +61,7 @@ public class UserQueryEntityManager {
         userEntity.setRoleType(userAggregate.roleType);
         userEntity.setProfileImageUrl(userAggregate.profileImageUrl);
         userEntity.setStatus(userAggregate.status);
+        userEntity.setSocialType(userAggregate.socialType);
 
         return userEntity;
     }

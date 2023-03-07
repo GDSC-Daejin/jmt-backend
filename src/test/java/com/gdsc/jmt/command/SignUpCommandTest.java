@@ -1,8 +1,9 @@
 package com.gdsc.jmt.command;
 
-import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
+import com.gdsc.jmt.domain.user.command.SignUpCommand;
 import com.gdsc.jmt.domain.user.command.aggregate.UserAggregate;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
+import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @SpringBootTest
 @RequiredArgsConstructor
 @ActiveProfiles("dev")
-public class GoogleLoginCommandTest {
+public class SignUpCommandTest {
     private FixtureConfiguration<UserAggregate> fixture;
 
     @BeforeEach
@@ -38,8 +39,8 @@ public class GoogleLoginCommandTest {
         String uuid = UUID.randomUUID().toString();
 
         fixture.given()
-                .when(new GoogleLoginCommand(uuid, userInfo))
+                .when(new SignUpCommand(uuid, userInfo, SocialType.GOOGLE))
                 .expectSuccessfulHandlerExecution()
-                .expectEvents(new CreateUserEvent(uuid, userInfo.getEmail()));
+                .expectEvents(new CreateUserEvent(uuid, userInfo.getEmail(), SocialType.GOOGLE));
     }
 }

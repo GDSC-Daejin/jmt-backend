@@ -46,6 +46,10 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-impl:_")
 	implementation("io.jsonwebtoken:jjwt-jackson:_")
 	implementation("com.nimbusds:nimbus-jose-jwt:_")
+//	//Jackson
+//	implementation ("com.fasterxml.jackson.core:jackson-core:_")
+//	implementation ("com.fasterxml.jackson.core:jackson-annotations:_")
+//	implementation("com.fasterxml.jackson.core:jackson-databind:_")
 }
 
 tasks.named('test') {

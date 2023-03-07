@@ -1,11 +1,14 @@
 package com.gdsc.jmt.domain.user.command.service;
 
-import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
+import com.gdsc.jmt.domain.user.command.SignUpCommand;
 import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
 import com.gdsc.jmt.domain.user.command.info.Reissue;
 import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.domain.user.common.SocialType;
+import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
+import com.gdsc.jmt.domain.user.apple.AppleUtil;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
@@ -41,7 +44,7 @@ public class AuthService {
     public TokenResponse googleLogin(String idToken) {
         // TODO : GoogleIdTokenVerifier는 Bean으로 등록하고 써도 될듯???
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(googleClientId))
+//                .setAudience(Collections.singletonList(googleClientId))
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(idToken);
@@ -52,26 +55,21 @@ public class AuthService {
             else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
 
-                String userAggregateId = UUID.randomUUID().toString();
-                commandGateway.sendAndWait(new GoogleLoginCommand(
-                        userAggregateId,
-                        userInfo
-                ));
+                sendSignUpCommend(userInfo, SocialType.GOOGLE);
 
-                String refreshTokenAggregateId = UUID.randomUUID().toString();
-                TokenResponse tokenResponse = createToken(userInfo.getEmail(), refreshTokenAggregateId);
-                commandGateway.sendAndWait(new PersistRefreshTokenCommand(
-                        refreshTokenAggregateId,
-                        userInfo.getEmail(),
-                        tokenResponse.refreshToken(),
-                        null
-                ));
-
-                return tokenResponse;
+                return sendGenerateJwtTokenCommend(userInfo.getEmail());
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
+    }
+
+    @Transactional
+    public TokenResponse appleLogin(String idToken) {
+        OAuth2UserInfo userInfo = AppleUtil.appleLogin(idToken);
+
+        sendSignUpCommend(userInfo, SocialType.APPLE);
+        return sendGenerateJwtTokenCommend(userInfo.getEmail());
     }
 
     @Transactional
@@ -101,6 +99,26 @@ public class AuthService {
                 email,
                 refreshToken)
         );
+    }
+
+    private void sendSignUpCommend(OAuth2UserInfo userInfo, SocialType socialType) {
+        String userAggregateId = UUID.randomUUID().toString();
+        commandGateway.sendAndWait(new SignUpCommand(
+                userAggregateId,
+                userInfo,
+                socialType));
+    }
+
+    private TokenResponse sendGenerateJwtTokenCommend(String email) {
+        String refreshTokenAggregateId = UUID.randomUUID().toString();
+        TokenResponse tokenResponse = createToken(email, refreshTokenAggregateId);
+        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
+                refreshTokenAggregateId,
+                email,
+                tokenResponse.refreshToken(),
+                null
+        ));
+        return tokenResponse;
     }
 
     private void validateRefreshToken(String refreshToken) {
