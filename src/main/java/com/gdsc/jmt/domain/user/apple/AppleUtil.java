@@ -1,10 +1,8 @@
-package com.gdsc.jmt.domain.user.command.service;
+package com.gdsc.jmt.domain.user.apple;
 
-import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
-import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
+import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.global.exception.ApiException;
-import com.gdsc.jmt.global.jwt.TokenProvider;
-import com.gdsc.jmt.global.jwt.dto.TokenResponse;
 import com.gdsc.jmt.global.messege.AuthMessage;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonArray;
@@ -24,25 +22,15 @@ import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
-import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class AppleService {
+public class AppleUtil {
     /**
      * 1. apple로 부터 공개키 3개 가져옴
      * 2. 내가 클라에서 가져온 token String과 비교해서 써야할 공개키 확인 (kid,alg 값 같은 것)
      * 3. 그 공개키 재료들로 공개키 만들고, 이 공개키로 JWT토큰 부분의 바디 부분의 decode하면 유저 정보
      */
-
-    private final TokenProvider tokenProvider;
-    private final CommandGateway commandGateway;
-
-    public TokenResponse appleLogin(String idToken) {
+    public static OAuth2UserInfo appleLogin(String idToken) {
         StringBuilder result = new StringBuilder();
         try {
             URL url = new URL("https://appleid.apple.com/auth/keys");
@@ -87,27 +75,17 @@ public class AppleService {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
 
-        assert avaliableObject != null;
-        PublicKey publicKey = this.getPublicKey(avaliableObject);
-
-        //여기까지 검증
+        PublicKey publicKey = getPublicKey(avaliableObject);
 
         Claims userInfo = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(idToken).getBody();
         JsonObject userInfoObject = (JsonObject) parser.parse(new Gson().toJson(userInfo));
-        JsonElement appleAlg = userInfoObject.get("sub");
-        String userId = appleAlg.getAsString();
 
-        // JWT 발급 및 Response 반환
-        TokenResponse tokenResponse = createToken(userId);
-        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
-                UUID.randomUUID().toString(),
-                userId,
-                tokenResponse.refreshToken()
-        ));
-
-        return tokenResponse;
+        String userId = userInfoObject.get("sub").getAsString();
+        String appleEmail = userInfoObject.get("email").toString();
+        return new AppleOAuth2UserInfo(userId, appleEmail);
     }
-    public PublicKey getPublicKey(JsonObject object) {
+
+    private static PublicKey getPublicKey(JsonObject object) {
         String nStr = object.get("n").toString();
         String eStr = object.get("e").toString();
 
@@ -124,9 +102,5 @@ public class AppleService {
         } catch (Exception exception) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
-    }
-
-    private TokenResponse createToken(String userId) {
-        return tokenProvider.generateJwtToken(userId, RoleType.MEMBER);
     }
 }

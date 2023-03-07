@@ -5,15 +5,11 @@ import com.gdsc.jmt.domain.user.command.controller.springdocs.LogoutSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.ReissueSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.LogoutRequest;
 import com.gdsc.jmt.domain.user.command.dto.SocialLoginRequest;
-import com.gdsc.jmt.domain.user.command.service.AppleService;
 import com.gdsc.jmt.domain.user.command.service.AuthService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
 import com.gdsc.jmt.global.messege.UserMessage;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    private final AppleService appleService;
 
     @PostMapping("/auth/google")
     @GoogleLoginSpringDocs
@@ -51,8 +46,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth/apple")
-    public ApiResponse<TokenResponse> appleLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
-        TokenResponse tokenResponse = appleService.appleLogin(socialLoginRequest.token());
-        return ApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
+    public JMTApiResponse<TokenResponse> appleLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
+        TokenResponse tokenResponse = authService.appleLogin(socialLoginRequest.token());
+        return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
     }
 }

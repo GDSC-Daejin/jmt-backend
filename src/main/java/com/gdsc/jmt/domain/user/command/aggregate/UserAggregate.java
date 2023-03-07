@@ -1,8 +1,9 @@
 package com.gdsc.jmt.domain.user.command.aggregate;
 
-import com.gdsc.jmt.domain.user.command.GoogleLoginCommand;
+import com.gdsc.jmt.domain.user.command.SignUpCommand;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
 import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.common.Status;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
@@ -19,18 +20,19 @@ public class UserAggregate {
     public String id;
 
     // TODO : 내용 자체는 QueryEntity랑 중복인데 abstract class 만들까???
-    // 아 하면 할수록 코틀린 마렵네
     public String email;
     public String profileImageUrl;
     public String nickname;
+    public SocialType socialType;
     public RoleType roleType;
     public Status status;
 
     @CommandHandler
-    public UserAggregate(GoogleLoginCommand googleLoginCommand) {
+    public UserAggregate(SignUpCommand signUpCommand) {
         AggregateLifecycle.apply(new CreateUserEvent(
-                googleLoginCommand.getId(),
-                googleLoginCommand.getUserInfo().getEmail()
+                signUpCommand.getId(),
+                signUpCommand.getUserInfo().getEmail(),
+                signUpCommand.getSocialType()
         ));
     }
 
@@ -39,5 +41,6 @@ public class UserAggregate {
         this.id = createUserEvent.getId();
         this.email = createUserEvent.getEmail();
         this.status = Status.ACTIVE;
+        this.socialType = createUserEvent.getSocialType();
     }
 }

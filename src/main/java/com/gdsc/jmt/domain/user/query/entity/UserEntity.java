@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.user.query.entity;
 
 import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.common.Status;
 import com.gdsc.jmt.global.entity.BaseTimeEntity;
 import jakarta.annotation.Nullable;
@@ -24,6 +25,10 @@ public class UserEntity extends BaseTimeEntity {
     private String profileImageUrl;
     @Nullable
     private String nickname;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
     @Enumerated(EnumType.STRING)
