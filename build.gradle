@@ -41,6 +41,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:_")
 	implementation("com.google.api-client:google-api-client:_")
+
+	implementation("com.squareup.retrofit2:retrofit:_")
+	implementation("com.squareup.retrofit2:converter-gson:_")
+
+
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:_")
 	implementation("io.jsonwebtoken:jjwt-impl:_")
