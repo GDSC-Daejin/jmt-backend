@@ -78,7 +78,7 @@ public class AppleUtil {
 
         PublicKey publicKey = getPublicKey(avaliableObject);
 
-        Claims userInfo = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(idToken).getBody();
+        Claims userInfo = Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(idToken).getBody();
         JsonObject userInfoObject = (JsonObject) JsonParser.parseString(new Gson().toJson(userInfo));
 
         String userId = userInfoObject.get("sub").getAsString();
