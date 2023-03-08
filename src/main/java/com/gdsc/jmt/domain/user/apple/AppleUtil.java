@@ -4,11 +4,11 @@ import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.AuthMessage;
-import com.nimbusds.jose.shaded.gson.Gson;
-import com.nimbusds.jose.shaded.gson.JsonArray;
-import com.nimbusds.jose.shaded.gson.JsonElement;
-import com.nimbusds.jose.shaded.gson.JsonObject;
-import com.nimbusds.jose.shaded.gson.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import java.io.BufferedReader;
@@ -23,6 +23,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Objects;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.boot.json.BasicJsonParser;
 
 public class AppleUtil {
     /**
@@ -46,8 +47,8 @@ public class AppleUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        JsonParser parser = new JsonParser();
-        JsonObject keys = (JsonObject) parser.parse(result.toString());
+
+        JsonObject keys = (JsonObject) JsonParser.parseString(result.toString());
         JsonArray keyArray = (JsonArray) keys.get("keys");
 
         //클라이언트로부터 가져온 identity token String decode
@@ -55,8 +56,8 @@ public class AppleUtil {
         String header = new String(Base64.getDecoder().decode(decodeArray[0]));
 
         //apple에서 제공해주는 kid값과 일치하는지 알기 위해
-        JsonElement kid = ((JsonObject) parser.parse(header)).get("kid");
-        JsonElement alg = ((JsonObject) parser.parse(header)).get("alg");
+        JsonElement kid = ((JsonObject) JsonParser.parseString(header)).get("kid");
+        JsonElement alg = ((JsonObject) JsonParser.parseString(header)).get("alg");
 
         //써야하는 Element (kid, alg 일치하는 element)
         JsonObject avaliableObject = null;
@@ -78,10 +79,10 @@ public class AppleUtil {
         PublicKey publicKey = getPublicKey(avaliableObject);
 
         Claims userInfo = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(idToken).getBody();
-        JsonObject userInfoObject = (JsonObject) parser.parse(new Gson().toJson(userInfo));
+        JsonObject userInfoObject = (JsonObject) JsonParser.parseString(new Gson().toJson(userInfo));
 
         String userId = userInfoObject.get("sub").getAsString();
-        String appleEmail = userInfoObject.get("email").toString();
+        String appleEmail = userInfoObject.get("email").toString().replaceAll("\"", "");;
         return new AppleOAuth2UserInfo(userId, appleEmail);
     }
 
