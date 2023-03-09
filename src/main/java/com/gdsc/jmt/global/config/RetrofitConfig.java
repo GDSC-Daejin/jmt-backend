@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class RetrofitConfig {
-    private static final String APPLE_URL = "https://appleid.apple.com/auth/keys";
+    private static final String APPLE_URL = "https://appleid.apple.com/";
 
     @Bean
     public OkHttpClient okHttpClient() {
