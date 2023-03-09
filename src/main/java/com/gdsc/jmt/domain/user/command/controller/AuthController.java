@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.user.command.controller;
 
+import com.gdsc.jmt.domain.user.command.controller.springdocs.AppleLoginSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.GoogleLoginSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.LogoutSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.ReissueSpringDocs;
@@ -46,6 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/apple")
+    @AppleLoginSpringDocs
     public JMTApiResponse<TokenResponse> appleLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
         TokenResponse tokenResponse = authService.appleLogin(socialLoginRequest.token());
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
