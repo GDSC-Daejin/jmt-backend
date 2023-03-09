@@ -66,7 +66,7 @@ public class AuthService {
 
     @Transactional
     public TokenResponse appleLogin(String idToken) {
-        OAuth2UserInfo userInfo = AppleUtil.appleLogin(idToken);
+        OAuth2UserInfo userInfo = AppleUtil.getAppleUserInfo(idToken);
 
         sendSignUpCommend(userInfo, SocialType.APPLE);
         return sendGenerateJwtTokenCommend(userInfo.getEmail());

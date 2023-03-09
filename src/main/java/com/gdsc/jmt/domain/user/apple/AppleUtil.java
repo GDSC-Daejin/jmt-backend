@@ -3,13 +3,16 @@ package com.gdsc.jmt.domain.user.apple;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.http.AppleRestServerAPI;
 import com.gdsc.jmt.global.messege.AuthMessage;
-import com.nimbusds.jose.shaded.gson.Gson;
-import com.nimbusds.jose.shaded.gson.JsonArray;
-import com.nimbusds.jose.shaded.gson.JsonElement;
-import com.nimbusds.jose.shaded.gson.JsonObject;
-import com.nimbusds.jose.shaded.gson.JsonParser;
+import com.gdsc.jmt.global.messege.DefaultMessage;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,76 +24,77 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.ObjectUtils;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.BasicJsonParser;
+import org.springframework.stereotype.Component;
+import retrofit2.Call;
+import retrofit2.Response;
+
+@Component
 public class AppleUtil {
+    private static AppleRestServerAPI appleRestServerAPI;
+
+    @Autowired
+    public AppleUtil(AppleRestServerAPI appleRestServerAPI) {
+        AppleUtil.appleRestServerAPI = appleRestServerAPI;
+    }
+
     /**
      * 1. apple로 부터 공개키 3개 가져옴
      * 2. 내가 클라에서 가져온 token String과 비교해서 써야할 공개키 확인 (kid,alg 값 같은 것)
      * 3. 그 공개키 재료들로 공개키 만들고, 이 공개키로 JWT토큰 부분의 바디 부분의 decode하면 유저 정보
      */
-    public static OAuth2UserInfo appleLogin(String idToken) {
-        StringBuilder result = new StringBuilder();
-        try {
-            URL url = new URL("https://appleid.apple.com/auth/keys");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-            String line = "";
-
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        JsonParser parser = new JsonParser();
-        JsonObject keys = (JsonObject) parser.parse(result.toString());
-        JsonArray keyArray = (JsonArray) keys.get("keys");
-
+    public static OAuth2UserInfo getAppleUserInfo(String idToken) {
         //클라이언트로부터 가져온 identity token String decode
         String[] decodeArray = idToken.split("\\.");
         String header = new String(Base64.getDecoder().decode(decodeArray[0]));
 
         //apple에서 제공해주는 kid값과 일치하는지 알기 위해
-        JsonElement kid = ((JsonObject) parser.parse(header)).get("kid");
-        JsonElement alg = ((JsonObject) parser.parse(header)).get("alg");
+        String kid = ((JsonObject) JsonParser.parseString(header)).get("kid").getAsString();
+        String alg = ((JsonObject) JsonParser.parseString(header)).get("alg").getAsString();
 
-        //써야하는 Element (kid, alg 일치하는 element)
-        JsonObject avaliableObject = null;
-        for (int i = 0; i < keyArray.size(); i++) {
-            JsonObject appleObject = (JsonObject) keyArray.get(i);
-            JsonElement appleKid = appleObject.get("kid");
-            JsonElement appleAlg = appleObject.get("alg");
+        try {
+            Call<Keys> call = appleRestServerAPI.sendAPI("application/json");
+            Response<Keys> response = call.execute();
 
-            if (Objects.equals(appleKid, kid) && Objects.equals(appleAlg, alg)) {
-                avaliableObject = appleObject;
-                break;
-            }
+            Key key = findCorrectElement(response.body().getKeys(), kid, alg);
+            PublicKey publicKey = getPublicKey(key);
+
+            Claims userInfo = Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(idToken).getBody();
+            JsonObject userInfoObject = (JsonObject) JsonParser.parseString(new Gson().toJson(userInfo));
+
+            String userId = userInfoObject.get("sub").getAsString();
+            String appleEmail = userInfoObject.get("email").getAsString();
+            return new AppleOAuth2UserInfo(userId, appleEmail);
         }
-        //일치하는 공개키 없음
-        if (ObjectUtils.isEmpty(avaliableObject)) {
-            throw new ApiException(AuthMessage.INVALID_TOKEN);
+        catch (IOException e) {
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
         }
-
-        PublicKey publicKey = getPublicKey(avaliableObject);
-
-        Claims userInfo = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(idToken).getBody();
-        JsonObject userInfoObject = (JsonObject) parser.parse(new Gson().toJson(userInfo));
-
-        String userId = userInfoObject.get("sub").getAsString();
-        String appleEmail = userInfoObject.get("email").toString();
-        return new AppleOAuth2UserInfo(userId, appleEmail);
     }
 
-    private static PublicKey getPublicKey(JsonObject object) {
-        String nStr = object.get("n").toString();
-        String eStr = object.get("e").toString();
+    private static Key findCorrectElement(List<Key> keys, String kid, String alg) {
+        for(Key key : keys) {
+            String appleKid = key.getKid();
+            String appleAlg = key.getAlg();
+            if(appleKid.equals(kid) && appleAlg.equals(alg)) {
+                return key;
+            }
+        }
 
-        byte[] nBytes = Base64.getUrlDecoder().decode(nStr.substring(1, nStr.length() - 1));
-        byte[] eBytes = Base64.getUrlDecoder().decode(eStr.substring(1, eStr.length() - 1));
+        throw new ApiException(AuthMessage.INVALID_TOKEN);
+    }
+
+    private static PublicKey getPublicKey(Key key) {
+        String nStr = key.getN();
+        String eStr = key.getE();
+
+        byte[] nBytes = Base64.getUrlDecoder().decode(nStr);
+        byte[] eBytes = Base64.getUrlDecoder().decode(eStr);
 
         BigInteger n = new BigInteger(1, nBytes);
         BigInteger e = new BigInteger(1, eBytes);
