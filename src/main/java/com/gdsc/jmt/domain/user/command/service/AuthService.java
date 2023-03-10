@@ -44,7 +44,7 @@ public class AuthService {
     public TokenResponse googleLogin(String idToken) {
         // TODO : GoogleIdTokenVerifier는 Bean으로 등록하고 써도 될듯???
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-//                .setAudience(Collections.singletonList(googleClientId))
+                .setAudience(Collections.singletonList(googleClientId))
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(idToken);
@@ -54,9 +54,7 @@ public class AuthService {
             }
             else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
-
                 sendSignUpCommend(userInfo, SocialType.GOOGLE);
-
                 return sendGenerateJwtTokenCommend(userInfo.getEmail());
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
