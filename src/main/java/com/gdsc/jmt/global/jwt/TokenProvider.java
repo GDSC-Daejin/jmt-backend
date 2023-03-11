@@ -38,13 +38,14 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenResponse generateJwtToken(String id, String refreshTokenAggregateId, RoleType role) {
+    public TokenResponse generateJwtToken(String id, String userAggregateId, String refreshTokenAggregateId, RoleType role) {
         long now = (new Date()).getTime();
 
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
                 .setSubject(id)                             // payload "sub": "name"
                 .claim(AUTHORITIES_KEY, role)        // payload "auth": "ROLE_USER"
+                .setId(userAggregateId)
                 .setExpiration(accessTokenExpiresIn)        // payload "exp": 1516239022 (예시)
                 .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
                 .compact();
