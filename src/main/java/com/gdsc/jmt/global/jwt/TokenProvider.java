@@ -2,9 +2,11 @@ package com.gdsc.jmt.global.jwt;
 
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
 import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +40,18 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenResponse generateJwtToken(String id, String userAggregateId, String refreshTokenAggregateId, RoleType role) {
+    public TokenResponse generateJwtToken(String email, String userAggregateId, String refreshTokenAggregateId, RoleType role) {
         long now = (new Date()).getTime();
 
+        Map<String, Object> payloads = Map.of(
+                "email", email,
+                "aggregateId", userAggregateId,
+                AUTHORITIES_KEY, role);
+
+
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-        String accessToken = Jwts.builder()
-                .setSubject(id)                             // payload "sub": "name"
-                .claim(AUTHORITIES_KEY, role)        // payload "auth": "ROLE_USER"
-                .setId(userAggregateId)
+        String accessToken = Jwts.builder() // payload "email": "email"
+                .setClaims(payloads)           // payload "aggregatedId : "userAggregateId" , "auth": "ROLE_USER"
                 .setExpiration(accessTokenExpiresIn)        // payload "exp": 1516239022 (예시)
                 .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
                 .compact();
@@ -73,7 +79,7 @@ public class TokenProvider {
                         .toList();
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = new UserInfo(claims.get("email").toString(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 

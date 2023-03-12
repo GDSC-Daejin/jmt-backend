@@ -10,11 +10,11 @@ import com.gdsc.jmt.domain.user.command.service.AuthService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.UserMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,16 +34,15 @@ public class AuthController {
 
     @PostMapping("/token")
     @ReissueSpringDocs
-    public JMTApiResponse<TokenResponse> reissue(@AuthenticationPrincipal User user, @RequestBody LogoutRequest logoutRequest) {
-        String userAggregateId = authService.findUserByEmail(user.getUsername());
-        TokenResponse tokenResponse = authService.reissue(user.getUsername(), userAggregateId,logoutRequest.refreshToken());
+    public JMTApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
+        TokenResponse tokenResponse = authService.reissue(user.getEmail(), user.getAggreagatedId(),logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.REISSUE_SUCCESS);
     }
 
     @DeleteMapping("/user")
     @LogoutSpringDocs
-    public JMTApiResponse<?> logout(@AuthenticationPrincipal User user, @RequestBody LogoutRequest logoutRequest) {
-        authService.logout(user.getUsername() , logoutRequest.refreshToken());
+    public JMTApiResponse<?> logout(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
+        authService.logout(user.getEmail() , logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.LOGOUT_SUCCESS);
     }
 

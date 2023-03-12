@@ -9,7 +9,6 @@ import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.apple.AppleUtil;
-import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
@@ -21,7 +20,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Value;
@@ -131,10 +129,5 @@ public class AuthService {
 
     private TokenResponse createToken(String email, String userAggregateId, String refreshTokenAggregateId) {
         return tokenProvider.generateJwtToken(email, userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
-    }
-
-    //TODO : 이거 여기 위치가 맞는지는 모르겠어요
-    public String findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND)).getUserAggregateId();
     }
 }
