@@ -28,6 +28,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -37,6 +38,9 @@ public class AuthService {
 
     @Value("${google.client.id}")
     private String googleClientId;
+
+    @Value("${apple.side.google.client.id}")
+    private String applieSidegoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
 
@@ -44,7 +48,7 @@ public class AuthService {
     public TokenResponse googleLogin(String idToken) {
         // TODO : GoogleIdTokenVerifier는 Bean으로 등록하고 써도 될듯???
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(googleClientId))
+                .setAudience(Arrays.asList(googleClientId, applieSidegoogleClientId))
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(idToken);
