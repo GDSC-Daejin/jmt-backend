@@ -9,6 +9,7 @@ import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.apple.AppleUtil;
+import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
@@ -43,6 +44,7 @@ public class AuthService {
     private String applieSidegoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
+    private UserRepository userRepository;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {
@@ -58,8 +60,8 @@ public class AuthService {
             }
             else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
-                sendSignUpCommend(userInfo, SocialType.GOOGLE);
-                return sendGenerateJwtTokenCommend(userInfo.getEmail());
+                String userAggregateId = sendSignUpCommand(userInfo, SocialType.GOOGLE);
+                return sendGenerateJwtTokenCommend(userInfo.getEmail(), userAggregateId);
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
@@ -70,16 +72,16 @@ public class AuthService {
     public TokenResponse appleLogin(String idToken) {
         OAuth2UserInfo userInfo = AppleUtil.getAppleUserInfo(idToken);
 
-        sendSignUpCommend(userInfo, SocialType.APPLE);
-        return sendGenerateJwtTokenCommend(userInfo.getEmail());
+        String userAggregateId = sendSignUpCommand(userInfo, SocialType.APPLE);
+        return sendGenerateJwtTokenCommend(userInfo.getEmail(), userAggregateId);
     }
 
     @Transactional
-    public TokenResponse reissue(String email, String refreshToken) {
+    public TokenResponse reissue(String email, String userAggregateId, String refreshToken) {
         validateRefreshToken(refreshToken);
 
         String refreshTokenAggregateId = UUID.randomUUID().toString();
-        TokenResponse tokenResponse =createToken(email, refreshTokenAggregateId);
+        TokenResponse tokenResponse = createToken(email, userAggregateId, refreshTokenAggregateId);
         Reissue reissue = new Reissue(true, refreshToken, tokenResponse.refreshToken());
         commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                 refreshTokenAggregateId,
@@ -103,17 +105,18 @@ public class AuthService {
         );
     }
 
-    private void sendSignUpCommend(OAuth2UserInfo userInfo, SocialType socialType) {
+    private String sendSignUpCommand(OAuth2UserInfo userInfo, SocialType socialType) {
         String userAggregateId = UUID.randomUUID().toString();
         commandGateway.sendAndWait(new SignUpCommand(
                 userAggregateId,
                 userInfo,
                 socialType));
+        return userAggregateId;
     }
 
-    private TokenResponse sendGenerateJwtTokenCommend(String email) {
+    private TokenResponse sendGenerateJwtTokenCommend(String email, String userAggregateId) {
         String refreshTokenAggregateId = UUID.randomUUID().toString();
-        TokenResponse tokenResponse = createToken(email, refreshTokenAggregateId);
+        TokenResponse tokenResponse = createToken(email, userAggregateId, refreshTokenAggregateId);
         commandGateway.sendAndWait(new PersistRefreshTokenCommand(
                 refreshTokenAggregateId,
                 email,
@@ -128,7 +131,7 @@ public class AuthService {
             throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
 
-    private TokenResponse createToken(String email, String refreshTokenAggregateId) {
-        return tokenProvider.generateJwtToken(email, refreshTokenAggregateId, RoleType.MEMBER);
+    private TokenResponse createToken(String email, String userAggregateId, String refreshTokenAggregateId) {
+        return tokenProvider.generateJwtToken(email, userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
     }
 }
