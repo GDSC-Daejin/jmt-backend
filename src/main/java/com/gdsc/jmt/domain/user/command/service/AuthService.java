@@ -3,10 +3,12 @@ package com.gdsc.jmt.domain.user.command.service;
 import com.gdsc.jmt.domain.user.command.SignUpCommand;
 import com.gdsc.jmt.domain.user.command.LogoutCommand;
 import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
+import com.gdsc.jmt.domain.user.command.dto.AndroidAppleLoginRequest;
 import com.gdsc.jmt.domain.user.command.info.Reissue;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
+import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.apple.AppleUtil;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
@@ -41,7 +43,7 @@ public class AuthService {
     private String googleClientId;
 
     @Value("${apple.side.google.client.id}")
-    private String applieSidegoogleClientId;
+    private String appleSideGoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
     private UserRepository userRepository;
@@ -50,7 +52,7 @@ public class AuthService {
     public TokenResponse googleLogin(String idToken) {
         // TODO : GoogleIdTokenVerifier는 Bean으로 등록하고 써도 될듯???
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Arrays.asList(googleClientId, applieSidegoogleClientId))
+                .setAudience(Arrays.asList(googleClientId, appleSideGoogleClientId))
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(idToken);
@@ -66,6 +68,17 @@ public class AuthService {
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
         }
+    }
+
+    public TokenResponse appleLoginFromAndroid(AndroidAppleLoginRequest androidAppleLoginRequest) {
+        if(!appleSideGoogleClientId.equals(androidAppleLoginRequest.clientId())) {
+            throw new ApiException(AuthMessage.LOGIN_BAD_REQUEST);
+        }
+
+        // TODO : 안드로이드에서 애플 로그인 Request는 현재 SUB가 존재하지 않음 (애초에 SUB 사용안하고 있음 지금)
+        OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("이 sub는 없습니다", androidAppleLoginRequest.email());
+        sendSignUpCommend(userInfo, SocialType.APPLE);
+        return sendGenerateJwtTokenCommend(androidAppleLoginRequest.email());
     }
 
     @Transactional

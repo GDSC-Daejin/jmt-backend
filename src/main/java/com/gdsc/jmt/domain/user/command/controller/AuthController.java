@@ -1,9 +1,7 @@
 package com.gdsc.jmt.domain.user.command.controller;
 
-import com.gdsc.jmt.domain.user.command.controller.springdocs.AppleLoginSpringDocs;
-import com.gdsc.jmt.domain.user.command.controller.springdocs.GoogleLoginSpringDocs;
-import com.gdsc.jmt.domain.user.command.controller.springdocs.LogoutSpringDocs;
-import com.gdsc.jmt.domain.user.command.controller.springdocs.ReissueSpringDocs;
+import com.gdsc.jmt.domain.user.command.controller.springdocs.*;
+import com.gdsc.jmt.domain.user.command.dto.AndroidAppleLoginRequest;
 import com.gdsc.jmt.domain.user.command.dto.LogoutRequest;
 import com.gdsc.jmt.domain.user.command.dto.SocialLoginRequest;
 import com.gdsc.jmt.domain.user.command.service.AuthService;
@@ -32,6 +30,20 @@ public class AuthController {
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
     }
 
+    @PostMapping("/auth/android/apple")
+    @AndroidAppleLoginSpringDocs
+    public JMTApiResponse<TokenResponse> appleLoginFromAndroid(@RequestBody AndroidAppleLoginRequest androidAppleLoginRequest) {
+        TokenResponse tokenResponse = authService.appleLoginFromAndroid(androidAppleLoginRequest);
+        return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
+    }
+
+    @PostMapping("/auth/apple")
+    @AppleLoginSpringDocs
+    public JMTApiResponse<TokenResponse> appleLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
+        TokenResponse tokenResponse = authService.appleLogin(socialLoginRequest.token());
+        return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
+    }
+
     @PostMapping("/token")
     @ReissueSpringDocs
     public JMTApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
@@ -44,12 +56,5 @@ public class AuthController {
     public JMTApiResponse<?> logout(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
         authService.logout(user.getEmail() , logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.LOGOUT_SUCCESS);
-    }
-
-    @PostMapping("/auth/apple")
-    @AppleLoginSpringDocs
-    public JMTApiResponse<TokenResponse> appleLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
-        TokenResponse tokenResponse = authService.appleLogin(socialLoginRequest.token());
-        return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
     }
 }

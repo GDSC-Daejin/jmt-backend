@@ -1,4 +1,4 @@
-package com.gdsc.jmt.global.interceptor;
+package com.gdsc.jmt.global.logs.interceptor;
 
 import org.axonframework.eventhandling.EventMessage;
 import org.axonframework.messaging.MessageDispatchInterceptor;
