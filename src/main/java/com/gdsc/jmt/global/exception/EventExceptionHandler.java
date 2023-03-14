@@ -1,6 +1,6 @@
 package com.gdsc.jmt.global.exception;
 
-import com.gdsc.jmt.global.interceptor.EventLoggingDispatchInterceptor;
+import com.gdsc.jmt.global.logs.interceptor.EventLoggingDispatchInterceptor;
 import org.axonframework.eventhandling.EventMessage;
 import org.axonframework.eventhandling.EventMessageHandler;
 import org.axonframework.eventhandling.ListenerInvocationErrorHandler;

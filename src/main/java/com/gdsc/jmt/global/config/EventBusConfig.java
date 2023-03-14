@@ -1,6 +1,6 @@
 package com.gdsc.jmt.global.config;
 
-import com.gdsc.jmt.global.interceptor.EventLoggingDispatchInterceptor;
+import com.gdsc.jmt.global.logs.interceptor.EventLoggingDispatchInterceptor;
 import org.axonframework.eventhandling.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
