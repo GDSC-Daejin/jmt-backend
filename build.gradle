@@ -46,6 +46,8 @@ dependencies {
 	implementation("com.squareup.retrofit2:retrofit:_")
 	implementation("com.squareup.retrofit2:converter-gson:_")
 
+	implementation("org.hibernate:hibernate-spatial:_")
+
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:_")
 	implementation("io.jsonwebtoken:jjwt-impl:_")

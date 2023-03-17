@@ -32,7 +32,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -77,8 +76,8 @@ public class AuthService {
 
         // TODO : 안드로이드에서 애플 로그인 Request는 현재 SUB가 존재하지 않음 (애초에 SUB 사용안하고 있음 지금)
         OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("이 sub는 없습니다", androidAppleLoginRequest.email());
-        sendSignUpCommend(userInfo, SocialType.APPLE);
-        return sendGenerateJwtTokenCommend(androidAppleLoginRequest.email());
+        String userAggregateId = sendSignUpCommand(userInfo, SocialType.APPLE);
+        return sendGenerateJwtTokenCommend(androidAppleLoginRequest.email(), userAggregateId);
     }
 
     @Transactional
