@@ -24,7 +24,7 @@ public class RecommendRestaurantEntity {
     private CategoryEntity category;
 
     @OneToMany(
-            mappedBy = "tb_recommend_restaurant",
+            mappedBy = "recommendRestaurant",
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
