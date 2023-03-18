@@ -37,7 +37,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
     @Value("${google.client.id}")
     private String googleClientId;
 
@@ -45,7 +44,6 @@ public class AuthService {
     private String appleSideGoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
-    private UserRepository userRepository;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {
