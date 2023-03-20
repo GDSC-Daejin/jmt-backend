@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.command.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +22,9 @@ public class CreateRestaurantRequest {
         @Schema(description = "임시 식당 이름", example = "1")
         private Long categoryId;
 
-//        @Schema(description = "사진 데이터")
-//        private List<MultipartFile> pictures;
+        @JsonIgnore
+        @Schema(description = "사진 데이터")
+        private List<MultipartFile> pictures;
 
         @Schema(description = "주류 유무", example = "true")
         private Boolean canDrinkLiquor;
