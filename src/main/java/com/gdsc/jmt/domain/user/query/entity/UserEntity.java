@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String email;
     private String profileImageUrl;
-    @Nullable
+    @Nullable @UniqueElements
     private String nickname;
 
     @Enumerated(EnumType.STRING)

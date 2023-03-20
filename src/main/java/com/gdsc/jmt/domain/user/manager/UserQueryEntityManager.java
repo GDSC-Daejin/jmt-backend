@@ -3,8 +3,11 @@ package com.gdsc.jmt.domain.user.manager;
 import com.gdsc.jmt.domain.user.command.aggregate.UserAggregate;
 import com.gdsc.jmt.domain.user.command.event.BaseUserEvent;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
+import com.gdsc.jmt.domain.user.command.event.UpdateUserNickNameEvent;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
+import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.messege.UserMessage;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.eventsourcing.EventSourcingRepository;
@@ -79,5 +82,17 @@ public class UserQueryEntityManager {
 
     private void persistUser(UserEntity userEntity) {
         userRepository.save(userEntity);
+    }
+
+    @EventSourcingHandler
+    private void updateUserNickname(UpdateUserNickNameEvent updateUserNickNameEvent) {
+        UserAggregate userAggregate = getUserFromEvent(updateUserNickNameEvent);
+        Optional<UserEntity> userEntity = userRepository.findByNickname(userAggregate.nickname);
+        if(userEntity.isPresent()) {
+            throw new ApiException(UserMessage.NICKNAME_IS_DUPLICATED);
+        }
+        UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
+        updateUserEntity.setNickname(userAggregate.nickname);
+        persistUser(updateUserEntity);
     }
 }

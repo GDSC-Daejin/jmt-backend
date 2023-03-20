@@ -45,7 +45,6 @@ public class AuthService {
     private String appleSideGoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
-    private UserRepository userRepository;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {

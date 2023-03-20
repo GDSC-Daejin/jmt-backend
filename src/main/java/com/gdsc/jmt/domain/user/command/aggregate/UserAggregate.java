@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.user.command.aggregate;
 
 import com.gdsc.jmt.domain.user.command.SignUpCommand;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
+import com.gdsc.jmt.domain.user.command.event.UpdateUserNickNameEvent;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.common.Status;
@@ -42,5 +43,11 @@ public class UserAggregate {
         this.email = createUserEvent.getEmail();
         this.status = Status.ACTIVE;
         this.socialType = createUserEvent.getSocialType();
+    }
+
+    @EventSourcingHandler
+    public void UpdateUserNickName(UpdateUserNickNameEvent updateUserNickNameEvent) {
+        this.id = updateUserNickNameEvent.getId();
+        this.nickname = updateUserNickNameEvent.getNickName();
     }
 }
