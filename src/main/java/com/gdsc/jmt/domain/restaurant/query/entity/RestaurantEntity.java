@@ -1,6 +1,5 @@
 package com.gdsc.jmt.domain.restaurant.query.entity;
 
-import com.gdsc.jmt.domain.restaurant.query.entity.embedded.Coordinate;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

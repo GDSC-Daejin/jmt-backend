@@ -10,14 +10,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @FirstVersionRestController
 @RequiredArgsConstructor
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
-    // TODO : Security 적용 전 로직
-    @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // TODO : 네이버 API 연동 전, Security 적용 전 로직
+    @PostMapping(value = "/restaurant", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     public JMTApiResponse<?> createRestaurant(@ModelAttribute CreateRestaurantRequest createRestaurantRequest) {
         CreatedRestaurantResponse response = restaurantService.createRestaurant(createRestaurantRequest);
         return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RESTAURANT_CREATED);

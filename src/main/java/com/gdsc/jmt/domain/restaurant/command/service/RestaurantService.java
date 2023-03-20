@@ -23,7 +23,7 @@ public class RestaurantService {
         RecommendRestaurantRequest recommendRestaurantRequest = RecommendRestaurantRequest.builder()
                 .introduce(createRestaurantRequest.getIntroduce())
                 .categoryId(createRestaurantRequest.getCategoryId())
-                .pictures(createRestaurantRequest.getPictures())
+//                .pictures(createRestaurantRequest.getPictures())
                 .canDrinkLiquor(createRestaurantRequest.getCanDrinkLiquor())
                 .goWellWithLiquor(createRestaurantRequest.getGoWellWithLiquor())
                 .recommendMenu(createRestaurantRequest.getRecommendMenu())
@@ -41,7 +41,7 @@ public class RestaurantService {
 
     private String createRecommendRestaurant(RecommendRestaurantRequest recommendRestaurantRequest, String restaurantName) {
         String aggregateId = UUID.randomUUID().toString();
-        commandGateway.send(new CreateRecommendRestaurantCommand(
+        commandGateway.sendAndWait(new CreateRecommendRestaurantCommand(
                 aggregateId,
                 recommendRestaurantRequest,
                 restaurantName

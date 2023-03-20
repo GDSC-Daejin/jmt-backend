@@ -20,8 +20,9 @@ public class CreateRestaurantRequest {
         private String introduce;
         @Schema(description = "임시 식당 이름", example = "1")
         private Long categoryId;
-        @Schema(description = "사진 데이터")
-        private List<MultipartFile> pictures;
+
+//        @Schema(description = "사진 데이터")
+//        private List<MultipartFile> pictures;
 
         @Schema(description = "주류 유무", example = "true")
         private Boolean canDrinkLiquor;
