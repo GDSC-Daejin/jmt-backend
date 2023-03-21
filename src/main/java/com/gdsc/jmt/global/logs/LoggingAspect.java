@@ -1,6 +1,7 @@
 package com.gdsc.jmt.global.logs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -68,14 +70,33 @@ public class LoggingAspect {
     }
 
     /* printing request parameter or request body */
-    private Map<String, Object> params(JoinPoint joinPoint) {
+    private Map<String, Object> params(JoinPoint joinPoint) throws IllegalAccessException {
         CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
         String[] parameterNames = codeSignature.getParameterNames();
         Object[] args = joinPoint.getArgs();
         Map<String, Object> params = new HashMap<>();
         for (int i = 0; i < parameterNames.length; i++) {
-            params.put(parameterNames[i], args[i]);
+            // TODO : MultipartFile 이슈로 임시 해결...
+            if(args[i] instanceof CreateRestaurantRequest) {
+                paramsForMultipartFile((CreateRestaurantRequest) args[i], params);
+            }
+            else
+                params.put(parameterNames[i], args[i]);
         }
         return params;
+    }
+
+    private void paramsForMultipartFile(CreateRestaurantRequest request, Map<String, Object> params) {
+        try {
+            Field[] fields = CreateRestaurantRequest.class.getDeclaredFields();
+            for(Field field : request.getClass().getDeclaredFields()) {
+                if(field.getName().equals("pictures"))
+                    continue;
+                field.setAccessible(true);
+                params.put(field.getName(), field.get(request));
+            }
+        }
+        catch (IllegalAccessException ex) {
+        }
     }
 }
