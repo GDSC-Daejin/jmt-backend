@@ -5,6 +5,7 @@ import com.gdsc.jmt.domain.category.query.repository.CategoryRepository;
 import com.gdsc.jmt.domain.restaurant.command.aggregate.RecommendRestaurantAggregate;
 import com.gdsc.jmt.domain.restaurant.command.event.CreateRecommendRestaurantEvent;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity.RecommendRestaurantEntityBuilder;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
@@ -31,17 +32,8 @@ public class RecommendRestaurantQueryEntityManager {
 
     @EventSourcingHandler
     public void on(CreateRecommendRestaurantEvent event) {
-        // TODO : 네이버 API 연동전 로직
-        Optional<RestaurantEntity> restaurant = restaurantRepository.findByName(event.getRestaurantName());
-        // NOT FOUND
-        if(restaurant.isEmpty())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
-        Optional<RecommendRestaurantEntity> recommendRestaurant = recommendRestaurantRepository.findByRestaurant(restaurant.get());
-        // CONFLICT
-        if(recommendRestaurant.isPresent())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
-
-        persistRecommendRestaurant(createRecommendRestaurant(getRecommendRestaurantFromEvent(event), restaurant.get()));
+        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(event.getRestaurantName(), event.getRecommendRestaurantRequest().getCategoryId());
+        persistRecommendRestaurant(createRecommendRestaurant(getRecommendRestaurantFromEvent(event), recommendRestaurantEntityBuilder));
     }
 
     private RecommendRestaurantAggregate getRecommendRestaurantFromEvent(BaseEvent<String> event) {
@@ -50,19 +42,43 @@ public class RecommendRestaurantQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private RecommendRestaurantEntity createRecommendRestaurant(RecommendRestaurantAggregate recommendRestaurantAggregate, RestaurantEntity restaurant) {
-        Optional<CategoryEntity> category = categoryRepository.findById(recommendRestaurantAggregate.getCategoryId());
+    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantName, final Long categoryId) {
+        RestaurantEntity restaurant = validateRestaurant(restaurantName);
+        CategoryEntity category = validateCategory(categoryId);
+        validateConflict(restaurant);
+
+        return RecommendRestaurantEntity.builder()
+                .restaurant(restaurant)
+                .category(category);
+    }
+
+    private RestaurantEntity validateRestaurant(final String restaurantName) {
+        // TODO : 네이버 API 연동전 로직
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findByName(restaurantName);
+        if(restaurant.isEmpty())
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        return  restaurant.get();
+    }
+
+    private CategoryEntity validateCategory(final Long categoryId) {
+        Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
+        if(category.isEmpty())
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        return category.get();
+    }
+
+    private void validateConflict(RestaurantEntity restaurant) {
+        Optional<RecommendRestaurantEntity> recommendRestaurant = recommendRestaurantRepository.findByRestaurant(restaurant);
+        if(recommendRestaurant.isPresent())
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    private RecommendRestaurantEntity createRecommendRestaurant(RecommendRestaurantAggregate recommendRestaurantAggregate, RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder) {
         // TODO : 이거는 실제 이미지 올리는 서버가 있으면 처리하기..
         List<RestaurantPhotoEntity> test = new ArrayList<>();
 
-        // 카테고리 검증........
-        if(category.isEmpty())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
-
-        return RecommendRestaurantEntity.builder()
+        return recommendRestaurantEntityBuilder
                 .introduce(recommendRestaurantAggregate.getIntroduce())
-                .category(category.get())
-                .restaurant(restaurant)
                 .pictures(test)
                 .canDrinkLiquor(recommendRestaurantAggregate.getCanDrinkLiquor())
                 .goWellWithLiquor(recommendRestaurantAggregate.getGoWellWithLiquor())
@@ -74,5 +90,4 @@ public class RecommendRestaurantQueryEntityManager {
     private void persistRecommendRestaurant(RecommendRestaurantEntity recommendRestaurant) {
         recommendRestaurantRepository.save(recommendRestaurant);
     }
-
 }

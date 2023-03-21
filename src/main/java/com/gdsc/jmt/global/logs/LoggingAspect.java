@@ -1,8 +1,6 @@
 package com.gdsc.jmt.global.logs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -14,13 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 @Aspect
@@ -78,23 +74,8 @@ public class LoggingAspect {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> params = new HashMap<>();
         for (int i = 0; i < parameterNames.length; i++) {
-            if(args[i] instanceof List) {
-                List<?> files = (List<?>) args[i];
-                if(files.size() > 0 && files.get(0) instanceof MultipartFile) {
-                    paramMultiplePartFile(parameterNames[i], (List<MultipartFile>) files, params);
-                }
-            }
-            else {
-                params.put(parameterNames[i], args[i]);
-            }
+            params.put(parameterNames[i], args[i]);
         }
         return params;
-    }
-
-    private void paramMultiplePartFile(String parameterName , List<MultipartFile> files, Map<String, Object> params) {
-        for(int j = 0; j < files.size(); j++) {
-            MultipartFile multipartFile = (MultipartFile) files.get(j);
-            params.put(parameterName + j, multipartFile.getOriginalFilename());
-        }
     }
 }
