@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping("/user/nickname")
     public JMTApiResponse<UserResponse> updateUserNickname(@AuthenticationPrincipal UserInfo user, @RequestBody NicknameRequest nicknameRequest) {
-        userService.updateUserNickName(user.getAggreagatedId(), nicknameRequest.nickname());
+        userService.updateUserNickName(nicknameRequest.userAggregateId(), nicknameRequest.nickname());
         UserResponse response = new UserResponse(user.getEmail(), nicknameRequest.nickname());
         return JMTApiResponse.createResponseWithMessage(response, UserMessage.NICKNAME_UPDATE_SUCCESS);
     }

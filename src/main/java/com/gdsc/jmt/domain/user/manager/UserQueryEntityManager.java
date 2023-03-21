@@ -33,6 +33,18 @@ public class UserQueryEntityManager {
     }
 
     @EventSourcingHandler
+    private void updateUserNickName(UpdateUserNickNameEvent updateUserNickNameEvent) {
+        UserAggregate userAggregate = getUserFromEvent(updateUserNickNameEvent);
+        Optional<UserEntity> userEntity = userRepository.findByNickname(userAggregate.nickname);
+        if(userEntity.isPresent()) {
+            throw new ApiException(UserMessage.NICKNAME_IS_DUPLICATED);
+        }
+        UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
+        updateUserEntity.setNickname(userAggregate.nickname);
+        persistUser(updateUserEntity);
+    }
+
+    @EventSourcingHandler
     public void on(BaseUserEvent<String> event) {
         persistUser(updateQueryUser(getUserFromEvent(event)));
     }
@@ -82,17 +94,5 @@ public class UserQueryEntityManager {
 
     private void persistUser(UserEntity userEntity) {
         userRepository.save(userEntity);
-    }
-
-    @EventSourcingHandler
-    private void updateUserNickname(UpdateUserNickNameEvent updateUserNickNameEvent) {
-        UserAggregate userAggregate = getUserFromEvent(updateUserNickNameEvent);
-        Optional<UserEntity> userEntity = userRepository.findByNickname(userAggregate.nickname);
-        if(userEntity.isPresent()) {
-            throw new ApiException(UserMessage.NICKNAME_IS_DUPLICATED);
-        }
-        UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
-        updateUserEntity.setNickname(userAggregate.nickname);
-        persistUser(updateUserEntity);
     }
 }
