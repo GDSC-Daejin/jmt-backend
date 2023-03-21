@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.user.command.controller;
 
+import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserNicknameSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.NicknameRequest;
 import com.gdsc.jmt.domain.user.command.dto.response.UserResponse;
 import com.gdsc.jmt.domain.user.command.service.UserService;
@@ -20,6 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/user/nickname")
+    @UpdateUserNicknameSpringDocs
     public JMTApiResponse<UserResponse> updateUserNickname(@AuthenticationPrincipal UserInfo user, @RequestBody NicknameRequest nicknameRequest) {
         userService.updateUserNickName(nicknameRequest.userAggregateId(), nicknameRequest.nickname());
         UserResponse response = new UserResponse(user.getEmail(), nicknameRequest.nickname());
