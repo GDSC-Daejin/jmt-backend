@@ -11,7 +11,6 @@ import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.apple.AppleUtil;
-import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
@@ -45,7 +44,6 @@ public class AuthService {
     private String appleSideGoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
-    private UserRepository userRepository;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {

@@ -24,6 +24,7 @@ public class UserEntity extends BaseTimeEntity {
     private String email;
     private String profileImageUrl;
     @Nullable
+    @Column(unique = true)
     private String nickname;
 
     @Enumerated(EnumType.STRING)

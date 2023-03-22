@@ -1,7 +1,9 @@
 package com.gdsc.jmt.domain.user.command.aggregate;
 
 import com.gdsc.jmt.domain.user.command.SignUpCommand;
+import com.gdsc.jmt.domain.user.command.UpdateUserNickNameCommand;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
+import com.gdsc.jmt.domain.user.command.event.UpdateUserNickNameEvent;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.common.Status;
@@ -36,11 +38,25 @@ public class UserAggregate {
         ));
     }
 
+    @CommandHandler
+    public void updateUserNickNameCommand(UpdateUserNickNameCommand updateUserNickNameCommand) {
+        AggregateLifecycle.apply(new UpdateUserNickNameEvent(
+                        updateUserNickNameCommand.getId(),
+                        updateUserNickNameCommand.getNickName()
+        ));
+    }
+
     @EventSourcingHandler
     public void on(CreateUserEvent createUserEvent) {
         this.id = createUserEvent.getId();
         this.email = createUserEvent.getEmail();
         this.status = Status.ACTIVE;
         this.socialType = createUserEvent.getSocialType();
+    }
+
+    @EventSourcingHandler
+    public void updateUserNickName(UpdateUserNickNameEvent updateUserNickNameEvent) {
+        this.id = updateUserNickNameEvent.getId();
+        this.nickname = updateUserNickNameEvent.getNickName();
     }
 }
