@@ -23,6 +23,10 @@ public class RecommendRestaurantEntity {
     @JoinColumn(name="category_id", nullable = false)
     private CategoryEntity category;
 
+    @OneToOne
+    @JoinColumn(name="restaurant_id", nullable = false)
+    private RestaurantEntity restaurant;
+
     @OneToMany(
             mappedBy = "recommendRestaurant",
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
@@ -42,6 +46,7 @@ public class RecommendRestaurantEntity {
     @Builder
     RecommendRestaurantEntity(String introduce,
                               CategoryEntity category,
+                              RestaurantEntity restaurant,
                               List<RestaurantPhotoEntity> pictures,
                               Boolean canDrinkLiquor,
                               String goWellWithLiquor,
@@ -49,6 +54,7 @@ public class RecommendRestaurantEntity {
                               String aggregateId) {
         this.introduce = introduce;
         this.category = category;
+        this.restaurant = restaurant;
         initPictures(pictures);
         this.pictures = pictures;
         this.canDrinkLiquor = canDrinkLiquor;

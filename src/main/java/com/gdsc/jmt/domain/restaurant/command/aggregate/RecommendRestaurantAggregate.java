@@ -1,8 +1,9 @@
 package com.gdsc.jmt.domain.restaurant.command.aggregate;
 
 import com.gdsc.jmt.domain.restaurant.command.CreateRecommendRestaurantCommand;
-import com.gdsc.jmt.domain.restaurant.command.dto.RecommendRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.RecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.event.CreateRecommendRestaurantEvent;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Aggregate
+@Getter
 @RequiredArgsConstructor
 public class RecommendRestaurantAggregate {
     @AggregateIdentifier
@@ -34,7 +36,8 @@ public class RecommendRestaurantAggregate {
     public RecommendRestaurantAggregate(CreateRecommendRestaurantCommand command) {
         AggregateLifecycle.apply(new CreateRecommendRestaurantEvent(
                 command.getId(),
-                command.getRecommendRestaurantRequest()
+                command.getRecommendRestaurantRequest(),
+                command.getRestaurantName()
         ));
     }
 
@@ -42,11 +45,11 @@ public class RecommendRestaurantAggregate {
     public void on(CreateRecommendRestaurantEvent event) {
         RecommendRestaurantRequest createRequest = event.getRecommendRestaurantRequest();
         this.id = event.getId();
-        this.introduce = createRequest.introduce();
-        this.categoryId = createRequest.categoryId();
-        this.pictures = createRequest.pictures();
-        this.canDrinkLiquor = createRequest.canDrinkLiquor();
-        this.goWellWithLiquor = createRequest.goWellWithLiquor();
-        this.recommendMenu = createRequest.recommendMenu();
+        this.introduce = createRequest.getIntroduce();
+        this.categoryId = createRequest.getCategoryId();
+//        this.pictures = createRequest.getPictures();
+        this.canDrinkLiquor = createRequest.getCanDrinkLiquor();
+        this.goWellWithLiquor = createRequest.getGoWellWithLiquor();
+        this.recommendMenu = createRequest.getRecommendMenu();
     }
 }

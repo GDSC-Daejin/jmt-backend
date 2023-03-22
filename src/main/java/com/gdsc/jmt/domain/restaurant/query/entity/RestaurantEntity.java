@@ -1,8 +1,8 @@
 package com.gdsc.jmt.domain.restaurant.query.entity;
 
-import com.gdsc.jmt.domain.restaurant.query.entity.embedded.Coordinate;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.Point;
 public class RestaurantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Long id;
 
     @Column(nullable = false, unique = true)

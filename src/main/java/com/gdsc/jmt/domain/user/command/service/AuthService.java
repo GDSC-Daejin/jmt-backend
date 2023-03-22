@@ -36,7 +36,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
     @Value("${google.client.id}")
     private String googleClientId;
 
