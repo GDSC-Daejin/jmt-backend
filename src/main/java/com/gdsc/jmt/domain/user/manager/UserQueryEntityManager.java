@@ -35,13 +35,19 @@ public class UserQueryEntityManager {
     @EventSourcingHandler
     private void updateUserNickName(UpdateUserNickNameEvent updateUserNickNameEvent) {
         UserAggregate userAggregate = getUserFromEvent(updateUserNickNameEvent);
-        Optional<UserEntity> userEntity = userRepository.findByNickname(userAggregate.nickname);
+        checkExistingQueryUserByNickname(userAggregate.nickname);
+
+        UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
+        updateUserEntity.setNickname(userAggregate.nickname);
+
+        persistUser(updateUserEntity);
+    }
+
+    private void checkExistingQueryUserByNickname(String nickname) {
+        Optional<UserEntity> userEntity = userRepository.findByNickname(nickname);
         if(userEntity.isPresent()) {
             throw new ApiException(UserMessage.NICKNAME_IS_DUPLICATED);
         }
-        UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
-        updateUserEntity.setNickname(userAggregate.nickname);
-        persistUser(updateUserEntity);
     }
 
     @EventSourcingHandler

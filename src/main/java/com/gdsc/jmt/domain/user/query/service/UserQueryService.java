@@ -13,9 +13,6 @@ public class UserQueryService {
 
     public boolean checkDuplicateUserNickname(String nickname) {
         Optional<UserEntity> userEntity = userRepository.findByNickname(nickname);
-        if(userEntity.isEmpty()) {
-            return false;
-        }
-        return true;
+        return userEntity.isPresent();
     }
 }
