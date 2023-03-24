@@ -11,6 +11,8 @@ import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.apple.AppleUtil;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
@@ -31,6 +33,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -43,6 +46,9 @@ public class AuthService {
     private String appleSideGoogleClientId;
     private final TokenProvider tokenProvider;
     private final CommandGateway commandGateway;
+
+    // 인증 로직만 CQRS 예외
+    private final UserRepository userRepository;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {
@@ -120,6 +126,10 @@ public class AuthService {
                 userAggregateId,
                 userInfo,
                 socialType));
+
+        Optional<UserEntity> user = userRepository.findByEmail(userInfo.getEmail());
+        if(user.isPresent())
+            userAggregateId = user.get().getUserAggregateId();
         return userAggregateId;
     }
 
