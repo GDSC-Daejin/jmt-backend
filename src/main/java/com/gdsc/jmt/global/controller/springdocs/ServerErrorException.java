@@ -1,4 +1,4 @@
-package com.gdsc.jmt.domain.user.command.controller.springdocs.model;
+package com.gdsc.jmt.global.controller.springdocs;
 
 import com.gdsc.jmt.global.messege.DefaultMessage;
 import io.swagger.v3.oas.annotations.media.Schema;

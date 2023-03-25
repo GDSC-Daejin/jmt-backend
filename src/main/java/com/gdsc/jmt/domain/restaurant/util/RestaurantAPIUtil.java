@@ -4,7 +4,6 @@ import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.http.KakaoRestServerAPI;
 import com.gdsc.jmt.global.messege.DefaultMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;

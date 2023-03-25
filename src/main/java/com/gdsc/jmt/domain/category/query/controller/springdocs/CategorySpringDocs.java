@@ -1,7 +1,6 @@
 package com.gdsc.jmt.domain.category.query.controller.springdocs;
 
 import com.gdsc.jmt.domain.category.query.controller.springdocs.model.CategoryNotFoundException;
-import com.gdsc.jmt.domain.user.command.controller.springdocs.model.UnauthorizedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

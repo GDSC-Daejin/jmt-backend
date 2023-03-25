@@ -6,6 +6,7 @@ import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @FirstVersionRestController
 @RequiredArgsConstructor
+@Tag(name = "맛집 등록 컨트롤러")
 public class RestaurantController {
     private final RestaurantService restaurantService;
 

@@ -1,6 +1,6 @@
 package com.gdsc.jmt.domain.user.query.controller.springdocs;
 
-import com.gdsc.jmt.domain.user.command.controller.springdocs.model.ServerErrorException;
+import com.gdsc.jmt.global.controller.springdocs.ServerErrorException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
