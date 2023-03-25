@@ -1,6 +1,7 @@
 package com.gdsc.jmt.global.config;
 
 import com.gdsc.jmt.global.http.AppleRestServerAPI;
+import com.gdsc.jmt.global.http.NaverRestServerAPI;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class RetrofitConfig {
     private static final String APPLE_URL = "https://appleid.apple.com/";
+    private static final String NAVER_URL = "https://openapi.naver.com/v1/";
 
     @Bean
     public OkHttpClient okHttpClient() {
@@ -23,8 +25,16 @@ public class RetrofitConfig {
     }
 
     @Bean(name = "appleRetrofit")
-    public Retrofit retrofit(OkHttpClient client) {
+    public Retrofit appleRetrofit(OkHttpClient client) {
         return new Retrofit.Builder().baseUrl(APPLE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+    }
+
+    @Bean(name = "naverRetrofit")
+    public Retrofit naverRetrofit(OkHttpClient client) {
+        return new Retrofit.Builder().baseUrl(NAVER_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
@@ -33,5 +43,10 @@ public class RetrofitConfig {
     @Bean
     public AppleRestServerAPI appleRestServerAPI(@Qualifier("appleRetrofit") Retrofit retrofit) {
         return retrofit.create(AppleRestServerAPI.class);
+    }
+
+    @Bean
+    public NaverRestServerAPI naverRestServerAPI(@Qualifier("naverRetrofit") Retrofit retrofit) {
+        return retrofit.create(NaverRestServerAPI.class);
     }
 }
