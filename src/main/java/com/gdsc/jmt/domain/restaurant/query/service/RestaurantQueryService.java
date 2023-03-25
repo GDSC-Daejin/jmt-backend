@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
-import com.gdsc.jmt.domain.restaurant.naver.NaverUtil;
+import com.gdsc.jmt.domain.restaurant.util.KaKaoSearchResponse;
+import com.gdsc.jmt.domain.restaurant.util.RestaurantAPIUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +10,8 @@ import org.springframework.stereotype.Service;
 public class RestaurantQueryService {
 
 
-    public void findRestaurantLocationList(final String query) {
-         = NaverUtil.findRestaurantLocation(query);
+    public void findRestaurantLocationList(final String query, final Integer page) {
+         KaKaoSearchResponse response = RestaurantAPIUtil.findRestaurantLocation(query, page);
+
     }
 }

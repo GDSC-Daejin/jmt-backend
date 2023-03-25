@@ -1,4 +1,4 @@
-package com.gdsc.jmt.domain.restaurant.naver;
+package com.gdsc.jmt.domain.restaurant.util;
 
 import lombok.Getter;
 
