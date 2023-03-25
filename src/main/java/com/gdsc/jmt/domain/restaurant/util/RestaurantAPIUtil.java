@@ -10,7 +10,6 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class RestaurantAPIUtil {
@@ -32,9 +31,9 @@ public class RestaurantAPIUtil {
         RestaurantAPIUtil.kakaoRestServerAPI = kakaoRestServerAPI;
     }
 
-    public static KaKaoSearchResponse findRestaurantLocation(final String query, final Integer page) {
+    public static KakaoSearchResponse findRestaurantLocation(final String query, final Integer page) {
         try {
-            Call<KaKaoSearchResponse> call = kakaoRestServerAPI.sendSearchAPI(
+            Call<KakaoSearchResponse> call = kakaoRestServerAPI.sendSearchAPI(
                     "KakaoAK " + kakaoRestAPIKey,
                     query,
                     "FD6",
@@ -42,7 +41,7 @@ public class RestaurantAPIUtil {
                     10
             );
 
-            Response<KaKaoSearchResponse> response = call.execute();
+            Response<KakaoSearchResponse> response = call.execute();
             return response.body();
         } catch (IOException ex) {
             throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);

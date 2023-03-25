@@ -3,7 +3,7 @@ package com.gdsc.jmt.domain.restaurant.util;
 import lombok.Getter;
 
 @Getter
-public class KaKaoSearchDocument {
+public class KakaoSearchDocument {
 
     private String place_name;
     private String distance;
