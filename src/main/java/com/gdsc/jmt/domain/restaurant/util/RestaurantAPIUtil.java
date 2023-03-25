@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.restaurant.util;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.http.KakaoRestServerAPI;
 import com.gdsc.jmt.global.messege.DefaultMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,10 +13,10 @@ import retrofit2.Response;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class RestaurantAPIUtil {
 //    private static NaverRestServerAPI naverRestServerAPI;
-
-    private static KakaoRestServerAPI kakaoRestServerAPI;
+    private final KakaoRestServerAPI kakaoRestServerAPI;
 
 //    @Value("naver.client.id")
 //    private static String naverClientId;
@@ -23,15 +24,10 @@ public class RestaurantAPIUtil {
 //    @Value("naver.client.secret")
 //    private static String naverClientSecret;
 
-    @Value("kakao.rest.api.key")
-    private static String kakaoRestAPIKey;
+    @Value("${kakao.rest.api.key}")
+    private String kakaoRestAPIKey;
 
-    @Autowired
-    public RestaurantAPIUtil(KakaoRestServerAPI kakaoRestServerAPI) {
-        RestaurantAPIUtil.kakaoRestServerAPI = kakaoRestServerAPI;
-    }
-
-    public static KakaoSearchResponse findRestaurantLocation(final String query, final Integer page) {
+    public KakaoSearchResponse findRestaurantLocation(final String query, final Integer page) {
         try {
             Call<KakaoSearchResponse> call = kakaoRestServerAPI.sendSearchAPI(
                     "KakaoAK " + kakaoRestAPIKey,

@@ -75,19 +75,23 @@ public class LoggingAspect {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> params = new HashMap<>();
         for (int i = 0; i < parameterNames.length; i++) {
-            paramsProcess(args[i], params);
+            paramsProcess(parameterNames[i], args[i], params);
         }
         return params;
     }
 
-    private void paramsProcess(Object args, Map<String, Object> params) {
+    private void paramsProcess(String parameterName, Object args, Map<String, Object> params) {
         try {
-            Field[] fields = args.getClass().getDeclaredFields();
-            for(Field field : fields)
-            {
-                field.setAccessible(true);
-                if(!paramsForMultipartFile(field, args, params))
-                    params.put(field.getName(), field.get(args));
+            if(!(args instanceof String || args instanceof  Integer || args instanceof Long)) {
+                Field[] fields = args.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    if (!paramsForMultipartFile(field, args, params))
+                        params.put(field.getName(), field.get(args));
+                }
+            }
+            else {
+                params.put(parameterName, args);
             }
         }catch (IllegalAccessException ex) {
         }

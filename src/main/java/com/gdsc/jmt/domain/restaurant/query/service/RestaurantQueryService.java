@@ -11,8 +11,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RestaurantQueryService {
+
+    private final RestaurantAPIUtil restaurantAPIUtil;
+
     public List<KakaoSearchDocument> findRestaurantLocationList(final String query, final Integer page) {
-         KakaoSearchResponse response = RestaurantAPIUtil.findRestaurantLocation(query, page);
+         KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(query, page);
          return response.getDocuments();
     }
 }
