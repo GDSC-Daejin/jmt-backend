@@ -15,7 +15,9 @@ public enum UserMessage implements ResponseMessage{
     REFRESH_TOKEN_INVALID("RefreshToken이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     NICKNAME_UPDATE_SUCCESS("닉네임 변경에 성공하였습니다.", HttpStatus.OK),
     NICKNAME_IS_DUPLICATED("이미 존재하는 닉네임입니다.", HttpStatus.CONFLICT),
-    NICKNAME_IS_AVAILABLE("사용 가능한 닉네임입니다.", HttpStatus.OK);
+    NICKNAME_IS_AVAILABLE("사용 가능한 닉네임입니다.", HttpStatus.OK),
+    PROFILE_IMAGE_UPDATE_SUCCESS("프로필 사진 등록에 성공하였습니다.", HttpStatus.OK),
+    PROFILE_IMAGE_UPLOAD_FAIL("프로필 사진 업로드에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String message;
     private final HttpStatus status;
