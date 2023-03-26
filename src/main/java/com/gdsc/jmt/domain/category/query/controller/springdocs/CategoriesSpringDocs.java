@@ -1,11 +1,7 @@
 package com.gdsc.jmt.domain.category.query.controller.springdocs;
 
 
-import com.gdsc.jmt.domain.user.command.controller.springdocs.model.AuthInvalidTokenException;
-import com.gdsc.jmt.domain.user.command.controller.springdocs.model.ServerErrorException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 

@@ -1,7 +1,6 @@
 package com.gdsc.jmt.global.logs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 @Aspect
@@ -76,27 +75,40 @@ public class LoggingAspect {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> params = new HashMap<>();
         for (int i = 0; i < parameterNames.length; i++) {
-            // TODO : MultipartFile 이슈로 임시 해결...
-            if(args[i] instanceof CreateRestaurantRequest) {
-                paramsForMultipartFile((CreateRestaurantRequest) args[i], params);
-            }
-            else
-                params.put(parameterNames[i], args[i]);
+            paramsProcess(parameterNames[i], args[i], params);
         }
         return params;
     }
 
-    private void paramsForMultipartFile(CreateRestaurantRequest request, Map<String, Object> params) {
+    private void paramsProcess(String parameterName, Object args, Map<String, Object> params) {
         try {
-            Field[] fields = CreateRestaurantRequest.class.getDeclaredFields();
-            for(Field field : request.getClass().getDeclaredFields()) {
-                if(field.getName().equals("pictures"))
-                    continue;
-                field.setAccessible(true);
-                params.put(field.getName(), field.get(request));
+            if(!(args instanceof String || args instanceof  Integer || args instanceof Long)) {
+                Field[] fields = args.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    if (!paramsForMultipartFile(field, args, params))
+                        params.put(field.getName(), field.get(args));
+                }
+            }
+            else {
+                params.put(parameterName, args);
+            }
+        }catch (IllegalAccessException ex) {
+        }
+    }
+
+    private boolean paramsForMultipartFile(Field field, Object args, Map<String, Object> params) throws IllegalAccessException {
+        Type type = field.getGenericType();
+        // List<MultipartFile>
+        if(field.get(args) instanceof List && type instanceof ParameterizedType) {
+            for(Type gType : ((ParameterizedType) type).getActualTypeArguments()) {
+                if(gType.getTypeName().equals(MultipartFile.class.getTypeName())) {
+                    params.put(field.getName(), ((List<?>) field.get(args)).size() + "개의 파일이 들어옴.");
+                    return true;
+                }
             }
         }
-        catch (IllegalAccessException ex) {
-        }
+
+        return false;
     }
 }
