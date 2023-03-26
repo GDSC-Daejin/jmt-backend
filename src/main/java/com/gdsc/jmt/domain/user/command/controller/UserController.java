@@ -1,8 +1,7 @@
 package com.gdsc.jmt.domain.user.command.controller;
 
-import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantRequest;
-import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserNicknameSpringDocs;
+import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserProfileImgSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.NicknameRequest;
 import com.gdsc.jmt.domain.user.command.dto.ProfileImgRequest;
 import com.gdsc.jmt.domain.user.command.dto.response.UserResponse;
@@ -10,7 +9,6 @@ import com.gdsc.jmt.domain.user.command.service.UserService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
-import com.gdsc.jmt.global.messege.RestaurantMessage;
 import com.gdsc.jmt.global.messege.UserMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "사용자 정보 관련 컨트롤러")
 @FirstVersionRestController
@@ -38,6 +33,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/user/profileImg", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @UpdateUserProfileImgSpringDocs
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
                                                   @ModelAttribute ProfileImgRequest profileImgRequest) {
         userService.updateUserProfileImg(profileImgRequest.userAggregateId(), profileImgRequest.profileImg());
