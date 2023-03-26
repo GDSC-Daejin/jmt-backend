@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantReques
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserNicknameSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.NicknameRequest;
+import com.gdsc.jmt.domain.user.command.dto.ProfileImgRequest;
 import com.gdsc.jmt.domain.user.command.dto.response.UserResponse;
 import com.gdsc.jmt.domain.user.command.service.UserService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,8 +39,8 @@ public class UserController {
 
     @PostMapping(value = "/user/profileImg", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
-                                                  @RequestPart(value = "file")  MultipartFile profileImg) {
-        userService.updateUserProfileImg(user.getAggreagatedId(), profileImg);
+                                                  @ModelAttribute ProfileImgRequest profileImgRequest) {
+        userService.updateUserProfileImg(profileImgRequest.userAggregateId(), profileImgRequest.profileImg());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 

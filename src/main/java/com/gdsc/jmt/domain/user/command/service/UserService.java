@@ -16,7 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserService {
     private final CommandGateway commandGateway;
-    private final String PROFILE_IMAGE_URL = "/";
+    //TODO : 임시로 피오니 로컬로 테스트 해봤어요. 나중에는 s3로 바꿔야할 것 같아요.
+    private final String PROFILE_IMAGE_URL = "/Users/jeongmyeongju/github/jmt-backend/src/main/resources/image/";
 
     @Transactional
     public void updateUserNickName(String userAggregateId, String nickName) {
@@ -33,6 +34,7 @@ public class UserService {
                 userAggregateId,
                 PROFILE_IMAGE_URL + profileImg.getOriginalFilename()
         ));
+        System.out.println("이미지 업로드 성공");
     }
 
     private void uploadImage(MultipartFile image){
