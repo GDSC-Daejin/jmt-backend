@@ -2,8 +2,10 @@ package com.gdsc.jmt.domain.user.command.aggregate;
 
 import com.gdsc.jmt.domain.user.command.SignUpCommand;
 import com.gdsc.jmt.domain.user.command.UpdateUserNickNameCommand;
+import com.gdsc.jmt.domain.user.command.UpdateUserProfileImgCommand;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
 import com.gdsc.jmt.domain.user.command.event.UpdateUserNickNameEvent;
+import com.gdsc.jmt.domain.user.command.event.UpdateUserProfileImgEvent;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.common.Status;
@@ -46,6 +48,14 @@ public class UserAggregate {
         ));
     }
 
+    @CommandHandler
+    public void updateUserProfileImgCommand(UpdateUserProfileImgCommand updateUserProfileImgCommand) {
+        AggregateLifecycle.apply(new UpdateUserProfileImgEvent(
+                        updateUserProfileImgCommand.getId(),
+                        updateUserProfileImgCommand.getProfileImageUrl()
+        ));
+    }
+
     @EventSourcingHandler
     public void on(CreateUserEvent createUserEvent) {
         this.id = createUserEvent.getId();
@@ -58,5 +68,11 @@ public class UserAggregate {
     public void updateUserNickName(UpdateUserNickNameEvent updateUserNickNameEvent) {
         this.id = updateUserNickNameEvent.getId();
         this.nickname = updateUserNickNameEvent.getNickName();
+    }
+
+    @EventSourcingHandler
+    public void updateUserProfileImg(UpdateUserProfileImgEvent updateUserProfileImgEvent) {
+        this.id = updateUserProfileImgEvent.getId();
+        this.profileImageUrl = updateUserProfileImgEvent.getProfileImageUrl();
     }
 }
