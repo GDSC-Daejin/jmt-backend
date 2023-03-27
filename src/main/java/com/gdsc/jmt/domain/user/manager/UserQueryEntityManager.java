@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.user.command.aggregate.UserAggregate;
 import com.gdsc.jmt.domain.user.command.event.BaseUserEvent;
 import com.gdsc.jmt.domain.user.command.event.CreateUserEvent;
 import com.gdsc.jmt.domain.user.command.event.UpdateUserNickNameEvent;
+import com.gdsc.jmt.domain.user.command.event.UpdateUserProfileImgEvent;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -39,6 +40,16 @@ public class UserQueryEntityManager {
 
         UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
         updateUserEntity.setNickname(userAggregate.nickname);
+
+        persistUser(updateUserEntity);
+    }
+
+    @EventSourcingHandler
+    private void updateUserProfileImg(UpdateUserProfileImgEvent updateUserProfileImgEvent) {
+        UserAggregate userAggregate = getUserFromEvent(updateUserProfileImgEvent);
+
+        UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
+        updateUserEntity.setProfileImageUrl(userAggregate.profileImageUrl);
 
         persistUser(updateUserEntity);
     }

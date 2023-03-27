@@ -22,7 +22,7 @@ public class UserEntity extends BaseTimeEntity {
     private String userAggregateId;
     @Column(nullable = false, unique = true)
     private String email;
-    private String profileImageUrl;
+    private String profileImageUrl;  // 파일 저장 경로
     @Nullable
     @Column(unique = true)
     private String nickname;
