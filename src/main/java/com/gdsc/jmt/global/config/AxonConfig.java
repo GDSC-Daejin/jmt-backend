@@ -1,6 +1,7 @@
 package com.gdsc.jmt.global.config;
 
 import com.gdsc.jmt.domain.restaurant.command.aggregate.RecommendRestaurantAggregate;
+import com.gdsc.jmt.domain.restaurant.command.aggregate.RestaurantAggregate;
 import com.gdsc.jmt.domain.user.command.aggregate.RefreshTokenAggregate;
 import com.gdsc.jmt.domain.user.command.aggregate.UserAggregate;
 import com.gdsc.jmt.global.exception.EventExceptionHandler;
@@ -25,6 +26,11 @@ public class AxonConfig {
     @Bean
     public EventSourcingRepository<RecommendRestaurantAggregate> recommendRestaurantAggregateEventSourcingRepository(EventStore eventStore) {
         return EventSourcingRepository.builder(RecommendRestaurantAggregate.class).eventStore(eventStore).build();
+    }
+
+    @Bean
+    public EventSourcingRepository<RestaurantAggregate> restaurantAggregateEventSourcingRepository(EventStore eventStore) {
+        return EventSourcingRepository.builder(RestaurantAggregate.class).eventStore(eventStore).build();
     }
 
     @Bean

@@ -1,6 +1,5 @@
 package com.gdsc.jmt.domain.restaurant.command.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,15 +10,15 @@ import java.util.List;
 // TODO : 네이버 API 연동 전 로직
 @Getter
 @Setter
-public class CreateRestaurantRequest {
+public class CreateRecommendRestaurantRequest {
         // 기본 식당 정보
-        @Schema(description = "임시 식당 이름", example = "마라탕")
+        @Schema(description = "식당 이름", example = "마라탕")
         private String name;
 
         // 사용자가 입력한 맛집 정보
-        @Schema(description = "임시 식당 이름", example = "마라탕")
+        @Schema(description = "식당 소개글", example = "마라탕")
         private String introduce;
-        @Schema(description = "임시 식당 이름", example = "1")
+        @Schema(description = "식당 카테고리 ID", example = "1")
         private Long categoryId;
 
         @Schema(description = "사진 데이터", nullable = true)
@@ -34,4 +33,6 @@ public class CreateRestaurantRequest {
         @Schema(description = "추천 메뉴", example = "#마라탕#양꼬치")
         private String recommendMenu;
 
+        @Schema(description = "카카오 위치정보 ID", example = "234513")
+        private String kakaoSubId;
 }

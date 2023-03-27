@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.restaurant.manager;
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.category.query.repository.CategoryRepository;
 import com.gdsc.jmt.domain.restaurant.command.aggregate.RecommendRestaurantAggregate;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.event.CreateRecommendRestaurantEvent;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity.RecommendRestaurantEntityBuilder;
@@ -31,8 +32,9 @@ public class RecommendRestaurantQueryEntityManager {
     private final CategoryRepository categoryRepository;
 
     @EventSourcingHandler
-    public void on(CreateRecommendRestaurantEvent event) {
-        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(event.getRestaurantName(), event.getRecommendRestaurantRequest().getCategoryId());
+    public void createdRecommendRestaurant(CreateRecommendRestaurantEvent event) {
+        CreateRecommendRestaurantRequest createRecommendRestaurantRequest = event.getCreateRecommendRestaurantRequest();
+        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getKakaoSubId(), createRecommendRestaurantRequest.getCategoryId());
         persistRecommendRestaurant(createRecommendRestaurant(getRecommendRestaurantFromEvent(event), recommendRestaurantEntityBuilder));
     }
 
@@ -42,8 +44,8 @@ public class RecommendRestaurantQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantName, final Long categoryId) {
-        RestaurantEntity restaurant = validateRestaurant(restaurantName);
+    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantKakaSubId, final Long categoryId) {
+        RestaurantEntity restaurant = validateRestaurant(restaurantKakaSubId);
         CategoryEntity category = validateCategory(categoryId);
         validateConflict(restaurant);
 
@@ -52,9 +54,8 @@ public class RecommendRestaurantQueryEntityManager {
                 .category(category);
     }
 
-    private RestaurantEntity validateRestaurant(final String restaurantName) {
-        // TODO : 네이버 API 연동전 로직
-        Optional<RestaurantEntity> restaurant = restaurantRepository.findByName(restaurantName);
+    private RestaurantEntity validateRestaurant(final String restaurantKakaSubId) {
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findByKakaoSubId(restaurantKakaSubId);
         if(restaurant.isEmpty())
             throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
         return  restaurant.get();

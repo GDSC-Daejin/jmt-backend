@@ -15,22 +15,46 @@ public class RestaurantEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    private String kakaoSubId;
+
+    @Column(nullable = false, unique = true)
     private String name;
+
+    private String placeUrl;
+
+    private String category;
+
+    private String phone;
 
     @Column(nullable = false)
     private String address;
 
-//    @Embedded
-//    private Coordinate coordinate;
+    @Column(nullable = false)
+    private String roadAddress;
+
+    @Column(nullable = false)
     private Point location;
 
     @Column(nullable = false, unique = true)
     private String aggregateId;
 
     @Builder
-    public RestaurantEntity(String name, String address, Point location, String aggregateId) {
+    public RestaurantEntity(String kakaoSubId,
+                            String name,
+                            String placeUrl,
+                            String category,
+                            String phone,
+                            String address,
+                            String roadAddress,
+                            Point location,
+                            String aggregateId) {
+        this.kakaoSubId = kakaoSubId;
         this.name = name;
+        this.placeUrl = placeUrl;
+        this.category = category;
+        this.phone = phone;
         this.address = address;
+        this.roadAddress = roadAddress;
         this.location = location;
         this.aggregateId = aggregateId;
     }
