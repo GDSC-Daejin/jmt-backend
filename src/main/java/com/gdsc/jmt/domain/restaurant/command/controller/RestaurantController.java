@@ -11,6 +11,7 @@ import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class RestaurantController {
 
     @PostMapping(value = "/restaurant/location")
     @CreateRestaurantLocationSpringDocs
+    @ResponseStatus(HttpStatus.CREATED)
     public JMTApiResponse<String> createRestaurantLocation(@RequestBody KakaoSearchDocument kakaoSearchDocumentRequest) {
         String aggregateId = restaurantService.createRestaurantLocation(kakaoSearchDocumentRequest);
         return JMTApiResponse.createResponseWithMessage(aggregateId, RestaurantMessage.RESTAURANT_LOCATION_CREATED);
@@ -29,6 +31,7 @@ public class RestaurantController {
 
     @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @CreateRecommendRestaurantSpringDocs
+    @ResponseStatus(HttpStatus.CREATED)
     public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
         CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(createRecommendRestaurantRequest);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);

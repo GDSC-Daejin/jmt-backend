@@ -9,9 +9,11 @@ import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class RestaurantQueryController {
 
     @GetMapping("/restaurant/{kakaoSubId}")
     @CheckRecommendRestaurantExistingSpringDocs
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public JMTApiResponse<?> checkRecommendRestaurantExisting(@PathVariable String kakaoSubId) {
         restaurantQueryService.checkRestaurantExisting(kakaoSubId);
         return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RESTAURANT_NOT_FOUND);
