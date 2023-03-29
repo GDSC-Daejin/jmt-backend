@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.user.query.controller;
 
 import com.gdsc.jmt.domain.user.query.controller.springdocs.CheckDuplicateNicknameSpringDocs;
+import com.gdsc.jmt.domain.user.query.controller.springdocs.GetUserInfoSpringDocs;
 import com.gdsc.jmt.domain.user.query.dto.UserResponse;
 import com.gdsc.jmt.domain.user.query.service.UserQueryService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
@@ -30,6 +31,7 @@ public class UserQueryController {
     }
 
     @GetMapping("/user/info")
+    @GetUserInfoSpringDocs
     public JMTApiResponse<UserResponse> getUserInfo(@AuthenticationPrincipal UserInfo user) {
         UserResponse userInfo = userQueryService.getUserInfo(user.getAggreagatedId());
         return JMTApiResponse.createResponseWithMessage(userInfo, UserMessage.GET_USER_SUCCESS);
