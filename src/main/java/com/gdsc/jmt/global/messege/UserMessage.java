@@ -17,7 +17,8 @@ public enum UserMessage implements ResponseMessage{
     NICKNAME_IS_DUPLICATED("이미 존재하는 닉네임입니다.", HttpStatus.CONFLICT),
     NICKNAME_IS_AVAILABLE("사용 가능한 닉네임입니다.", HttpStatus.OK),
     PROFILE_IMAGE_UPDATE_SUCCESS("프로필 사진 등록에 성공하였습니다.", HttpStatus.OK),
-    PROFILE_IMAGE_UPLOAD_FAIL("프로필 사진 업로드에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    PROFILE_IMAGE_UPLOAD_FAIL("프로필 사진 업로드에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    GET_USER_SUCCESS("사용자 정보 조회에 성공하였습니다.", HttpStatus.OK);
 
     private final String message;
     private final HttpStatus status;
