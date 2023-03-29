@@ -1,7 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.command.aggregate;
 
 import com.gdsc.jmt.domain.restaurant.command.CreateRecommendRestaurantCommand;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.RecommendRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.event.CreateRecommendRestaurantEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,6 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
 
 @Aggregate
 @Getter
@@ -23,9 +21,6 @@ public class RecommendRestaurantAggregate {
     private String introduce;
     private Long categoryId;
 
-    // Aggregate에서 사진 정보를 MultipartFile로 넣어도 되려나요??
-    private List<MultipartFile> pictures;
-
     private Boolean canDrinkLiquor;
 
     private String goWellWithLiquor;
@@ -36,20 +31,18 @@ public class RecommendRestaurantAggregate {
     public RecommendRestaurantAggregate(CreateRecommendRestaurantCommand command) {
         AggregateLifecycle.apply(new CreateRecommendRestaurantEvent(
                 command.getId(),
-                command.getRecommendRestaurantRequest(),
-                command.getRestaurantName()
+                command.getCreateRecommendRestaurantRequest()
         ));
     }
 
     @EventSourcingHandler
-    public void on(CreateRecommendRestaurantEvent event) {
-        RecommendRestaurantRequest createRequest = event.getRecommendRestaurantRequest();
+    public void createdRecommendRestaurant(CreateRecommendRestaurantEvent event) {
+        CreateRecommendRestaurantRequest createdRequest = event.getCreateRecommendRestaurantRequest();
         this.id = event.getId();
-        this.introduce = createRequest.getIntroduce();
-        this.categoryId = createRequest.getCategoryId();
-//        this.pictures = createRequest.getPictures();
-        this.canDrinkLiquor = createRequest.getCanDrinkLiquor();
-        this.goWellWithLiquor = createRequest.getGoWellWithLiquor();
-        this.recommendMenu = createRequest.getRecommendMenu();
+        this.introduce = createdRequest.getIntroduce();
+        this.categoryId = createdRequest.getCategoryId();
+        this.canDrinkLiquor = createdRequest.getCanDrinkLiquor();
+        this.goWellWithLiquor = createdRequest.getGoWellWithLiquor();
+        this.recommendMenu = createdRequest.getRecommendMenu();
     }
 }

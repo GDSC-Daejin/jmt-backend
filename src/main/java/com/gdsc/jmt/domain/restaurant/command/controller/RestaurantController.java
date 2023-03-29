@@ -1,18 +1,19 @@
 package com.gdsc.jmt.domain.restaurant.command.controller;
 
-import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecommendRestaurantSpringDocs;
+import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
+import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @FirstVersionRestController
 @RequiredArgsConstructor
@@ -20,10 +21,19 @@ import java.util.List;
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
-    // TODO : 네이버 API 연동 전, Security 적용 전 로직
+    @PostMapping(value = "/restaurant/location")
+    @CreateRestaurantLocationSpringDocs
+    @ResponseStatus(HttpStatus.CREATED)
+    public JMTApiResponse<String> createRestaurantLocation(@RequestBody KakaoSearchDocument kakaoSearchDocumentRequest) {
+        String aggregateId = restaurantService.createRestaurantLocation(kakaoSearchDocumentRequest);
+        return JMTApiResponse.createResponseWithMessage(aggregateId, RestaurantMessage.RESTAURANT_LOCATION_CREATED);
+    }
+
     @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public JMTApiResponse<?> createRestaurant(@ModelAttribute CreateRestaurantRequest createRestaurantRequest) {
-        CreatedRestaurantResponse response = restaurantService.createRestaurant(createRestaurantRequest);
-        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RESTAURANT_CREATED);
+    @CreateRecommendRestaurantSpringDocs
+    @ResponseStatus(HttpStatus.CREATED)
+    public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
+        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(createRecommendRestaurantRequest);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
     }
 }
