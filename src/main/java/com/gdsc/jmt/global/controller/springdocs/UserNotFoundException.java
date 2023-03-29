@@ -2,7 +2,9 @@ package com.gdsc.jmt.global.controller.springdocs;
 
 import com.gdsc.jmt.global.messege.UserMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 public class UserNotFoundException {
     @Schema(description = "", nullable = true)
     String data = null;
