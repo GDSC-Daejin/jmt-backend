@@ -23,7 +23,7 @@ class UpdateUserNickNameCommandTest {
     }
 
     @Test
-    @WithUserDetails(value = "example2@google.com")
+//    @WithUserDetails(value = "example2@google.com")
     public void 유저_닉네임_등록_COMMAND_TEST() {
         //given
 
