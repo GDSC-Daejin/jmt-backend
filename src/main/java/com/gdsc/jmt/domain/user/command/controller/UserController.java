@@ -4,7 +4,7 @@ import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserNickname
 import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserProfileImgSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.NicknameRequest;
 import com.gdsc.jmt.domain.user.command.dto.ProfileImgRequest;
-import com.gdsc.jmt.domain.user.command.dto.response.UserResponse;
+import com.gdsc.jmt.domain.user.command.dto.response.UserNicknameResponse;
 import com.gdsc.jmt.domain.user.command.service.UserService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
@@ -26,9 +26,9 @@ public class UserController {
 
     @PostMapping("/user/nickname")
     @UpdateUserNicknameSpringDocs
-    public JMTApiResponse<UserResponse> updateUserNickname(@AuthenticationPrincipal UserInfo user, @RequestBody NicknameRequest nicknameRequest) {
+    public JMTApiResponse<UserNicknameResponse> updateUserNickname(@AuthenticationPrincipal UserInfo user, @RequestBody NicknameRequest nicknameRequest) {
         userService.updateUserNickName(nicknameRequest.userAggregateId(), nicknameRequest.nickname());
-        UserResponse response = new UserResponse(user.getEmail(), nicknameRequest.nickname());
+        UserNicknameResponse response = new UserNicknameResponse(user.getEmail(), nicknameRequest.nickname());
         return JMTApiResponse.createResponseWithMessage(response, UserMessage.NICKNAME_UPDATE_SUCCESS);
     }
 
