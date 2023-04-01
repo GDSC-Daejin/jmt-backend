@@ -64,11 +64,17 @@ tasks.named('test') {
 }
 
 String versionIncrement(String versionName, String oldVersion) {
-	String nextVersion;
-	nextVersion = String.valueOf(Integer.valueOf(oldVersion) + 1);
-	println("version changed");
-	println(versionName + " version : " + oldVersion + " ---> " + nextVersion);
-	return nextVersion;
+	String isVersionUp = project.findProperty("versionup")
+
+	if(isVersionUp.equals("true")) {
+		String nextVersion
+		nextVersion = String.valueOf(Integer.valueOf(oldVersion) + 1)
+		println("version changed")
+		println(versionName + " version : " + oldVersion + " ---> " + nextVersion)
+		return nextVersion
+	}
+
+	return oldVersion
 }
 
 build {
