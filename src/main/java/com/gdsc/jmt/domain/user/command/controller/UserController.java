@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping("/user/nickname")
     @UpdateUserNicknameSpringDocs
     public JMTApiResponse<UserNicknameResponse> updateUserNickname(@AuthenticationPrincipal UserInfo user, @RequestBody NicknameRequest nicknameRequest) {
-        userService.updateUserNickName(nicknameRequest.userAggregateId(), nicknameRequest.nickname());
+        userService.updateUserNickName(user.getAggreagatedId(), nicknameRequest.nickname());
         UserNicknameResponse response = new UserNicknameResponse(user.getEmail(), nicknameRequest.nickname());
         return JMTApiResponse.createResponseWithMessage(response, UserMessage.NICKNAME_UPDATE_SUCCESS);
     }
@@ -36,7 +36,7 @@ public class UserController {
     @UpdateUserProfileImgSpringDocs
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
                                                   @ModelAttribute ProfileImgRequest profileImgRequest) {
-        userService.updateUserProfileImg(profileImgRequest.userAggregateId(), profileImgRequest.profileImg());
+        userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 
