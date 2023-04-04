@@ -14,15 +14,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class RestaurantAPIUtil {
-//    private static NaverRestServerAPI naverRestServerAPI;
     private final KakaoRestServerAPI kakaoRestServerAPI;
-
-//    @Value("naver.client.id")
-//    private static String naverClientId;
-//
-//    @Value("naver.client.secret")
-//    private static String naverClientSecret;
-
     @Value("${kakao.rest.api.key}")
     private String kakaoRestAPIKey;
 

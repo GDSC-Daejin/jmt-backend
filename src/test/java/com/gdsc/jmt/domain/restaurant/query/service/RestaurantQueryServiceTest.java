@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
+import com.gdsc.jmt.domain.restaurant.MockKakaoMaker;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -46,7 +47,7 @@ public class RestaurantQueryServiceTest {
         public void 맛집_위치정보_리스트_조회() {
             // given
             String query = "마제소바"; int page = 1;
-            KakaoSearchResponse kakaoSearchResponse = makeMockKaKaoApiResponse();
+            KakaoSearchResponse kakaoSearchResponse = MockKakaoMaker.makeMockKaKaoApiResponse();
             Mockito.when(restaurantAPIUtil.findRestaurantLocation(query, page))
                     .thenReturn(kakaoSearchResponse);
             // when
@@ -122,26 +123,4 @@ public class RestaurantQueryServiceTest {
             return null;
         }
     }
-
-
-    private KakaoSearchResponse makeMockKaKaoApiResponse() {
-        List<KakaoSearchDocument> kakaoSearchDocuments = new ArrayList<>();
-        KakaoSearchDocument document = new KakaoSearchDocument(
-                "마제소바",
-                "0",
-                "http://place.map.kakao.com/1574464357",
-                "음식점 > 일식",
-                "대구 동구 신천동 384-12",
-                "대구 동구 동부로 158-7",
-                "1574464357",
-                "",
-                "FD6",
-                "음식점",
-                "128.629555401333",
-                "35.8768967936303");
-
-        kakaoSearchDocuments.add(document);
-        return new KakaoSearchResponse(null, kakaoSearchDocuments);
-    }
-
 }

@@ -16,9 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-@SpringBootTest
-@RequiredArgsConstructor
-@ActiveProfiles("dev")
+
 public class SignUpCommandTest {
     private FixtureConfiguration<UserAggregate> fixture;
 
