@@ -13,6 +13,11 @@ public class CategoryEntity {
 
     private String name;
 
+    public void initForTest(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public CategoryResponse toResponse() {
         return new CategoryResponse(id, name);
     }

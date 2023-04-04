@@ -1,9 +1,11 @@
 package com.gdsc.jmt.domain.restaurant.util;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class KakaoSearchDocument {
 
     @Schema(description = "식당 이름", example = "마제소바")
