@@ -64,33 +64,33 @@ tasks.named('test') {
 }
 
 String versionIncrement(String versionName, String oldVersion) {
-	String isVersionUp = project.findProperty("versionup")
 
-	if(isVersionUp.equals("true")) {
-		String nextVersion
-		nextVersion = String.valueOf(Integer.valueOf(oldVersion) + 1)
-		println("version changed")
-		println(versionName + " version : " + oldVersion + " ---> " + nextVersion)
-		return nextVersion
-	}
+	String nextVersion
+	nextVersion = String.valueOf(Integer.valueOf(oldVersion) + 1)
+	println("version changed")
+	println(versionName + " version : " + oldVersion + " ---> " + nextVersion)
+	return nextVersion
 
 	return oldVersion
 }
 
 build {
-	def props = new Properties()
-	File applicationPropertiesFile = project.rootProject.file("src/main/resources/application.properties")
-	props.load(applicationPropertiesFile.newInputStream())
+	String isVersionUp = project.findProperty("versionup")
+	if(isVersionUp.equals("true")) {
+		def props = new Properties()
+		File applicationPropertiesFile = project.rootProject.file("src/main/resources/application.properties")
+		props.load(applicationPropertiesFile.newInputStream())
 
-	String version = props.getProperty("jmt.api.version")
-	def (oldMajor, oldMinor, oldPatch) = version.tokenize('.')
+		String version = props.getProperty("jmt.api.version")
+		def (oldMajor, oldMinor, oldPatch) = version.tokenize('.')
 
-	String minor = versionIncrement("minor", oldMinor)
+		String minor = versionIncrement("minor", oldMinor)
 
-	String applicationVersion = oldMajor + "." + minor + "." + oldPatch
-	version=applicationVersion
-	props.setProperty("jmt.api.version", applicationVersion)
-	props.store(applicationPropertiesFile.newWriter(), null)
+		String applicationVersion = oldMajor + "." + minor + "." + oldPatch
+		version=applicationVersion
+		props.setProperty("jmt.api.version", applicationVersion)
+		props.store(applicationPropertiesFile.newWriter(), null)
 
-	bootJar.archiveFileName = rootProject.name + "-" + applicationVersion + ".jar"
+		bootJar.archiveFileName = rootProject.name + "-" + applicationVersion + ".jar"
+	}
 }

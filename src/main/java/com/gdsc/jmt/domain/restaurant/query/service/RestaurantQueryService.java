@@ -21,9 +21,12 @@ public class RestaurantQueryService {
 
     private final RestaurantRepository restaurantRepository;
 
-    public List<KakaoSearchDocument> findRestaurantLocationList(final String query, final Integer page) {
-         KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(query, page);
-         return response.getDocuments();
+    public List<KakaoSearchDocument> findRestaurantLocationList(final String query, Integer page) {
+        if(page == null) {
+            page = 1;
+        }
+        KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(query, page);
+        return response.getDocuments();
     }
 
     public void checkRestaurantExisting(final String kakaoSubId) {

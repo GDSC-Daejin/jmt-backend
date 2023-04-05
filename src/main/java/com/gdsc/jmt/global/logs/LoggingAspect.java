@@ -82,7 +82,7 @@ public class LoggingAspect {
 
     private void paramsProcess(String parameterName, Object args, Map<String, Object> params) {
         try {
-            if(!(args instanceof String || args instanceof  Integer || args instanceof Long)) {
+            if(args != null && !(args instanceof String || args instanceof  Integer || args instanceof Long)) {
                 Field[] fields = args.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     field.setAccessible(true);
