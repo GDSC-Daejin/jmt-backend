@@ -55,7 +55,8 @@ public class RecommendRestaurantEntity {
         this.introduce = introduce;
         this.category = category;
         this.restaurant = restaurant;
-        initPictures(pictures);
+        if(pictures != null)
+            initPictures(pictures);
         this.pictures = pictures;
         this.canDrinkLiquor = canDrinkLiquor;
         this.goWellWithLiquor = goWellWithLiquor;
