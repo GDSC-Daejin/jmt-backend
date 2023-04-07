@@ -1,7 +1,10 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
+import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.restaurant.MockKakaoMaker;
+import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchResponse;
@@ -32,6 +35,9 @@ public class RestaurantQueryServiceTest {
 
     @MockBean
     RestaurantRepository restaurantRepository;
+
+    @MockBean
+    RecommendRestaurantRepository recommendRestaurantRepository;
 
     @MockBean
     RestaurantAPIUtil restaurantAPIUtil;
@@ -79,24 +85,44 @@ public class RestaurantQueryServiceTest {
         public void 이미_등록되어_있는맛집_위치정보_조회() {
             // given
             String kakaoSubId = "123456789";
-            Optional<RestaurantEntity> isExisting = Optional.ofNullable(makeMockRestaurantEntity(kakaoSubId));
+            RestaurantEntity restaurant = makeMockRestaurantEntity(kakaoSubId);
+            Optional<RestaurantEntity> locationIsExisting = Optional.ofNullable(restaurant);
+            Optional<RecommendRestaurantEntity> isExisting = Optional.ofNullable(makcMockRecommendRestaurantEntity(restaurant));
             Mockito.when(restaurantRepository.findByKakaoSubId(kakaoSubId))
+                    .thenReturn(locationIsExisting);
+            Mockito.when(recommendRestaurantRepository.findByRestaurant(restaurant))
                     .thenReturn(isExisting);
 
             // when then
             ApiException exception = Assertions.assertThrows(ApiException.class, () -> {
-                restaurantQueryService.checkRestaurantExisting(kakaoSubId);
+                restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
             });
-            Assertions.assertEquals(exception.getResponseMessage(), RestaurantMessage.RESTAURANT_LOCATION_CONFLICT);
+            Assertions.assertEquals(exception.getResponseMessage(), RestaurantMessage.RECOMMEND_RESTAURANT_CONFLICT);
         }
 
         @Test
-        public void 등록되지_않은_맛집_위치정보_조회() {
+        public void 모든_것이_등록되지_않은_맛집_등록_유무_조회() {
             // given
             String kakaoSubId = "123456789";
             // when then
+            ApiException exception = Assertions.assertThrows(ApiException.class , () -> {
+                    restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
+            });
+            Assertions.assertEquals(exception.getResponseMessage(), RestaurantMessage.RESTAURANT_LOCATION_NOT_FOUND);
+        }
+
+        @Test
+        public void 위치_정보만_등록되어있는_맛집_등록_유무_조회() {
+            // given
+            String kakaoSubId = "123456789";
+            RestaurantEntity restaurant = makeMockRestaurantEntity(kakaoSubId);
+            Optional<RestaurantEntity> locationIsExisting = Optional.ofNullable(restaurant);
+            Mockito.when(restaurantRepository.findByKakaoSubId(kakaoSubId))
+                    .thenReturn(locationIsExisting);
+
+            // when then
             Assertions.assertDoesNotThrow(() -> {
-                    restaurantQueryService.checkRestaurantExisting(kakaoSubId);
+                restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
             });
         }
     }
@@ -122,5 +148,19 @@ public class RestaurantQueryServiceTest {
         catch (ParseException ex) {
             return null;
         }
+    }
+
+    private RecommendRestaurantEntity makcMockRecommendRestaurantEntity(RestaurantEntity restaurant) {
+        CategoryEntity category = new CategoryEntity();
+        category.initForTest(1L, "중식");
+        return RecommendRestaurantEntity.builder()
+                .introduce("마라탕")
+                .category(category)
+                .restaurant(restaurant)
+                .canDrinkLiquor(true)
+                .goWellWithLiquor("위스키")
+                .recommendMenu("#마제소바#라멘")
+                .aggregateId("1234-5678-87")
+                .build();
     }
 }
