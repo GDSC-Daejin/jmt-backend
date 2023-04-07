@@ -32,9 +32,8 @@ public class RestaurantQueryController {
 
     @GetMapping("/restaurant/{kakaoSubId}")
     @CheckRecommendRestaurantExistingSpringDocs
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public JMTApiResponse<?> checkRecommendRestaurantExisting(@PathVariable String kakaoSubId) {
-        restaurantQueryService.checkRestaurantExisting(kakaoSubId);
-        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RESTAURANT_NOT_FOUND);
+        restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
+        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_REGISTERABLE);
     }
 }

@@ -9,9 +9,9 @@ public class RecommendRestaurantConflictException {
     @Schema(description = "", nullable = true)
     String data = null;
 
-    @Schema(description = "", example = "해당 맛집을 찾을 수 없습니다.")
-    String message = RestaurantMessage.RESTAURANT_CONFLICT.getMessage();
+    @Schema(description = "", example = "맛집이 이미 등록이 되어있습니다.")
+    String message = RestaurantMessage.RECOMMEND_RESTAURANT_CONFLICT.getMessage();
 
-    @Schema(description = "", example = "RESTAURANT_CONFLICT")
-    String code = RestaurantMessage.RESTAURANT_CONFLICT.toString();
+    @Schema(description = "", example = "RECOMMEND_RESTAURANT_CONFLICT")
+    String code = RestaurantMessage.RECOMMEND_RESTAURANT_CONFLICT.toString();
 }
