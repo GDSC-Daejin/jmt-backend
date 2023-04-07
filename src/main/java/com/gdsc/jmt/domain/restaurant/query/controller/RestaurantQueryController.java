@@ -1,6 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.controller;
 
-import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
+import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -30,10 +30,10 @@ public class RestaurantQueryController {
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_LOCATION_FIND);
     }
 
-    @GetMapping("/restaurant/{kakaoSubId}")
-    @CheckRecommendRestaurantExistingSpringDocs
+    @GetMapping("/restaurant/location/{kakaoSubId}")
+    @CheckRestaurantExistingSpringDocs
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public JMTApiResponse<?> checkRecommendRestaurantExisting(@PathVariable String kakaoSubId) {
+    public JMTApiResponse<?> checkRestaurantExisting(@PathVariable String kakaoSubId) {
         restaurantQueryService.checkRestaurantExisting(kakaoSubId);
         return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RESTAURANT_NOT_FOUND);
     }
