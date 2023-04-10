@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
@@ -27,11 +28,8 @@ public class RestaurantQueryService {
     private final RecommendRestaurantRepository recommendRestaurantRepository;
 
 
-    public List<KakaoSearchDocument> findRestaurantLocationList(final String query, Integer page) {
-        if(page == null) {
-            page = 1;
-        }
-        KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(query, page);
+    public List<KakaoSearchDocument> findRestaurantLocationList(final FindRestaurantLocationListRequest findRestaurantLocationListRequest) {
+        KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(findRestaurantLocationListRequest);
         return response.getDocuments();
     }
 

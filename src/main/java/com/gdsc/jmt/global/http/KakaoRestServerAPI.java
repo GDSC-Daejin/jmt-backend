@@ -13,5 +13,7 @@ public interface KakaoRestServerAPI {
             @Query("query") String query,
             @Query("category_group_code") String category,
             @Query("page") Integer page,
-            @Query("size") Integer size);
+            @Query("size") Integer size,
+            @Query("x") String x,
+            @Query("y") String y);
 }

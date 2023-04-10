@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.util;
 
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.http.KakaoRestServerAPI;
 import com.gdsc.jmt.global.messege.DefaultMessage;
@@ -18,14 +19,16 @@ public class RestaurantAPIUtil {
     @Value("${kakao.rest.api.key}")
     private String kakaoRestAPIKey;
 
-    public KakaoSearchResponse findRestaurantLocation(final String query, final Integer page) {
+    public KakaoSearchResponse findRestaurantLocation(final FindRestaurantLocationListRequest request) {
         try {
             Call<KakaoSearchResponse> call = kakaoRestServerAPI.sendSearchAPI(
                     "KakaoAK " + kakaoRestAPIKey,
-                    query,
+                    request.query(),
                     "FD6",
-                    page,
-                    10
+                    request.page() != null ? request.page() : 1,
+                    10,
+                    request.x() != null ? request.x() : "",
+                    request.y() != null ? request.y() : ""
             );
 
             Response<KakaoSearchResponse> response = call.execute();
