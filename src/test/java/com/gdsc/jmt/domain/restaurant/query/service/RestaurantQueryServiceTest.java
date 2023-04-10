@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.restaurant.query.service;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.restaurant.MockKakaoMaker;
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
@@ -54,10 +55,11 @@ public class RestaurantQueryServiceTest {
             // given
             String query = "마제소바"; int page = 1;
             KakaoSearchResponse kakaoSearchResponse = MockKakaoMaker.makeMockKaKaoApiResponse();
-            Mockito.when(restaurantAPIUtil.findRestaurantLocation(query, page))
+            FindRestaurantLocationListRequest request = makeMockFindRestaurantLocationListRequest(query, page);
+            Mockito.when(restaurantAPIUtil.findRestaurantLocation(request))
                     .thenReturn(kakaoSearchResponse);
             // when
-            List<KakaoSearchDocument> result = restaurantQueryService.findRestaurantLocationList(query, page);
+            List<KakaoSearchDocument> result = restaurantQueryService.findRestaurantLocationList(request);
 
             //then
             Assertions.assertEquals(kakaoSearchResponse.getDocuments(), result);
@@ -68,10 +70,11 @@ public class RestaurantQueryServiceTest {
             // given
             String query = "마제소바"; int page = 1;
             KakaoSearchResponse kakaoSearchResponse = new KakaoSearchResponse(null, new ArrayList<>());
-            Mockito.when(restaurantAPIUtil.findRestaurantLocation(query, page))
+            FindRestaurantLocationListRequest request = makeMockFindRestaurantLocationListRequest(query, page);
+            Mockito.when(restaurantAPIUtil.findRestaurantLocation(request))
                     .thenReturn(kakaoSearchResponse);
             // when
-            List<KakaoSearchDocument> result = restaurantQueryService.findRestaurantLocationList(query, page);
+            List<KakaoSearchDocument> result = restaurantQueryService.findRestaurantLocationList(request);
             //then
             Assertions.assertTrue(result.isEmpty());
         }
@@ -162,5 +165,14 @@ public class RestaurantQueryServiceTest {
                 .recommendMenu("#마제소바#라멘")
                 .aggregateId("1234-5678-87")
                 .build();
+    }
+
+    private FindRestaurantLocationListRequest makeMockFindRestaurantLocationListRequest(final String query, final Integer page) {
+        return new FindRestaurantLocationListRequest(
+                query,
+                page,
+                "",
+                ""
+        );
     }
 }
