@@ -1,12 +1,11 @@
 package com.gdsc.jmt.domain.restaurant.manager;
 
-import com.gdsc.jmt.domain.MockRestaurantMaker;
+import com.gdsc.jmt.domain.restaurant.MockRestaurantMaker;
 import com.gdsc.jmt.domain.restaurant.MockKakaoMaker;
 import com.gdsc.jmt.domain.restaurant.command.aggregate.RestaurantAggregate;
 import com.gdsc.jmt.domain.restaurant.command.event.CreateRestaurantEvent;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
-import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import org.axonframework.eventsourcing.EventSourcingRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package com.gdsc.jmt.domain;
+package com.gdsc.jmt.domain.restaurant;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
