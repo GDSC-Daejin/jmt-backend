@@ -1,6 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
-import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
+import com.gdsc.jmt.domain.MockRestaurantMaker;
 import com.gdsc.jmt.domain.restaurant.MockKakaoMaker;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
@@ -16,9 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -85,9 +82,9 @@ public class RestaurantQueryServiceTest {
         public void 이미_등록되어_있는맛집_위치정보_조회() {
             // given
             String kakaoSubId = "123456789";
-            RestaurantEntity restaurant = makeMockRestaurantEntity(kakaoSubId);
+            RestaurantEntity restaurant = MockRestaurantMaker.makeMockRestaurantEntity(kakaoSubId);
             Optional<RestaurantEntity> locationIsExisting = Optional.ofNullable(restaurant);
-            Optional<RecommendRestaurantEntity> isExisting = Optional.ofNullable(makcMockRecommendRestaurantEntity(restaurant));
+            Optional<RecommendRestaurantEntity> isExisting = Optional.ofNullable(MockRestaurantMaker.makcMockRecommendRestaurantEntity(restaurant));
             Mockito.when(restaurantRepository.findByKakaoSubId(kakaoSubId))
                     .thenReturn(locationIsExisting);
             Mockito.when(recommendRestaurantRepository.findByRestaurant(restaurant))
@@ -115,7 +112,7 @@ public class RestaurantQueryServiceTest {
         public void 위치_정보만_등록되어있는_맛집_등록_유무_조회() {
             // given
             String kakaoSubId = "123456789";
-            RestaurantEntity restaurant = makeMockRestaurantEntity(kakaoSubId);
+            RestaurantEntity restaurant = MockRestaurantMaker.makeMockRestaurantEntity(kakaoSubId);
             Optional<RestaurantEntity> locationIsExisting = Optional.ofNullable(restaurant);
             Mockito.when(restaurantRepository.findByKakaoSubId(kakaoSubId))
                     .thenReturn(locationIsExisting);
@@ -128,39 +125,39 @@ public class RestaurantQueryServiceTest {
     }
 
 
-    private RestaurantEntity makeMockRestaurantEntity(String kakaoSubId) {
-        try {
-            String pointWKT = String.format("POINT(%s %s)", 1.2, 3.4);
-            Point testLocation = (Point) new WKTReader().read(pointWKT);
-
-            return RestaurantEntity.builder()
-                    .kakaoSubId(kakaoSubId)
-                    .name("마제소바 맛집")
-                    .placeUrl("https://test맛집.com")
-                    .category("양식")
-                    .phone("010-1234-5678")
-                    .address("서울 노원구")
-                    .roadAddress("도로명 주소")
-                    .location(testLocation)
-                    .aggregateId("123456789")
-                    .build();
-        }
-        catch (ParseException ex) {
-            return null;
-        }
-    }
-
-    private RecommendRestaurantEntity makcMockRecommendRestaurantEntity(RestaurantEntity restaurant) {
-        CategoryEntity category = new CategoryEntity();
-        category.initForTest(1L, "중식");
-        return RecommendRestaurantEntity.builder()
-                .introduce("마라탕")
-                .category(category)
-                .restaurant(restaurant)
-                .canDrinkLiquor(true)
-                .goWellWithLiquor("위스키")
-                .recommendMenu("#마제소바#라멘")
-                .aggregateId("1234-5678-87")
-                .build();
-    }
+//    private RestaurantEntity makeMockRestaurantEntity(String kakaoSubId) {
+//        try {
+//            String pointWKT = String.format("POINT(%s %s)", 1.2, 3.4);
+//            Point testLocation = (Point) new WKTReader().read(pointWKT);
+//
+//            return RestaurantEntity.builder()
+//                    .kakaoSubId(kakaoSubId)
+//                    .name("마제소바 맛집")
+//                    .placeUrl("https://test맛집.com")
+//                    .category("양식")
+//                    .phone("010-1234-5678")
+//                    .address("서울 노원구")
+//                    .roadAddress("도로명 주소")
+//                    .location(testLocation)
+//                    .aggregateId("123456789")
+//                    .build();
+//        }
+//        catch (ParseException ex) {
+//            return null;
+//        }
+//    }
+//
+//    private RecommendRestaurantEntity makcMockRecommendRestaurantEntity(RestaurantEntity restaurant) {
+//        CategoryEntity category = new CategoryEntity();
+//        category.initForTest(1L, "중식");
+//        return RecommendRestaurantEntity.builder()
+//                .introduce("마라탕")
+//                .category(category)
+//                .restaurant(restaurant)
+//                .canDrinkLiquor(true)
+//                .goWellWithLiquor("위스키")
+//                .recommendMenu("#마제소바#라멘")
+//                .aggregateId("1234-5678-87")
+//                .build();
+//    }
 }
