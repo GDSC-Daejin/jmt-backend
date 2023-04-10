@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.restaurant.query.controller;
 
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
@@ -10,10 +11,7 @@ import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,8 +23,8 @@ public class RestaurantQueryController {
 
     @GetMapping("/restaurant/location")
     @FindRestaurantLocationSpringDocs
-    public JMTApiResponse<List<KakaoSearchDocument>> findRestaurantLocationList(@RequestParam String query, @RequestParam(required = false) Integer page) {
-        List<KakaoSearchDocument> restaurants = restaurantQueryService.findRestaurantLocationList(query, page);
+    public JMTApiResponse<List<KakaoSearchDocument>> findRestaurantLocationList(@ModelAttribute FindRestaurantLocationListRequest findRestaurantLocationListRequest) {
+        List<KakaoSearchDocument> restaurants = restaurantQueryService.findRestaurantLocationList(findRestaurantLocationListRequest);
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_LOCATION_FIND);
     }
 
