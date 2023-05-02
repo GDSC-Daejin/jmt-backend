@@ -17,7 +17,9 @@ public enum RestaurantMessage implements ResponseMessage {
     RESTAURANT_CREATED("맛집이 등록되었습니다." , HttpStatus.CREATED),
 
     RESTAURANT_LOCATION_NOT_FOUND("맛집 위치정보가 등록되지 않았습니다." , HttpStatus.NOT_FOUND),
-    RESTAURANT_LOCATION_FIND("맛집 위치 정보를 조회하였습니다." , HttpStatus.OK);
+    RESTAURANT_LOCATION_FIND("맛집 위치 정보를 조회하였습니다." , HttpStatus.OK),
+    DETAIL_RESTAURANT_FIND_SUCCESS("맛집 세부 정보를 조회하였습니다.", HttpStatus.OK),
+    RECOMMEND_RESTAURANT_NOT_FOUND("맛집 세부 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
     private final String message;
     private final HttpStatus status;

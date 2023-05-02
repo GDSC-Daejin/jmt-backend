@@ -3,14 +3,15 @@ package com.gdsc.jmt.domain.restaurant.query.controller;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
+import com.gdsc.jmt.domain.user.command.controller.springdocs.FindDetailRestaurantSpringDocs;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,10 +29,19 @@ public class RestaurantQueryController {
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_LOCATION_FIND);
     }
 
-    @GetMapping("/restaurant/{kakaoSubId}")
+    @GetMapping("/restaurant/registration/{kakaoSubId}")
     @CheckRecommendRestaurantExistingSpringDocs
     public JMTApiResponse<?> checkRecommendRestaurantExisting(@PathVariable String kakaoSubId) {
         restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
         return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_REGISTERABLE);
     }
+
+    @GetMapping("restaurant/{recommendRestaurantId}")
+
+    public JMTApiResponse<?> getDetailRestaurant(@PathVariable Long recommendRestaurantId) {
+        restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
+        FindDetailRestaurantResponse detailRestaurantResponse = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
+        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.DETAIL_RESTAURANT_FIND_SUCCESS);
+    }
+
 }
