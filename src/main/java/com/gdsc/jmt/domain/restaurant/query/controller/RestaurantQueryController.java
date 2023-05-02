@@ -37,7 +37,7 @@ public class RestaurantQueryController {
     }
 
     @GetMapping("restaurant/{recommendRestaurantId}")
-
+    @FindDetailRestaurantSpringDocs
     public JMTApiResponse<?> getDetailRestaurant(@PathVariable Long recommendRestaurantId) {
         restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
         FindDetailRestaurantResponse detailRestaurantResponse = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
