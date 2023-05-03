@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.entity;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantResponse;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,5 +69,19 @@ public class RecommendRestaurantEntity {
         for(RestaurantPhotoEntity picture : pictures) {
             picture.initRecommendRestaurant(this);
         }
+    }
+
+    public FindRestaurantResponse convertToFindResponse() {
+        return new FindRestaurantResponse(
+                this.id,
+                this.restaurant.getName(),
+                this.restaurant.getPlaceUrl(),
+                this.restaurant.getPhone(),
+                this.restaurant.getAddress(),
+                this.restaurant.getRoadAddress(),
+                this.introduce,
+                this.category.getName(),
+                this.aggregateId
+        );
     }
 }

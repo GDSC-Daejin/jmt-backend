@@ -15,6 +15,7 @@ public enum RestaurantMessage implements ResponseMessage {
     RECOMMEND_RESTAURANT_CONFLICT("맛집이 이미 등록이 되어있습니다." , HttpStatus.CONFLICT),
     RECOMMEND_RESTAURANT_REGISTERABLE("맛집 위치정보는 등록이 되어있고, 해당 맛집을 등록할 수 있습니다." , HttpStatus.OK),
     RESTAURANT_CREATED("맛집이 등록되었습니다." , HttpStatus.CREATED),
+    RESTAURANT_FIND_ALL("맛집 리스트가 조회되었습니다.", HttpStatus.OK),
 
     RESTAURANT_LOCATION_NOT_FOUND("맛집 위치정보가 등록되지 않았습니다." , HttpStatus.NOT_FOUND),
     RESTAURANT_LOCATION_FIND("맛집 위치 정보를 조회하였습니다." , HttpStatus.OK);
