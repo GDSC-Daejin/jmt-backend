@@ -1,5 +1,8 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
+import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
@@ -11,6 +14,8 @@ import com.gdsc.jmt.domain.restaurant.util.RestaurantAPIUtil;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,5 +53,21 @@ public class RestaurantQueryService {
         }
 
         return isExisting.get();
+    }
+
+    public FindAllRestaurantResponse findAll(final Pageable pageable) {
+        Page<RecommendRestaurantEntity> recommendRestaurantPage = recommendRestaurantRepository.findAll(pageable);
+
+        List<FindRestaurantResponse> restaurants = recommendRestaurantPage.getContent()
+                .stream().map(RecommendRestaurantEntity::convertToFindResponse)
+                .toList();
+
+        Pageable pageInfo = recommendRestaurantPage.getPageable();
+        PageMeta pageMeta = new PageMeta(
+                pageInfo.getPageNumber() + 1,
+                pageInfo.getPageSize(),
+                recommendRestaurantPage.getTotalPages()
+        );
+        return new FindAllRestaurantResponse(restaurants , pageMeta);
     }
 }
