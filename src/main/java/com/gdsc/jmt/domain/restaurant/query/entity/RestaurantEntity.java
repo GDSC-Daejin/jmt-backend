@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Point;
 
 @Getter
 @NoArgsConstructor
+@Getter
 @Entity @Table(name = "tb_restaurant")
 public class RestaurantEntity {
     @Id
