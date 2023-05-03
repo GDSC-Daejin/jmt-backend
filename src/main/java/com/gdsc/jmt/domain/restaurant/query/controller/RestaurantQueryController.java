@@ -39,9 +39,8 @@ public class RestaurantQueryController {
     @GetMapping("restaurant/{recommendRestaurantId}")
     @FindDetailRestaurantSpringDocs
     public JMTApiResponse<?> getDetailRestaurant(@PathVariable Long recommendRestaurantId) {
-        restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
-        FindDetailRestaurantResponse detailRestaurantResponse = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
-        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.DETAIL_RESTAURANT_FIND_SUCCESS);
+        FindDetailRestaurantResponse response = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.DETAIL_RESTAURANT_FIND_SUCCESS);
     }
 
 }
