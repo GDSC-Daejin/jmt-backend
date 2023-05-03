@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
@@ -55,6 +56,14 @@ public class RestaurantQueryService {
         return isExisting.get();
     }
 
+    public FindDetailRestaurantResponse findDetailRestaurant(Long recommendRestaurantId) {
+        Optional<RecommendRestaurantEntity> isExisting = recommendRestaurantRepository.findById(recommendRestaurantId);
+        if(isExisting.isEmpty()) {
+            throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
+        }
+        return isExisting.get().toResponse();
+    }
+        
     public FindAllRestaurantResponse findAll(final Pageable pageable) {
         Page<RecommendRestaurantEntity> recommendRestaurantPage = recommendRestaurantRepository.findAll(pageable);
 
