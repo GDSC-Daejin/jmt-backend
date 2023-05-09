@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
-@Getter
 @NoArgsConstructor
 @Getter
 @Entity @Table(name = "tb_restaurant")

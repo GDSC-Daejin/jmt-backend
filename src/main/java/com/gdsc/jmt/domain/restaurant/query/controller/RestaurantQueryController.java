@@ -51,7 +51,7 @@ public class RestaurantQueryController {
     @CheckRecommendRestaurantExistingSpringDocs
     public JMTApiResponse<?> checkRecommendRestaurantExisting(@PathVariable String kakaoSubId) {
         restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
-        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_REGISTERABLE);
+        return JMTApiResponse.createResponseWithMessage(true, RestaurantMessage.RECOMMEND_RESTAURANT_REGISTERABLE);
     }
 
     @GetMapping("restaurant/{recommendRestaurantId}")
@@ -60,5 +60,4 @@ public class RestaurantQueryController {
         FindDetailRestaurantResponse response = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.DETAIL_RESTAURANT_FIND_SUCCESS);
     }
-
 }
