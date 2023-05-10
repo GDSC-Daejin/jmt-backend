@@ -41,6 +41,9 @@ public class RestaurantQueryService {
 
     public void checkRecommendRestaurantExisting(final String kakaoSubId) {
         RestaurantEntity restaurant = findRestaurant(kakaoSubId);
+        if(restaurant == null) {
+            return;
+        }
         Optional<RecommendRestaurantEntity> isExisting = recommendRestaurantRepository.findByRestaurant(restaurant);
         if(isExisting.isPresent()) {
             throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_CONFLICT);
@@ -49,11 +52,10 @@ public class RestaurantQueryService {
 
     private RestaurantEntity findRestaurant(final String kakaoSubId) {
         Optional<RestaurantEntity> isExisting = restaurantRepository.findByKakaoSubId(kakaoSubId);
-        if(isExisting.isEmpty()) {
-            throw new ApiException(RestaurantMessage.RESTAURANT_LOCATION_NOT_FOUND);
-        }
-
-        return isExisting.get();
+//        if(isExisting.isEmpty()) {
+//            throw new ApiException(RestaurantMessage.RESTAURANT_LOCATION_NOT_FOUND);
+//        }
+        return isExisting.orElse(null);
     }
 
     public FindDetailRestaurantResponse findDetailRestaurant(Long recommendRestaurantId) {
