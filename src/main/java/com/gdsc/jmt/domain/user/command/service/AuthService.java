@@ -153,4 +153,12 @@ public class AuthService {
     private TokenResponse createToken(String email, String userAggregateId, String refreshTokenAggregateId) {
         return tokenProvider.generateJwtToken(email, userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
     }
+
+    public String createAccessToken(String userAggregateId) {
+        Optional<UserEntity> user = userRepository.findByUserAggregateId(userAggregateId);
+        if(user.isEmpty())
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        TokenResponse response = tokenProvider.generateJwtToken(user.get().getEmail(), userAggregateId, "", RoleType.MEMBER);
+        return response.accessToken();
+    }
 }
