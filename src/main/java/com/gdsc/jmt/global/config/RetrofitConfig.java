@@ -18,7 +18,6 @@ public class RetrofitConfig {
 
     private static final String KAKAO_URL = "https://dapi.kakao.com/v2/";
 
-
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS)

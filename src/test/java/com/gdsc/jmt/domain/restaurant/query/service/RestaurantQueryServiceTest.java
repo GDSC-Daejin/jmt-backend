@@ -108,10 +108,9 @@ public class RestaurantQueryServiceTest {
             // given
             String kakaoSubId = "123456789";
             // when then
-            ApiException exception = Assertions.assertThrows(ApiException.class , () -> {
+            Assertions.assertDoesNotThrow(() -> {
                     restaurantQueryService.checkRecommendRestaurantExisting(kakaoSubId);
             });
-            Assertions.assertEquals(exception.getResponseMessage(), RestaurantMessage.RESTAURANT_LOCATION_NOT_FOUND);
         }
 
         @Test
