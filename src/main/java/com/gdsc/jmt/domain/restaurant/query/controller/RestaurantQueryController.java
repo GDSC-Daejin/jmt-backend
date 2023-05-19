@@ -5,6 +5,7 @@ import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -59,5 +61,12 @@ public class RestaurantQueryController {
     public JMTApiResponse<?> getDetailRestaurant(@PathVariable Long recommendRestaurantId) {
         FindDetailRestaurantResponse response = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.DETAIL_RESTAURANT_FIND_SUCCESS);
+    }
+
+
+    @GetMapping("restaurant/search")
+    public JMTApiResponse<?> restaurantSearch(@RequestParam String keyword, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
+        Page<FindRestaurantResponse> response = restaurantQueryService.search(keyword, pageable);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
 }
