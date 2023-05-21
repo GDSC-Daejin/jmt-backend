@@ -81,4 +81,11 @@ public class RestaurantQueryService {
         );
         return new FindAllRestaurantResponse(restaurants , pageMeta);
     }
+
+    public Page<FindRestaurantResponse> search(final String keyword, Pageable pageable) {
+        Page<RecommendRestaurantEntity> recommendRestaurantPage = recommendRestaurantRepository.findSearch(keyword, pageable);
+        return recommendRestaurantPage.map(RecommendRestaurantEntity::convertToFindResponse);
+    }
+
+
 }
