@@ -57,6 +57,9 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-impl:_")
 	implementation("io.jsonwebtoken:jjwt-jackson:_")
 	implementation ("com.googlecode.json-simple:json-simple:_")
+
+	//S3
+	implementation("org.springframework.cloud:spring-cloud-starter-aws:_")
 }
 
 tasks.named('test') {
