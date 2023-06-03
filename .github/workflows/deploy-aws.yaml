@@ -5,7 +5,7 @@ on:
     branches: [ release/ec2 ]
 
 env:
-  project_id: jmt
+  PROJECT_ID: jmt
 
 
 jobs:
