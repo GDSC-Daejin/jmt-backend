@@ -4,6 +4,10 @@ on:
   push:
     branches: [ release/ec2 ]
 
+env:
+  project_id: jmt
+
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -43,11 +47,11 @@ jobs:
 
       - name: Docker Build
         run: |
-          docker build --tag gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA .
+          docker build --tag gcr.io/$PROJECT_ID/image:$GITHUB_SHA .
 
       - name: Docker Push
         run: |
-          docker push gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA
+          docker push gcr.io/$PROJECT_ID/image:$GITHUB_SHA
 
       - name: Create SSH Private Key
         run: |
