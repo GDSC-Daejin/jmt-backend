@@ -53,13 +53,13 @@ jobs:
           docker login --username=boo10500 --password=${{ secrets.DOCKER_USER_PW }}
           docker push boo10500/$DOCKER_REPO_NAME:jmt-image-$GITHUB_SHA
 
-      - name: Create SSH Private Key
-        run: |
-          touch gdsc-dju-jmt.pem
-          echo "$EC2_SSH_KEY" > gdsc-dju-jmt.pem
-          chmod 400 gdsc-dju-jmt.pem
-        env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+#      - name: Create SSH Private Key
+#        run: |
+#          touch gdsc-dju-jmt.pem
+#          echo "$EC2_SSH_KEY" > gdsc-dju-jmt.pem
+#          chmod 400 gdsc-dju-jmt.pem
+#        env:
+#          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
 
 #      - name: EC2 Docker Deploy and Run
 #        run: |
