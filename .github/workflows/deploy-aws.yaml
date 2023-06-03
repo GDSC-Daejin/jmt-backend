@@ -5,8 +5,7 @@ on:
     branches: [ release/ec2 ]
 
 env:
-  PROJECT_ID: jmt
-
+  DOCKER_REPO_NAME: ${{ secrets.DOCKER_REPO_NAME }}
 
 jobs:
   deploy:
@@ -47,11 +46,12 @@ jobs:
 
       - name: Docker Build
         run: |
-          docker build --tag gcr.io/$PROJECT_ID/image:$GITHUB_SHA .
+          docker build --tag boo10500/$DOCKER_REPO_NAME/jmt-image:$GITHUB_SHA .
 
       - name: Docker Push
         run: |
-          docker push gcr.io/$PROJECT_ID/image:$GITHUB_SHA
+          docker login --username=boo10500 --password=${{ secrets.DOCKER_USER_PW }}
+          docker push boo10500/$DOCKER_REPO_NAME/jmt-image:$GITHUB_SHA
 
       - name: Create SSH Private Key
         run: |
@@ -66,6 +66,6 @@ jobs:
           ssh -t -i gdsc-dju-jmt.pem ubuntu@${{ secrets.EC2_HOST }} '
           sudo docker ps -aq --filter "name=jmt" | xargs docker stop | xargs docker rm && 
           sudo docker image prune -a -f &&
-          sudo docker pull gcr.io/"'$PROJECT_ID'"/"'$GCE_INSTANCE'"-image:"'$GITHUB_SHA'" &&
-          sudo docker run -d -p 8080:8080 --name jmt gcr.io/"'$PROJECT_ID'"/"'$GCE_INSTANCE'"-image:"'$GITHUB_SHA'"
+          sudo docker pull boo10500/"'$DOCKER_REPO_NAME'"/jmt-image:"'$GITHUB_SHA'" &&
+          sudo docker run -d -p 8080:8080 --name jmt boo10500/"'$DOCKER_REPO_NAME'"/jmt-image:"'$GITHUB_SHA'"
           '
