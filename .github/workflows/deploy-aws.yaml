@@ -63,7 +63,7 @@ jobs:
 
       - name: EC2 Docker Deploy and Run
         run: |
-          ssh -t -i gdsc-dju-jmt.pem ubuntu@${{ secrets.EC2_HOST }} '
+          ssh -t -i ./gdsc-dju-jmt.pem ubuntu@${{ secrets.EC2_HOST }} '
           sudo docker ps -aq --filter "name=jmt" | xargs docker stop | xargs docker rm && 
           sudo docker image prune -a -f &&
           sudo docker pull boo10500/"'$DOCKER_REPO_NAME'":jmt-image-"'$GITHUB_SHA'" &&
