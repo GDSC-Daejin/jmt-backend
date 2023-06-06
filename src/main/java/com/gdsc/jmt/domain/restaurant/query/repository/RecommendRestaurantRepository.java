@@ -14,9 +14,9 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
     Optional<RecommendRestaurantEntity> findByRestaurant(RestaurantEntity restaurant);
 
     @Query("select reRestaurant from RecommendRestaurantEntity reRestaurant " +
-            "where reRestaurant.restaurant.name = :keyword " +
-            "or reRestaurant.introduce LIKE %:keyword% " +
-            "or reRestaurant.recommendMenu LIKE %:keyword% ")
+            "where reRestaurant.restaurant.name LIKE %:keyword%")
+//            "or reRestaurant.introduce LIKE %:keyword% " +
+//            "or reRestaurant.recommendMenu LIKE %:keyword% ")
     Page<RecommendRestaurantEntity> findSearch(String keyword, Pageable pageable);
 
 //    @EntityGraph(attributePaths = {"category", "restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
