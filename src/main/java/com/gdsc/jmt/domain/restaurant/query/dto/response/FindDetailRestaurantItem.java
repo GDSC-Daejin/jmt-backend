@@ -1,8 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.dto.response;
 
-import lombok.Builder;
-
-public record FindDetailRestaurantResponse(
+public record FindDetailRestaurantItem(
         //식당 정보
         String name,
         String placeUrl,

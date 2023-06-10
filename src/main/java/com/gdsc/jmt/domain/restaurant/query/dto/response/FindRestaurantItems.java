@@ -1,6 +1,6 @@
-package com.gdsc.jmt.domain.restaurant.query.dto;
+package com.gdsc.jmt.domain.restaurant.query.dto.response;
 
-public record FindRestaurantResponse(
+public record FindRestaurantItems(
         Long id,
         String name,
         String placeUrl,

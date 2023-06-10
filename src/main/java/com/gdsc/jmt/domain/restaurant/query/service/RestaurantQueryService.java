@@ -1,10 +1,11 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
 import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
-import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
@@ -12,6 +13,7 @@ import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchResponse;
 import com.gdsc.jmt.domain.restaurant.util.RestaurantAPIUtil;
+import com.gdsc.jmt.global.dto.PageResponse;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +60,7 @@ public class RestaurantQueryService {
         return isExisting.orElse(null);
     }
 
-    public FindDetailRestaurantResponse findDetailRestaurant(Long recommendRestaurantId) {
+    public FindDetailRestaurantItem findDetailRestaurant(Long recommendRestaurantId) {
         Optional<RecommendRestaurantEntity> isExisting = recommendRestaurantRepository.findById(recommendRestaurantId);
         if(isExisting.isEmpty()) {
             throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
@@ -69,8 +71,8 @@ public class RestaurantQueryService {
     public FindAllRestaurantResponse findAll(final Pageable pageable) {
         Page<RecommendRestaurantEntity> recommendRestaurantPage = recommendRestaurantRepository.findAll(pageable);
 
-        List<FindRestaurantResponse> restaurants = recommendRestaurantPage.getContent()
-                .stream().map(RecommendRestaurantEntity::convertToFindResponse)
+        List<FindRestaurantItems> restaurants = recommendRestaurantPage.getContent()
+                .stream().map(RecommendRestaurantEntity::convertToFindItems)
                 .toList();
 
         Pageable pageInfo = recommendRestaurantPage.getPageable();
@@ -82,9 +84,14 @@ public class RestaurantQueryService {
         return new FindAllRestaurantResponse(restaurants , pageMeta);
     }
 
-    public Page<FindRestaurantResponse> search(final String keyword, Pageable pageable) {
+    public FindRestaurantResponse search(final String keyword, Pageable pageable) {
         Page<RecommendRestaurantEntity> recommendRestaurantPage = recommendRestaurantRepository.findSearch(keyword, pageable);
-        return recommendRestaurantPage.map(RecommendRestaurantEntity::convertToFindResponse);
+
+        PageResponse pageResponse = new PageResponse(recommendRestaurantPage);
+        return new FindRestaurantResponse(
+                recommendRestaurantPage.getContent().stream().map(RecommendRestaurantEntity::convertToFindItems).toList(),
+                pageResponse
+        );
     }
 
 
