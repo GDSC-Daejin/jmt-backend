@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.user.command.UpdateUserNickNameCommand;
 import com.gdsc.jmt.domain.user.command.UpdateUserProfileImgCommand;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.UserMessage;
+import com.gdsc.jmt.global.service.S3FileService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserService {
     private final CommandGateway commandGateway;
+    private final S3FileService s3FileService;
     //TODO : 임시로 피오니 로컬로 테스트 해봤어요. 나중에는 s3로 바꿔야할 것 같아요.
     private final String PROFILE_IMAGE_URL = "/src/main/resources/image/";
 
@@ -30,12 +32,19 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserProfileImg(String userAggregateId, MultipartFile profileImg) {
-        uploadImage(profileImg);
+    public String updateUserProfileImg(String userAggregateId, MultipartFile profileImg) {
+        String responseUrl = "";
+        try {
+            responseUrl = s3FileService.upload(profileImg, "profileImg");
+        } catch (IOException e) {
+            throw new ApiException(UserMessage.PROFILE_IMAGE_UPLOAD_FAIL);
+        }
+
         commandGateway.send(new UpdateUserProfileImgCommand(
                 userAggregateId,
-                PROFILE_IMAGE_URL + profileImg.getOriginalFilename()
+                responseUrl
         ));
+        return responseUrl;
     }
 
     private void uploadImage(MultipartFile image){

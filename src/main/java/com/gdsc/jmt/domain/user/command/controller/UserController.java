@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "사용자 정보 관련 컨트롤러")
 @FirstVersionRestController
@@ -36,9 +38,9 @@ public class UserController {
     @PostMapping(value = "/user/profileImg", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UpdateUserProfileImgSpringDocs
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
-                                                  @ModelAttribute ProfileImgRequest profileImgRequest) {
-        userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg());
-        return JMTApiResponse.createResponseWithMessage(null, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
+                                                  @RequestParam MultipartFile profileImgFile) {
+        String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgFile);
+        return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 
 }

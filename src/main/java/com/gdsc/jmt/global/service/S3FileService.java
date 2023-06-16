@@ -41,7 +41,7 @@ public class S3FileService {
     }
 
     private String putS3(MultipartFile file, String key) throws IOException {
-        PutObjectRequest objectRequest = getPutObjectRequest(key);
+        PutObjectRequest objectRequest = getPutObjectRequest(key, file.getContentType());
         RequestBody requestBody = getFileRequestBody(file);
         s3Client.putObject(objectRequest, requestBody);
 
@@ -49,9 +49,10 @@ public class S3FileService {
     }
 
     // 파일 업로드를 하기위한 PutObjectRequest를 반환
-    private PutObjectRequest getPutObjectRequest(String key) {
+    private PutObjectRequest getPutObjectRequest(String key, String contentType) {
         return PutObjectRequest.builder()
                 .bucket(bucket)
+                .contentType(contentType)
                 .key(key)
                 .build();
     }
