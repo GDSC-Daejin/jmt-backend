@@ -7,9 +7,11 @@ import lombok.Getter;
 @Getter
 public class CreateRecommendRestaurantEvent extends BaseEvent<String> {
     private final CreateRecommendRestaurantRequest createRecommendRestaurantRequest;
+    private final String userAggregateId;
 
-    public CreateRecommendRestaurantEvent(String id, CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
+    public CreateRecommendRestaurantEvent(String id, CreateRecommendRestaurantRequest createRecommendRestaurantRequest, String userAggregateId) {
         super(id);
         this.createRecommendRestaurantRequest = createRecommendRestaurantRequest;
+        this.userAggregateId = userAggregateId;
     }
 }

@@ -37,7 +37,7 @@ public class RecommendRestaurantQueryEntityManager {
     @EventSourcingHandler
     public void createdRecommendRestaurant(CreateRecommendRestaurantEvent event) {
         CreateRecommendRestaurantRequest createRecommendRestaurantRequest = event.getCreateRecommendRestaurantRequest();
-        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getKakaoSubId(), createRecommendRestaurantRequest.getCategoryId());
+        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getKakaoSubId(), createRecommendRestaurantRequest.getCategoryId(), event.getUserAggregateId());
         persistRecommendRestaurant(createRecommendRestaurant(getRecommendRestaurantFromEvent(event), recommendRestaurantEntityBuilder));
     }
 
