@@ -35,11 +35,8 @@ public class RecommendRestaurantEntity {
     @JoinColumn(name="restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-    @OneToMany(
-            mappedBy = "recommendRestaurant",
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-            orphanRemoval = true
-    )
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recommend_restaurant_id")
     private List<RestaurantPhotoEntity> pictures = new ArrayList<>();
 
     @Column(nullable = false)
