@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,10 @@ public class RecommendRestaurantEntity {
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="category_id", nullable = false)
     private CategoryEntity category;
+
+    @OneToOne
+    @JoinColumn(name="user_id", nullable = false)
+    private UserEntity user;
 
     @OneToOne
     @JoinColumn(name="restaurant_id", nullable = false)
