@@ -21,8 +21,6 @@ public class RecommendRestaurantAggregate {
     private String introduce;
     private Long categoryId;
 
-    private Long userId;
-
     private Boolean canDrinkLiquor;
 
     private String goWellWithLiquor;

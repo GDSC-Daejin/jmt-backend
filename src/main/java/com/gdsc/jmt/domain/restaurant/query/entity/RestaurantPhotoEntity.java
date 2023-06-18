@@ -11,26 +11,27 @@ public class RestaurantPhotoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String origFileName;  // 파일 원본명
+    @Column(unique = true, nullable = false)
+    private String aggregateId;
 
     @Column(nullable = false)
-    private String fileUrl;  // 파일 저장 경로
+    private String imageUrl;  // 파일 저장 경로
 
-    private Long fileSize;
+    @Column(nullable = false)
+    private Long imageSize;
 
-    @ManyToOne
-    @JoinColumn(name = "recommend_restaurnat_id")
-    private RecommendRestaurantEntity recommendRestaurant;
+//    @ManyToOne
+//    @JoinColumn(name = "recommend_restaurnat_id")
+//    private RecommendRestaurantEntity recommendRestaurant;
 
     @Builder
-    public RestaurantPhotoEntity(String origFileName, String fileUrl, Long fileSize){
-        this.origFileName = origFileName;
-        this.fileUrl = fileUrl;
-        this.fileSize = fileSize;
+    public RestaurantPhotoEntity(String aggregateId, String imageUrl, Long imageSize){
+        this.aggregateId = aggregateId;
+        this.imageUrl = imageUrl;
+        this.imageSize = imageSize;
     }
 
-    public void initRecommendRestaurant(RecommendRestaurantEntity recommendRestaurant){
-        this.recommendRestaurant = recommendRestaurant;
-    }
+//    public void initRecommendRestaurant(RecommendRestaurantEntity recommendRestaurant){
+//        this.recommendRestaurant = recommendRestaurant;
+//    }
 }

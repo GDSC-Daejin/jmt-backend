@@ -20,8 +20,8 @@ public class CreateRecommendRestaurantRequest {
         @Schema(description = "식당 카테고리 ID", example = "1")
         private Long categoryId;
 
-//        @Schema(description = "사진 데이터", nullable = true)
-//        private List<MultipartFile> pictures;
+        @Schema(description = "사진 데이터", nullable = true)
+        private List<MultipartFile> pictures;
 
         @Schema(description = "주류 유무", example = "true")
         private Boolean canDrinkLiquor;

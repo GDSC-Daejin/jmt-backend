@@ -25,6 +25,7 @@ public class RestaurantService {
                 userAggregateId
         ));
 
+
         return new CreatedRestaurantResponse(createRecommendRestaurantRequest.getRestaurantLocationAggregateId(), aggregateId);
     }
 
