@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.DELETE, "/**/user").authenticated()
                 .requestMatchers(HttpMethod.POST, "/**/user/profileImg", "/**/user/nickname").authenticated()
+                .requestMatchers(HttpMethod.POST, "/**/restaurant/**", "/**/restaurant").authenticated()
                 .anyRequest().permitAll()
 
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용

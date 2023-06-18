@@ -1,0 +1,85 @@
+name: Deploy EC2
+
+on:
+  push:
+    branches: [ release/ec2 ]
+
+env:
+  DOCKER_REPO_NAME: ${{ secrets.DOCKER_REPO_NAME }}
+  SHA: ${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create application-dev.properties
+        run: |
+          touch src/main/resources/application-dev.properties
+          echo "$DEV_SPRING_PROPERTIES" > application-dev.properties.b64
+          base64 -d -i application-dev.properties.b64 > src/main/resources/application-dev.properties
+        env:
+          DEV_SPRING_PROPERTIES: ${{ secrets.DEV_SPRING_PROPERTIES }}
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew clean build -Pprofile=dev 
+
+      - name: Docker Build
+        run: |
+          docker build --tag boo10500/$DOCKER_REPO_NAME:jmt-image-$GITHUB_SHA .
+
+      - name: Docker Push
+        run: |
+          docker login --username=boo10500 --password=${{ secrets.DOCKER_USER_PW }}
+          docker push boo10500/$DOCKER_REPO_NAME:jmt-image-$GITHUB_SHA
+
+#      - name: Create SSH Private Key
+#        run: |
+#          touch gdsc-dju-jmt.pem
+#          echo "$EC2_SSH_KEY" > gdsc-dju-jmt.pem
+#          chmod 400 gdsc-dju-jmt.pem
+#        env:
+#          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+
+#      - name: EC2 Docker Deploy and Run
+#        run: |
+#          ssh -t -i ./gdsc-dju-jmt.pem -o UserKnownHostsFile=/github/home/.ssh/known_hosts ubuntu@${{ secrets.EC2_HOST }} '
+#          sudo docker ps -aq --filter "name=jmt" | xargs docker stop | xargs docker rm &&
+#          sudo docker image prune -a -f &&
+#          sudo docker pull boo10500/"'$DOCKER_REPO_NAME'":jmt-image-"'$GITHUB_SHA'" &&
+#          sudo docker run -d -p 8080:8080 --name jmt boo10500/"'$DOCKER_REPO_NAME'":jmt-image-"'$GITHUB_SHA'"
+#          '
+
+      - name: EC2 Docker Deploy and Run
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ubuntu
+            key: ${{ secrets.EC2_SSH_KEY }}
+            envs: DOCKER_REPO_NAME, SHA
+            script: |
+              sudo docker ps -aq --filter "name=jmt" | xargs sudo docker stop | xargs sudo docker rm
+              sudo docker image prune -a -f
+              sudo docker pull boo10500/$DOCKER_REPO_NAME:jmt-image-$SHA
+              sudo docker run -d -p 8080:8080 --name jmt boo10500/$DOCKER_REPO_NAME:jmt-image-$SHA
