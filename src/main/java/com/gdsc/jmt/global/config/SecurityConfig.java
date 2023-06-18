@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.DELETE, "/**/user").authenticated()
+                .requestMatchers(HttpMethod.POST, "/**/user/profileImg", "/**/user/nickname").authenticated()
                 .requestMatchers(HttpMethod.POST, "/**/restaurant/**", "/**/restaurant").authenticated()
                 .anyRequest().permitAll()
 

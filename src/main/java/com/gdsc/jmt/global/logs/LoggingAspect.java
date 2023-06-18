@@ -36,9 +36,13 @@ public class LoggingAspect {
             result = joinPoint.proceed(joinPoint.getArgs());
             return result;
         } finally {
-            logger.info(getRequestUrl(joinPoint));
-            logger.info("request : " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(params(joinPoint)));
-            logger.info("response : " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result));
+            try {
+                logger.info(getRequestUrl(joinPoint));
+                logger.info("request : " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(params(joinPoint)));
+                logger.info("response : " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result));
+            } catch (Exception e) {
+                logger.error("error : " + e.getMessage());
+            }
         }
     }
 
@@ -82,18 +86,22 @@ public class LoggingAspect {
 
     private void paramsProcess(String parameterName, Object args, Map<String, Object> params) {
         try {
-            if(args != null && !(args instanceof String || args instanceof  Integer || args instanceof Long)) {
+            if (args instanceof MultipartFile) {
+                params.put(parameterName, ((MultipartFile) args).getOriginalFilename());
+            } else if(args != null && !(args instanceof String || args instanceof  Integer || args instanceof Long)) {
                 Field[] fields = args.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     field.setAccessible(true);
-                    if (!paramsForMultipartFile(field, args, params))
+                    if (!paramsForMultipartFile(field, args, params)) {
                         params.put(field.getName(), field.get(args));
+                    }
                 }
             }
             else {
                 params.put(parameterName, args);
             }
         }catch (IllegalAccessException ex) {
+            logger.error(ex.getMessage());
         }
     }
 
