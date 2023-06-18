@@ -21,7 +21,11 @@ public enum RestaurantMessage implements ResponseMessage {
     RESTAURANT_LOCATION_FIND("맛집 위치 정보를 조회하였습니다." , HttpStatus.OK),
     RESTAURANT_SEARCH_FIND("맛집 위치 정보를 조회하였습니다." , HttpStatus.OK),
     DETAIL_RESTAURANT_FIND_SUCCESS("맛집 세부 정보를 조회하였습니다.", HttpStatus.OK),
-    RECOMMEND_RESTAURANT_NOT_FOUND("맛집 세부 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    RECOMMEND_RESTAURANT_NOT_FOUND("맛집 세부 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+
+    RESTAURANT_IMAGE_UPLOAD_FAIL("이미지 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+
 
     private final String message;
     private final HttpStatus status;

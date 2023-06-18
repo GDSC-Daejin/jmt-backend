@@ -11,6 +11,8 @@ import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.event.BaseEvent;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.DefaultMessage;
@@ -29,12 +31,13 @@ public class RecommendRestaurantQueryEntityManager {
     private final EventSourcingRepository<RecommendRestaurantAggregate> recommendRestaurantAggregateEventSourcingRepository;
     private final RecommendRestaurantRepository recommendRestaurantRepository;
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
     @EventSourcingHandler
     public void createdRecommendRestaurant(CreateRecommendRestaurantEvent event) {
         CreateRecommendRestaurantRequest createRecommendRestaurantRequest = event.getCreateRecommendRestaurantRequest();
-        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getKakaoSubId(), createRecommendRestaurantRequest.getCategoryId());
+        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getRestaurantLocationAggregateId(), createRecommendRestaurantRequest.getCategoryId(), event.getUserAggregateId());
         persistRecommendRestaurant(createRecommendRestaurant(getRecommendRestaurantFromEvent(event), recommendRestaurantEntityBuilder));
     }
 
@@ -44,18 +47,27 @@ public class RecommendRestaurantQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantKakaSubId, final Long categoryId) {
-        RestaurantEntity restaurant = validateRestaurant(restaurantKakaSubId);
+    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantLocationAggregateId, final Long categoryId, final String userAggregateId) {
+        RestaurantEntity restaurant = validateRestaurant(restaurantLocationAggregateId);
         CategoryEntity category = validateCategory(categoryId);
+        UserEntity user = validateUser(userAggregateId);
         validateConflict(restaurant);
 
         return RecommendRestaurantEntity.builder()
+                .user(user)
                 .restaurant(restaurant)
                 .category(category);
     }
 
-    private RestaurantEntity validateRestaurant(final String restaurantKakaSubId) {
-        Optional<RestaurantEntity> restaurant = restaurantRepository.findByKakaoSubId(restaurantKakaSubId);
+    private UserEntity validateUser(String userAggregateId) {
+        Optional<UserEntity> result = userRepository.findByUserAggregateId(userAggregateId);
+        if(result.isEmpty())
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        return  result.get();
+    }
+
+    private RestaurantEntity validateRestaurant(final String restaurantLocationAggregateId) {
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findByAggregateId(restaurantLocationAggregateId);
         if(restaurant.isEmpty())
             throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
         return  restaurant.get();

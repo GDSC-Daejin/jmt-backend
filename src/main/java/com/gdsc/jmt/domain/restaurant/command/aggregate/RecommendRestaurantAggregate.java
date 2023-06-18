@@ -31,7 +31,8 @@ public class RecommendRestaurantAggregate {
     public RecommendRestaurantAggregate(CreateRecommendRestaurantCommand command) {
         AggregateLifecycle.apply(new CreateRecommendRestaurantEvent(
                 command.getId(),
-                command.getCreateRecommendRestaurantRequest()
+                command.getCreateRecommendRestaurantRequest(),
+                command.getUserAggregateId()
         ));
     }
 

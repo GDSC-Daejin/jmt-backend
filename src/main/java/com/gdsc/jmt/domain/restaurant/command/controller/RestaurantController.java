@@ -3,16 +3,19 @@ package com.gdsc.jmt.domain.restaurant.command.controller;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecommendRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @FirstVersionRestController
@@ -32,8 +35,8 @@ public class RestaurantController {
     @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @CreateRecommendRestaurantSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
-    public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
-        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(createRecommendRestaurantRequest);
+    public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequestFromClient request, @AuthenticationPrincipal UserInfo user) {
+        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(request, user.getAggreagatedId());
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
     }
 }

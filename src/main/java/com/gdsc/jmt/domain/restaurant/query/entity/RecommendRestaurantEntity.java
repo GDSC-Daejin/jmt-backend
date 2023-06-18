@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,14 +28,15 @@ public class RecommendRestaurantEntity {
     private CategoryEntity category;
 
     @OneToOne
+    @JoinColumn(name="user_id", nullable = false)
+    private UserEntity user;
+
+    @OneToOne
     @JoinColumn(name="restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-    @OneToMany(
-            mappedBy = "recommendRestaurant",
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-            orphanRemoval = true
-    )
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recommend_restaurant_id")
     private List<RestaurantPhotoEntity> pictures = new ArrayList<>();
 
     @Column(nullable = false)
@@ -44,11 +46,13 @@ public class RecommendRestaurantEntity {
 
     private String recommendMenu;
 
+    @Column(unique = true, nullable = false)
     private String aggregateId;
 
     @Builder
     RecommendRestaurantEntity(String introduce,
                               CategoryEntity category,
+                              UserEntity user,
                               RestaurantEntity restaurant,
                               List<RestaurantPhotoEntity> pictures,
                               Boolean canDrinkLiquor,
@@ -57,9 +61,10 @@ public class RecommendRestaurantEntity {
                               String aggregateId) {
         this.introduce = introduce;
         this.category = category;
+        this.user = user;
         this.restaurant = restaurant;
         if(pictures != null)
-            initPictures(pictures);
+            this.pictures = pictures;
         this.pictures = pictures;
         this.canDrinkLiquor = canDrinkLiquor;
         this.goWellWithLiquor = goWellWithLiquor;
@@ -67,11 +72,12 @@ public class RecommendRestaurantEntity {
         this.aggregateId = aggregateId;
     }
 
-    private void initPictures(List<RestaurantPhotoEntity> pictures) {
-        for(RestaurantPhotoEntity picture : pictures) {
-            picture.initRecommendRestaurant(this);
-        }
-    }
+//    private void initPictures(List<RestaurantPhotoEntity> pictures) {
+//        for(RestaurantPhotoEntity picture : pictures) {
+//            picture.initRecommendRestaurant(this);
+//        }
+//    }
+
     public FindDetailRestaurantItem toResponse() {
         return new FindDetailRestaurantItem(
                 restaurant.getName(),

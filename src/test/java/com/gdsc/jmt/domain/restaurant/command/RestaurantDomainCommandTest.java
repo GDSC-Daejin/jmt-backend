@@ -49,12 +49,13 @@ public class RestaurantDomainCommandTest {
         public void 사용자_맛집_정보_Create_Command_발행() {
             // given
             String aggregateId = "123-456-789";
+            String userAggregateId = "USDASDsad-123132";
             CreateRecommendRestaurantRequest createRecommendRestaurantRequest = makeMockCreateRecommendRestaurantRequest();
             // when then
             recommendRestaurantFixture.given()
-                    .when(new CreateRecommendRestaurantCommand(aggregateId, createRecommendRestaurantRequest))
+                    .when(new CreateRecommendRestaurantCommand(aggregateId, createRecommendRestaurantRequest,userAggregateId))
                     .expectSuccessfulHandlerExecution()
-                    .expectEvents(new CreateRecommendRestaurantEvent(aggregateId, createRecommendRestaurantRequest));
+                    .expectEvents(new CreateRecommendRestaurantEvent(aggregateId, createRecommendRestaurantRequest,userAggregateId));
         }
     }
 
