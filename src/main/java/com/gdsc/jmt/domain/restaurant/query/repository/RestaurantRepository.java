@@ -9,4 +9,6 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity, Lo
     Optional<RestaurantEntity> findByName(String name);
 
     Optional<RestaurantEntity> findByKakaoSubId(String kakaoSubId);
+
+    Optional<RestaurantEntity> findByAggregateId(String aggregateId);
 }

@@ -35,7 +35,7 @@ public class RestaurantController {
     @CreateRecommendRestaurantSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
     public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequest createRecommendRestaurantRequest, @AuthenticationPrincipal UserInfo user) {
-        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(createRecommendRestaurantRequest);
+        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(createRecommendRestaurantRequest, user.getAggreagatedId());
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
     }
 }

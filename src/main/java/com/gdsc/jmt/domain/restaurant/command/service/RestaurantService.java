@@ -16,15 +16,16 @@ import java.util.UUID;
 public class RestaurantService {
     private final CommandGateway commandGateway;
 
-    public CreatedRestaurantResponse createRecommendRestaurant(CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
+    public CreatedRestaurantResponse createRecommendRestaurant(CreateRecommendRestaurantRequest createRecommendRestaurantRequest, String userAggregateId) {
         // TODO : 이미지 정보 등록 기능 필요
         String aggregateId = UUID.randomUUID().toString();
         commandGateway.sendAndWait(new CreateRecommendRestaurantCommand(
                 aggregateId,
-                createRecommendRestaurantRequest
+                createRecommendRestaurantRequest,
+                userAggregateId
         ));
 
-        return new CreatedRestaurantResponse(createRecommendRestaurantRequest.getKakaoSubId(), aggregateId);
+        return new CreatedRestaurantResponse(createRecommendRestaurantRequest.getRestaurantLocationAggregateId(), aggregateId);
     }
 
     public String createRestaurantLocation(KakaoSearchDocument kakaoSearchDocumentRequest) {

@@ -37,7 +37,7 @@ public class RecommendRestaurantQueryEntityManager {
     @EventSourcingHandler
     public void createdRecommendRestaurant(CreateRecommendRestaurantEvent event) {
         CreateRecommendRestaurantRequest createRecommendRestaurantRequest = event.getCreateRecommendRestaurantRequest();
-        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getKakaoSubId(), createRecommendRestaurantRequest.getCategoryId(), event.getUserAggregateId());
+        RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder = validateCreation(createRecommendRestaurantRequest.getRestaurantLocationAggregateId(), createRecommendRestaurantRequest.getCategoryId(), event.getUserAggregateId());
         persistRecommendRestaurant(createRecommendRestaurant(getRecommendRestaurantFromEvent(event), recommendRestaurantEntityBuilder));
     }
 
@@ -47,8 +47,8 @@ public class RecommendRestaurantQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantKakaSubId, final Long categoryId, final String userAggregateId) {
-        RestaurantEntity restaurant = validateRestaurant(restaurantKakaSubId);
+    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantLocationAggregateId, final Long categoryId, final String userAggregateId) {
+        RestaurantEntity restaurant = validateRestaurant(restaurantLocationAggregateId);
         CategoryEntity category = validateCategory(categoryId);
         UserEntity user = validateUser(userAggregateId);
         validateConflict(restaurant);
@@ -66,8 +66,8 @@ public class RecommendRestaurantQueryEntityManager {
         return  result.get();
     }
 
-    private RestaurantEntity validateRestaurant(final String restaurantKakaSubId) {
-        Optional<RestaurantEntity> restaurant = restaurantRepository.findByKakaoSubId(restaurantKakaSubId);
+    private RestaurantEntity validateRestaurant(final String restaurantLocationAggregateId) {
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findByAggregateId(restaurantLocationAggregateId);
         if(restaurant.isEmpty())
             throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
         return  restaurant.get();

@@ -32,6 +32,6 @@ public class CreateRecommendRestaurantRequest {
         @Schema(description = "추천 메뉴", example = "#마제소바#라멘")
         private String recommendMenu;
 
-        @Schema(description = "카카오 위치정보 ID", example = "1574464357")
-        private String kakaoSubId;
+        @Schema(description = "맛집 위치정보 ID", example = "54c3dcaf-70f0-4afc-8ef3-d8063500a537")
+        private String restaurantLocationAggregateId;
 }
