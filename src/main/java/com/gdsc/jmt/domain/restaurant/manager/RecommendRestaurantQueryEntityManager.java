@@ -11,6 +11,8 @@ import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.event.BaseEvent;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.DefaultMessage;
@@ -29,6 +31,7 @@ public class RecommendRestaurantQueryEntityManager {
     private final EventSourcingRepository<RecommendRestaurantAggregate> recommendRestaurantAggregateEventSourcingRepository;
     private final RecommendRestaurantRepository recommendRestaurantRepository;
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
     @EventSourcingHandler
@@ -44,14 +47,23 @@ public class RecommendRestaurantQueryEntityManager {
                 .getAggregateRoot();
     }
 
-    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantKakaSubId, final Long categoryId) {
+    private RecommendRestaurantEntityBuilder validateCreation(final String restaurantKakaSubId, final Long categoryId, final String userAggregateId) {
         RestaurantEntity restaurant = validateRestaurant(restaurantKakaSubId);
         CategoryEntity category = validateCategory(categoryId);
+        UserEntity user = validateUser(userAggregateId);
         validateConflict(restaurant);
 
         return RecommendRestaurantEntity.builder()
+                .user(user)
                 .restaurant(restaurant)
                 .category(category);
+    }
+
+    private UserEntity validateUser(String userAggregateId) {
+        Optional<UserEntity> result = userRepository.findByUserAggregateId(userAggregateId);
+        if(result.isEmpty())
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        return  result.get();
     }
 
     private RestaurantEntity validateRestaurant(final String restaurantKakaSubId) {

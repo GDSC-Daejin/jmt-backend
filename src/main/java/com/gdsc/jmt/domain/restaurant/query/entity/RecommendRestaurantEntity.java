@@ -54,6 +54,7 @@ public class RecommendRestaurantEntity {
     @Builder
     RecommendRestaurantEntity(String introduce,
                               CategoryEntity category,
+                              UserEntity user,
                               RestaurantEntity restaurant,
                               List<RestaurantPhotoEntity> pictures,
                               Boolean canDrinkLiquor,
@@ -62,6 +63,7 @@ public class RecommendRestaurantEntity {
                               String aggregateId) {
         this.introduce = introduce;
         this.category = category;
+        this.user = user;
         this.restaurant = restaurant;
         if(pictures != null)
             initPictures(pictures);
