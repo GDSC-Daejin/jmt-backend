@@ -20,9 +20,6 @@ public class CreateRecommendRestaurantRequest {
         @Schema(description = "식당 카테고리 ID", example = "1")
         private Long categoryId;
 
-        @Schema(description = "사진 데이터", nullable = true)
-        private List<MultipartFile> pictures;
-
         @Schema(description = "주류 유무", example = "true")
         private Boolean canDrinkLiquor;
 
@@ -34,4 +31,15 @@ public class CreateRecommendRestaurantRequest {
 
         @Schema(description = "맛집 위치정보 ID", example = "54c3dcaf-70f0-4afc-8ef3-d8063500a537")
         private String restaurantLocationAggregateId;
+
+
+        public CreateRecommendRestaurantRequest(CreateRecommendRestaurantRequestFromClient request) {
+                this.name = request.getName();
+                this.introduce = request.getIntroduce();
+                this.categoryId = request.getCategoryId();
+                this.canDrinkLiquor = request.getCanDrinkLiquor();
+                this.goWellWithLiquor = request.getGoWellWithLiquor();
+                this.recommendMenu = request.getRecommendMenu();
+                this.restaurantLocationAggregateId = request.getRestaurantLocationAggregateId();
+        }
 }

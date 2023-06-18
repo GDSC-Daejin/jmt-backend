@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.restaurant.command.CreateRecommendRestaurantCommand;
 import com.gdsc.jmt.domain.restaurant.command.CreateRestaurantCommand;
 import com.gdsc.jmt.domain.restaurant.command.CreateRestaurantPhotoCommand;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -25,17 +26,18 @@ public class RestaurantService {
 
     private final S3FileService s3FileService;
 
-    public CreatedRestaurantResponse createRecommendRestaurant(CreateRecommendRestaurantRequest createRecommendRestaurantRequest, String userAggregateId) {
+    public CreatedRestaurantResponse createRecommendRestaurant(CreateRecommendRestaurantRequestFromClient request, String userAggregateId) {
         String aggregateId = UUID.randomUUID().toString();
+
+
         commandGateway.sendAndWait(new CreateRecommendRestaurantCommand(
                 aggregateId,
-                createRecommendRestaurantRequest,
+                new CreateRecommendRestaurantRequest(request),
                 userAggregateId
         ));
 
-        uploadImages(createRecommendRestaurantRequest.getPictures());
-
-        return new CreatedRestaurantResponse(createRecommendRestaurantRequest.getRestaurantLocationAggregateId(), aggregateId);
+        uploadImages(request.getPictures());
+        return new CreatedRestaurantResponse(request.getRestaurantLocationAggregateId(), aggregateId);
     }
 
     public String createRestaurantLocation(KakaoSearchDocument kakaoSearchDocumentRequest) {

@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.restaurant.command.controller;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecommendRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -34,8 +35,8 @@ public class RestaurantController {
     @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @CreateRecommendRestaurantSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
-    public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequest createRecommendRestaurantRequest, @AuthenticationPrincipal UserInfo user) {
-        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(createRecommendRestaurantRequest, user.getAggreagatedId());
+    public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequestFromClient request, @AuthenticationPrincipal UserInfo user) {
+        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(request, user.getAggreagatedId());
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
     }
 }
