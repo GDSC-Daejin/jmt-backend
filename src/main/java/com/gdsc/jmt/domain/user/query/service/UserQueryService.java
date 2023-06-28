@@ -28,11 +28,6 @@ public class UserQueryService {
         UserEntity user =  userRepository.findByUserAggregateId(userAggregateId)
                 .orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
 
-        return new UserResponse(user.getEmail(), user.getNickname(), getProfileImg(user.getProfileImageUrl()));
-    }
-
-    private String getProfileImg(String profileImgUrl) {
-        Path path = Paths.get("");
-        return path.toAbsolutePath() + profileImgUrl;
+        return new UserResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
 }
