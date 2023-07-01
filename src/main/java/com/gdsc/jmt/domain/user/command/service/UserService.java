@@ -21,7 +21,7 @@ public class UserService {
     private final CommandGateway commandGateway;
     private final S3FileService s3FileService;
     //TODO : 임시로 피오니 로컬로 테스트 해봤어요. 나중에는 s3로 바꿔야할 것 같아요.
-    private final String PROFILE_IMAGE_URL = "/src/main/resources/image/";
+    private final String DEFAULT_PROFILE_IMAGE_URL = "https://gdsc-jmt.s3.ap-northeast-2.amazonaws.com/profileImg/defaultImg/Default+image.png";
 
     @Transactional
     public void updateUserNickName(String userAggregateId, String nickName) {
@@ -34,10 +34,15 @@ public class UserService {
     @Transactional
     public String updateUserProfileImg(String userAggregateId, MultipartFile profileImg) {
         String responseUrl = "";
-        try {
-            responseUrl = s3FileService.upload(profileImg, "profileImg");
-        } catch (IOException e) {
-            throw new ApiException(UserMessage.PROFILE_IMAGE_UPLOAD_FAIL);
+        if(profileImg != null) {
+            try {
+                responseUrl = s3FileService.upload(profileImg, "profileImg");
+            } catch (IOException e) {
+                throw new ApiException(UserMessage.PROFILE_IMAGE_UPLOAD_FAIL);
+            }
+        }
+        if(profileImg == null) {
+            responseUrl = DEFAULT_PROFILE_IMAGE_URL;
         }
 
         commandGateway.send(new UpdateUserProfileImgCommand(
@@ -45,19 +50,5 @@ public class UserService {
                 responseUrl
         ));
         return responseUrl;
-    }
-
-    private void uploadImage(MultipartFile image){
-        try {
-            File file = new File(PROFILE_IMAGE_URL);
-            Path path = Paths.get("");
-            if (!file.exists()) { // 파일이 존재하지 않는다면 디렉토리 생성
-                file.mkdirs();
-            }
-            File destination = new File(path.toAbsolutePath() + PROFILE_IMAGE_URL + File.separator + image.getOriginalFilename());
-            image.transferTo(destination);
-        } catch (IOException e) {
-            throw new ApiException(UserMessage.PROFILE_IMAGE_UPLOAD_FAIL);
-        }
     }
 }

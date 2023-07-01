@@ -86,9 +86,11 @@ public class LoggingAspect {
 
     private void paramsProcess(String parameterName, Object args, Map<String, Object> params) {
         try {
-            if (args instanceof MultipartFile) {
+            if(args == null) {
+                params.put(parameterName, "null");
+            } else if (args instanceof MultipartFile) {
                 params.put(parameterName, ((MultipartFile) args).getOriginalFilename());
-            } else if(args != null && !(args instanceof String || args instanceof  Integer || args instanceof Long)) {
+            } else if(!(args instanceof String || args instanceof  Integer || args instanceof Long)) {
                 Field[] fields = args.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     field.setAccessible(true);
@@ -96,8 +98,7 @@ public class LoggingAspect {
                         params.put(field.getName(), field.get(args));
                     }
                 }
-            }
-            else {
+            } else {
                 params.put(parameterName, args);
             }
         }catch (IllegalAccessException ex) {
