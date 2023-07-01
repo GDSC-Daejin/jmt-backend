@@ -6,6 +6,7 @@ import com.gdsc.jmt.domain.user.query.dto.UserResponse;
 import com.gdsc.jmt.domain.user.query.service.UserQueryService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
+import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.UserMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ public class UserQueryController {
     public JMTApiResponse<?> checkDuplicateUserNickname(@PathVariable("nickname") String nickname) {
         boolean isDuplicated = userQueryService.checkDuplicateUserNickname(nickname);
         if (isDuplicated) {
-            return JMTApiResponse.createResponseWithMessage(null, UserMessage.NICKNAME_IS_DUPLICATED);
+            throw  new ApiException(UserMessage.NICKNAME_IS_DUPLICATED);
         }
         return JMTApiResponse.createResponseWithMessage(nickname, UserMessage.NICKNAME_IS_AVAILABLE);
     }

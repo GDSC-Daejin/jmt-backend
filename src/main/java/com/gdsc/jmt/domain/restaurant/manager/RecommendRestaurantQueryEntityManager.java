@@ -87,12 +87,8 @@ public class RecommendRestaurantQueryEntityManager {
     }
 
     private RecommendRestaurantEntity createRecommendRestaurant(RecommendRestaurantAggregate recommendRestaurantAggregate, RecommendRestaurantEntityBuilder recommendRestaurantEntityBuilder) {
-        // TODO : 이거는 실제 이미지 올리는 서버가 있으면 처리하기..
-        List<RestaurantPhotoEntity> test = new ArrayList<>();
-
         return recommendRestaurantEntityBuilder
                 .introduce(recommendRestaurantAggregate.getIntroduce())
-                .pictures(test)
                 .canDrinkLiquor(recommendRestaurantAggregate.getCanDrinkLiquor())
                 .goWellWithLiquor(recommendRestaurantAggregate.getGoWellWithLiquor())
                 .recommendMenu(recommendRestaurantAggregate.getRecommendMenu())
