@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -28,7 +29,17 @@ public class S3FileService {
     private static String getUUid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
+    public void delete(String path) {
+        DeleteObjectRequest request = getDeleteObjectRequest(path);
+        s3Client.deleteObject(request);
+    }
 
+    private DeleteObjectRequest getDeleteObjectRequest(String path) {
+        return DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(path.substring(path.lastIndexOf("com/") + 4))
+                .build();
+    }
     public String upload(MultipartFile multipartFile, String path) throws IOException {
         String originName = multipartFile.getOriginalFilename();
         //확장자 추출
