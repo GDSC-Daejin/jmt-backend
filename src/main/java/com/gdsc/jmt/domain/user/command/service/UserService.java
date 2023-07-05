@@ -37,9 +37,7 @@ public class UserService {
                 throw new ApiException(UserMessage.PROFILE_IMAGE_NOT_FOUND);
             }
         } else {
-            if(profileImg == null) {
-                responseUrl = DEFAULT_PROFILE_IMAGE_URL;
-            }
+            responseUrl = DEFAULT_PROFILE_IMAGE_URL;
         }
         commandGateway.send(new UpdateUserProfileImgCommand(
                 userAggregateId,

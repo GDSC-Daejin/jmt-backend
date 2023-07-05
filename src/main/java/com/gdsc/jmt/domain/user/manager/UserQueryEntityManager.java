@@ -9,6 +9,7 @@ import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.UserMessage;
+import com.gdsc.jmt.global.service.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.eventsourcing.EventSourcingRepository;
@@ -22,6 +23,7 @@ public class UserQueryEntityManager {
     private final UserRepository userRepository;
 
     private final EventSourcingRepository<UserAggregate> userAggregateEventSourcingRepository;
+    private final S3FileService s3FileService;
 
     @EventSourcingHandler
     public void on(CreateUserEvent event) {
@@ -49,6 +51,9 @@ public class UserQueryEntityManager {
         UserAggregate userAggregate = getUserFromEvent(updateUserProfileImgEvent);
 
         UserEntity updateUserEntity = findExistingQueryUserByAggregateId(userAggregate.id);
+        if(updateUserEntity.getProfileImageUrl() != null) {
+            s3FileService.delete(updateUserEntity.getProfileImageUrl());
+        }
         updateUserEntity.setProfileImageUrl(userAggregate.profileImageUrl);
 
         persistUser(updateUserEntity);

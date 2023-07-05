@@ -38,8 +38,8 @@ public class UserController {
     @PostMapping(value = "/user/profileImg", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UpdateUserProfileImgSpringDocs
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
-                                                  @RequestParam(required = false) MultipartFile profileImgFile) {
-        String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgFile);
+                                                  @ModelAttribute ProfileImgRequest profileImgRequest) {
+        String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg(), profileImgRequest.upload());
         return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 

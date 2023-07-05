@@ -18,7 +18,8 @@ public enum UserMessage implements ResponseMessage{
     NICKNAME_IS_AVAILABLE("사용 가능한 닉네임입니다.", HttpStatus.OK),
     PROFILE_IMAGE_UPDATE_SUCCESS("프로필 사진 등록에 성공하였습니다.", HttpStatus.OK),
     PROFILE_IMAGE_UPLOAD_FAIL("프로필 사진 업로드에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    GET_USER_SUCCESS("사용자 정보 조회에 성공하였습니다.", HttpStatus.OK);
+    GET_USER_SUCCESS("사용자 정보 조회에 성공하였습니다.", HttpStatus.OK),
+    PROFILE_IMAGE_NOT_FOUND("프로필 이미지가 없습니다", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final HttpStatus status;
