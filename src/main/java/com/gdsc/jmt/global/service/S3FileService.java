@@ -31,15 +31,23 @@ public class S3FileService {
     }
     public void delete(String path) {
         DeleteObjectRequest request = getDeleteObjectRequest(path);
-        s3Client.deleteObject(request);
+        if(request == null) {
+            return;
+        }
+         s3Client.deleteObject(request);
     }
 
     private DeleteObjectRequest getDeleteObjectRequest(String path) {
+        String key = path.substring(path.lastIndexOf("com/") + 4);
+        if(key.equals("profileImg/defaultImg/Default+image.png")) {
+            return null;
+        }
         return DeleteObjectRequest.builder()
                 .bucket(bucket)
-                .key(path.substring(path.lastIndexOf("com/") + 4))
+                .key(key)
                 .build();
     }
+
     public String upload(MultipartFile multipartFile, String path) throws IOException {
         String originName = multipartFile.getOriginalFilename();
         //확장자 추출
