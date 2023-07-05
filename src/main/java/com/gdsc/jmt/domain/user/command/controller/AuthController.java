@@ -45,6 +45,12 @@ public class AuthController {
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
     }
 
+    @PostMapping("/auth/test")
+    public JMTApiResponse<TokenResponse> loginForTest() {
+        TokenResponse tokenResponse = authService.loginForTest();
+        return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.LOGIN_SUCCESS);
+    }
+
     @PostMapping("/token")
     @ReissueSpringDocs
     public JMTApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {

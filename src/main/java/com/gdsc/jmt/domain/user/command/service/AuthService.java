@@ -92,6 +92,13 @@ public class AuthService {
     }
 
     @Transactional
+    public TokenResponse loginForTest() {
+        OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("test", "test@naver.com");;
+        String userAggregateId = sendSignUpCommand(userInfo, SocialType.APPLE);
+        return sendGenerateJwtTokenCommend(userInfo.getEmail(), userAggregateId);
+    }
+
+    @Transactional
     public TokenResponse reissue(String email, String userAggregateId, String refreshToken) {
         validateRefreshToken(refreshToken);
 
