@@ -39,7 +39,7 @@ public class UserController {
     @UpdateUserProfileImgSpringDocs
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
                                                   @ModelAttribute ProfileImgRequest profileImgRequest) {
-        String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg(), profileImgRequest.upload());
+        String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg());
         return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 
