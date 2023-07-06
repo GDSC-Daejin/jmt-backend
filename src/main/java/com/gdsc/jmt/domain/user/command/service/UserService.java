@@ -30,15 +30,16 @@ public class UserService {
 
     @Transactional
     public String updateUserProfileImg(String userAggregateId, MultipartFile profileImg) {
-        if(profileImg == null) {
-            throw new ApiException(UserMessage.PROFILE_IMAGE_NOT_FOUND);
-        }
-
         String responseUrl = uploadProfileImage(profileImg);
         sendUpdateUserProfileImgCommand(userAggregateId, responseUrl);
         return responseUrl;
     }
 
+    @Transactional
+    public String updateUserDefaultProfileImg(String userAggregateId) {
+        sendUpdateUserProfileImgCommand(userAggregateId, DEFAULT_PROFILE_IMAGE_URL);
+        return DEFAULT_PROFILE_IMAGE_URL;
+    }
 
     private void sendUpdateUserProfileImgCommand(String userAggregateId, String responseUrl) {
         commandGateway.send(new UpdateUserProfileImgCommand(

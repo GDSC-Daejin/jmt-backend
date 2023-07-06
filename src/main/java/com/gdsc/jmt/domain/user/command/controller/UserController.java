@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.user.command.controller;
 
+import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateDefaultProfileImgSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserNicknameSpringDocs;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.UpdateUserProfileImgSpringDocs;
 import com.gdsc.jmt.domain.user.command.dto.NicknameRequest;
@@ -8,6 +9,7 @@ import com.gdsc.jmt.domain.user.command.dto.response.UserNicknameResponse;
 import com.gdsc.jmt.domain.user.command.service.UserService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
+import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.UserMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,8 +41,17 @@ public class UserController {
     @UpdateUserProfileImgSpringDocs
     public JMTApiResponse<?> updateUserProfileImg(@AuthenticationPrincipal UserInfo user,
                                                   @ModelAttribute ProfileImgRequest profileImgRequest) {
+        if(profileImgRequest.profileImg() == null) {
+            throw new ApiException(UserMessage.PROFILE_IMAGE_NOT_FOUND);
+        }
         String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg());
         return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 
+    @PostMapping(value = "/user/defaultProfileImg")
+    @UpdateDefaultProfileImgSpringDocs
+    public JMTApiResponse<?> updateUserDefaultProfileImg(@AuthenticationPrincipal UserInfo user) {
+        String responseUrl = userService.updateUserDefaultProfileImg(user.getAggreagatedId());
+        return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
+    }
 }
