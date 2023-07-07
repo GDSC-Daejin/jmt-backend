@@ -109,6 +109,10 @@ public class LoggingAspect {
     private boolean paramsForMultipartFile(Field field, Object args, Map<String, Object> params) throws IllegalAccessException {
         Type type = field.getGenericType();
         // List<MultipartFile>
+        if(field.get(args) instanceof MultipartFile) {
+            return true;
+        }
+
         if(field.get(args) instanceof List && type instanceof ParameterizedType) {
             for(Type gType : ((ParameterizedType) type).getActualTypeArguments()) {
                 if(gType.getTypeName().equals(MultipartFile.class.getTypeName())) {
