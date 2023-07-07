@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.category.query.repository.CategoryRepository;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
@@ -15,9 +16,12 @@ import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.messege.CategoryMessage;
 import com.gdsc.jmt.global.messege.DefaultMessage;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
+import com.gdsc.jmt.global.messege.UserMessage;
 import com.gdsc.jmt.global.service.S3FileService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +41,7 @@ public class RestaurantService {
 
     private final S3FileService s3FileService;
 
+    @Transactional
     public CreatedRestaurantResponse createRecommendRestaurant(CreateRecommendRestaurantRequestFromClient request, String email) {
         CreateRecommendRestaurantRequest createRecommendRestaurantRequest = new CreateRecommendRestaurantRequest(request);
         RecommendRestaurantEntity recommendRestaurant = validateCreation(email, createRecommendRestaurantRequest);
@@ -46,6 +51,7 @@ public class RestaurantService {
         return new CreatedRestaurantResponse(request.getRestaurantLocationId(), id);
     }
 
+    @Transactional
     public Long createRestaurantLocation(KakaoSearchDocument kakaoSearchDocumentRequest) {
         Optional<RestaurantEntity> checkExisting = restaurantRepository.findByKakaoSubId(kakaoSearchDocumentRequest.getId());
         if(checkExisting.isPresent()) {
@@ -54,6 +60,24 @@ public class RestaurantService {
 
         RestaurantEntity restaurant = restaurantRepository.save(kakaoSearchDocumentRequest.createRestaurantEntity());
         return restaurant.getId();
+    }
+
+    @Transactional
+    public void updateRecommendRestaurant(UpdateRecommendRestaurantRequest request, String email) {
+        // 내용 변경
+        RecommendRestaurantEntity recommendRestaurant = validateIsWriteRecommendRestaurantByUser(request.getId(), email);
+        Optional<CategoryEntity> findCategoryResult = categoryRepository.findById(request.getCategoryId());
+        if(findCategoryResult.isEmpty()) {
+            throw new ApiException(CategoryMessage.CATEGORY_FIND_FAIL);
+        }
+        recommendRestaurant.update(request, findCategoryResult.get());
+        recommendRestaurantRepository.save(recommendRestaurant);
+    }
+
+    @Transactional
+    public void removeRecommendRestaurant(final Long id, final String email) {
+        RecommendRestaurantEntity recommendRestaurant = validateIsWriteRecommendRestaurantByUser(id, email);
+        recommendRestaurantRepository.delete(recommendRestaurant);
     }
 
     private void uploadImages(List<MultipartFile> images) {
@@ -114,5 +138,24 @@ public class RestaurantService {
         if(result.isEmpty())
             throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
         return  result.get();
+    }
+
+    private RecommendRestaurantEntity validateIsWriteRecommendRestaurantByUser(Long id, String email) {
+        Optional<UserEntity> findUserResult = userRepository.findByEmail(email);
+        Optional<RecommendRestaurantEntity> findRecommendRestaurantResult = recommendRestaurantRepository.findById(id);
+
+        if(findRecommendRestaurantResult.isEmpty()) {
+            throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
+        }
+
+        if(findUserResult.isEmpty()) {
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+
+        RecommendRestaurantEntity recommendRestaurant = findRecommendRestaurantResult.get();
+        if(!recommendRestaurant.getUser().getId().equals(findUserResult.get().getId())) {
+            throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_MATCH_OWNER);
+        }
+        return recommendRestaurant;
     }
 }

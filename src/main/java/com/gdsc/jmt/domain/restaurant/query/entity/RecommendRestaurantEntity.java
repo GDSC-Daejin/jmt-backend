@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.entity;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 
@@ -98,5 +99,13 @@ public class RecommendRestaurantEntity {
                 this.introduce,
                 this.category.getName()
         );
+    }
+
+    public void update(UpdateRecommendRestaurantRequest updateRequest, CategoryEntity category) {
+        this.introduce = updateRequest.getIntroduce();
+        this.category = category;
+        this.canDrinkLiquor = updateRequest.getCanDrinkLiquor();
+        this.goWellWithLiquor = updateRequest.getGoWellWithLiquor();
+        this.recommendMenu = updateRequest.getRecommendMenu();
     }
 }

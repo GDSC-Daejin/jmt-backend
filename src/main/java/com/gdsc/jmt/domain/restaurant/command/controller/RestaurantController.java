@@ -4,6 +4,7 @@ import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecomm
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -11,6 +12,7 @@ import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,5 +40,19 @@ public class RestaurantController {
     public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequestFromClient request, @AuthenticationPrincipal UserInfo user) {
         CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(request, user.getEmail());
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
+    }
+
+    @PutMapping(value = "/restaurant")
+    @Operation(summary = "맛집 수정 API", description = "맛집 정보 업데이트 (사진 불가)")
+    public JMTApiResponse<?> updateRecommendRestaurant(@RequestBody UpdateRecommendRestaurantRequest request, @AuthenticationPrincipal UserInfo user) {
+        restaurantService.updateRecommendRestaurant(request, user.getEmail());
+        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_UPDATED);
+    }
+
+    @DeleteMapping(value = "/restaurant/{id}")
+    @Operation(summary = "맛집 삭제 API", description = "사용자가 등록한 맛집 정보 삭제")
+    public JMTApiResponse<?> removeRecommendRestaurant(@PathVariable Long id, @AuthenticationPrincipal UserInfo user) {
+        restaurantService.removeRecommendRestaurant(id, user.getEmail());
+        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_DELETED);
     }
 }
