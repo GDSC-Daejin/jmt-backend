@@ -36,9 +36,6 @@ public class RestaurantEntity {
     @Column(nullable = false)
     private Point location;
 
-    @Column(nullable = false, unique = true)
-    private String aggregateId;
-
     @Builder
     public RestaurantEntity(String kakaoSubId,
                             String name,
@@ -47,8 +44,7 @@ public class RestaurantEntity {
                             String phone,
                             String address,
                             String roadAddress,
-                            Point location,
-                            String aggregateId) {
+                            Point location) {
         this.kakaoSubId = kakaoSubId;
         this.name = name;
         this.placeUrl = placeUrl;
@@ -57,6 +53,5 @@ public class RestaurantEntity {
         this.address = address;
         this.roadAddress = roadAddress;
         this.location = location;
-        this.aggregateId = aggregateId;
     }
 }

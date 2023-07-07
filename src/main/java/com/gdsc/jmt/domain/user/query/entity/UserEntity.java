@@ -19,8 +19,6 @@ public class UserEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String userAggregateId;
-    @Column(nullable = false, unique = true)
     private String email;
     private String profileImageUrl;  // 파일 저장 경로
     @Nullable

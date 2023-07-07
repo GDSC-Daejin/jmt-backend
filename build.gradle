@@ -32,16 +32,11 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	testImplementation("org.axonframework:axon-test:_")
 
 	//db
 	implementation("org.mariadb.jdbc:mariadb-java-client:_")
 	//Hibernate Validator
 	implementation('org.hibernate.validator:hibernate-validator:_')
-
-	// axon
-	implementation("org.axonframework:axon-spring-boot-starter:_")
-	implementation("org.axonframework:axon-configuration:_")
 
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:_")

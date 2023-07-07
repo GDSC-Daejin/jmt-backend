@@ -27,16 +27,16 @@ public class RestaurantController {
     @PostMapping(value = "/restaurant/location")
     @CreateRestaurantLocationSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
-    public JMTApiResponse<String> createRestaurantLocation(@RequestBody KakaoSearchDocument kakaoSearchDocumentRequest) {
-        String aggregateId = restaurantService.createRestaurantLocation(kakaoSearchDocumentRequest);
-        return JMTApiResponse.createResponseWithMessage(aggregateId, RestaurantMessage.RESTAURANT_LOCATION_CREATED);
+    public JMTApiResponse<Long> createRestaurantLocation(@RequestBody KakaoSearchDocument kakaoSearchDocumentRequest) {
+        Long restaurantLocationId = restaurantService.createRestaurantLocation(kakaoSearchDocumentRequest);
+        return JMTApiResponse.createResponseWithMessage(restaurantLocationId, RestaurantMessage.RESTAURANT_LOCATION_CREATED);
     }
 
     @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @CreateRecommendRestaurantSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
     public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequestFromClient request, @AuthenticationPrincipal UserInfo user) {
-        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(request, user.getAggreagatedId());
+        CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(request, user.getEmail());
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
     }
 }

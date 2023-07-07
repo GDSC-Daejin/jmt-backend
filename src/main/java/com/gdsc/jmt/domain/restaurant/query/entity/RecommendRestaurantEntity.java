@@ -46,9 +46,6 @@ public class RecommendRestaurantEntity {
 
     private String recommendMenu;
 
-    @Column(unique = true, nullable = false)
-    private String aggregateId;
-
     @Builder
     RecommendRestaurantEntity(String introduce,
                               CategoryEntity category,
@@ -57,19 +54,15 @@ public class RecommendRestaurantEntity {
                               List<RestaurantPhotoEntity> pictures,
                               Boolean canDrinkLiquor,
                               String goWellWithLiquor,
-                              String recommendMenu,
-                              String aggregateId) {
+                              String recommendMenu) {
         this.introduce = introduce;
         this.category = category;
         this.user = user;
         this.restaurant = restaurant;
-        if(pictures != null)
-            this.pictures = pictures;
         this.pictures = pictures;
         this.canDrinkLiquor = canDrinkLiquor;
         this.goWellWithLiquor = goWellWithLiquor;
         this.recommendMenu = recommendMenu;
-        this.aggregateId = aggregateId;
     }
 
 //    private void initPictures(List<RestaurantPhotoEntity> pictures) {
@@ -88,11 +81,9 @@ public class RecommendRestaurantEntity {
                 restaurant.getRoadAddress(),
                 restaurant.getLocation().getX(),
                 restaurant.getLocation().getY(),
-//                restaurant.getImage(),
                 canDrinkLiquor,
                 goWellWithLiquor,
-                recommendMenu,
-                aggregateId
+                recommendMenu
         );
     }
 
@@ -105,8 +96,7 @@ public class RecommendRestaurantEntity {
                 this.restaurant.getAddress(),
                 this.restaurant.getRoadAddress(),
                 this.introduce,
-                this.category.getName(),
-                this.aggregateId
+                this.category.getName()
         );
     }
 }

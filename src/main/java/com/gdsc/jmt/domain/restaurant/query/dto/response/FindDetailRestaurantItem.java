@@ -15,7 +15,6 @@ public record FindDetailRestaurantItem(
         // 식당 추천 정보
         Boolean canDrinkLiquor,
         String goWellWithLiquor,
-        String recommendMenu,
-        String aggregateId
+        String recommendMenu
 
 ) { }

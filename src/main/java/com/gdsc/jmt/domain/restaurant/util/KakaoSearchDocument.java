@@ -1,8 +1,14 @@
 package com.gdsc.jmt.domain.restaurant.util;
 
+import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
+import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.messege.RestaurantMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 @Getter
 @AllArgsConstructor
@@ -43,4 +49,25 @@ public class KakaoSearchDocument {
 
     @Schema(description = "식당 경도", example = "35.8768967936303")
     private String y;
+
+    public RestaurantEntity createRestaurantEntity() {
+        Point location = null;
+        try {
+            String pointWKT = String.format("POINT(%s %s)", x, y);
+            location = (Point) new WKTReader().read(pointWKT);
+        } catch (ParseException ex) {
+            throw new ApiException(RestaurantMessage.RESTAURANT_LOCATION_FAIL);
+        }
+
+        return RestaurantEntity.builder()
+                .kakaoSubId(id)
+                .name(place_name)
+                .placeUrl(place_url)
+                .category(category_name)
+                .phone(phone)
+                .address(address_name)
+                .roadAddress(road_address_name)
+                .location(location)
+                .build();
+    }
 }

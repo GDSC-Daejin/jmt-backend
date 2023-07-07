@@ -11,9 +11,6 @@ public class RestaurantPhotoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String aggregateId;
-
     @Column(nullable = false)
     private String imageUrl;  // 파일 저장 경로
 
@@ -25,8 +22,7 @@ public class RestaurantPhotoEntity {
 //    private RecommendRestaurantEntity recommendRestaurant;
 
     @Builder
-    public RestaurantPhotoEntity(String aggregateId, String imageUrl, Long imageSize){
-        this.aggregateId = aggregateId;
+    public RestaurantPhotoEntity(String imageUrl, Long imageSize){
         this.imageUrl = imageUrl;
         this.imageSize = imageSize;
     }

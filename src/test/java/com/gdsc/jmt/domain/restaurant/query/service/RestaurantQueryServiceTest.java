@@ -144,7 +144,6 @@ public class RestaurantQueryServiceTest {
                     .address("서울 노원구")
                     .roadAddress("도로명 주소")
                     .location(testLocation)
-                    .aggregateId("123456789")
                     .build();
         }
         catch (ParseException ex) {
@@ -162,7 +161,6 @@ public class RestaurantQueryServiceTest {
                 .canDrinkLiquor(true)
                 .goWellWithLiquor("위스키")
                 .recommendMenu("#마제소바#라멘")
-                .aggregateId("1234-5678-87")
                 .build();
     }
 

@@ -29,8 +29,8 @@ public class CreateRecommendRestaurantRequest {
         @Schema(description = "추천 메뉴", example = "#마제소바#라멘")
         private String recommendMenu;
 
-        @Schema(description = "맛집 위치정보 ID", example = "54c3dcaf-70f0-4afc-8ef3-d8063500a537")
-        private String restaurantLocationAggregateId;
+        @Schema(description = "맛집 위치정보 ID", example = "1")
+        private Long restaurantLocationId;
 
 
         public CreateRecommendRestaurantRequest(CreateRecommendRestaurantRequestFromClient request) {
@@ -40,6 +40,6 @@ public class CreateRecommendRestaurantRequest {
                 this.canDrinkLiquor = request.getCanDrinkLiquor();
                 this.goWellWithLiquor = request.getGoWellWithLiquor();
                 this.recommendMenu = request.getRecommendMenu();
-                this.restaurantLocationAggregateId = request.getRestaurantLocationAggregateId();
+                this.restaurantLocationId = request.getRestaurantLocationId();
         }
 }

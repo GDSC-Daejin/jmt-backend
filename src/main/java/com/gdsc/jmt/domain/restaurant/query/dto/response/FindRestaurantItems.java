@@ -11,7 +11,5 @@ public record FindRestaurantItems(
         String roadAddress,
 
         String introduce,
-        String category,
-
-        String aggregateId
+        String category
 ) { }

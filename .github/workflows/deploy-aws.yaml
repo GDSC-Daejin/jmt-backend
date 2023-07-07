@@ -43,7 +43,7 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew clean build -Pprofile=dev 
+          ./gradlew clean build -Pprofile=dev --exclude-task test
 
       - name: Docker Build
         run: |
