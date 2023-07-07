@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("/user/nickname")
     @UpdateUserNicknameSpringDocs
     public JMTApiResponse<UserNicknameResponse> updateUserNickname(@AuthenticationPrincipal UserInfo user, @RequestBody NicknameRequest nicknameRequest) {
-        userService.updateUserNickName(user.getAggreagatedId(), nicknameRequest.nickname());
+        userService.updateUserNickName(user.getEmail(), nicknameRequest.nickname());
         UserNicknameResponse response = new UserNicknameResponse(user.getEmail(), nicknameRequest.nickname());
         return JMTApiResponse.createResponseWithMessage(response, UserMessage.NICKNAME_UPDATE_SUCCESS);
     }
@@ -44,14 +44,14 @@ public class UserController {
         if(profileImgRequest.profileImg() == null) {
             throw new ApiException(UserMessage.PROFILE_IMAGE_NOT_FOUND);
         }
-        String responseUrl = userService.updateUserProfileImg(user.getAggreagatedId(), profileImgRequest.profileImg());
+        String responseUrl = userService.updateUserProfileImg(user.getEmail(), profileImgRequest.profileImg());
         return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 
     @PostMapping(value = "/user/defaultProfileImg")
     @UpdateDefaultProfileImgSpringDocs
     public JMTApiResponse<?> updateUserDefaultProfileImg(@AuthenticationPrincipal UserInfo user) {
-        String responseUrl = userService.updateUserDefaultProfileImg(user.getAggreagatedId());
+        String responseUrl = userService.updateUserDefaultProfileImg(user.getEmail());
         return JMTApiResponse.createResponseWithMessage(responseUrl, UserMessage.PROFILE_IMAGE_UPDATE_SUCCESS);
     }
 }

@@ -22,7 +22,6 @@ public class UserInfo implements UserDetails, CredentialsContainer {
     private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
     private static final Log logger = LogFactory.getLog(User.class);
     private final String email;
-    private final String aggreagatedId;
     private final Set<GrantedAuthority> authorities;
     private final boolean accountNonExpired;
 
@@ -32,17 +31,16 @@ public class UserInfo implements UserDetails, CredentialsContainer {
 
     private final boolean enabled;
 
-    public UserInfo(String email, String aggreagatedId, Collection<? extends GrantedAuthority> authorities) {
-        this(email, aggreagatedId, true, true, true, true, authorities);
+    public UserInfo(String email, Collection<? extends GrantedAuthority> authorities) {
+        this(email, true, true, true, true, authorities);
     }
 
-    public UserInfo(String email, String aggreagatedId, boolean enabled, boolean accountNonExpired,
+    public UserInfo(String email, boolean enabled, boolean accountNonExpired,
                 boolean credentialsNonExpired, boolean accountNonLocked,
                 Collection<? extends GrantedAuthority> authorities) {
-        Assert.isTrue(email != null && !"".equals(email) && aggreagatedId != null,
+        Assert.isTrue(email != null && !"".equals(email),
                 "Cannot pass null or empty values to constructor");
         this.email = email;
-        this.aggreagatedId = aggreagatedId;
         this.enabled = enabled;
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -54,9 +52,6 @@ public class UserInfo implements UserDetails, CredentialsContainer {
         return this.email;
     }
 
-    public String getAggreagatedId() {
-        return this.aggreagatedId;
-    }
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {

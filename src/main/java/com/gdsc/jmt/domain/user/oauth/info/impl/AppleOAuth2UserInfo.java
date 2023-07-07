@@ -1,6 +1,8 @@
 package com.gdsc.jmt.domain.user.oauth.info.impl;
 
+import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +11,8 @@ public class AppleOAuth2UserInfo  extends OAuth2UserInfo {
     private String name;
     private String email;
     private String imageUrl;
+
+    private final SocialType socialType = SocialType.APPLE;
 
     public AppleOAuth2UserInfo(String id, String email) {
         this.id = id;

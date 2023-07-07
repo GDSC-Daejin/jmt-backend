@@ -1,17 +1,14 @@
 package com.gdsc.jmt.domain.user.command.service;
 
-import com.gdsc.jmt.domain.user.command.SignUpCommand;
-import com.gdsc.jmt.domain.user.command.LogoutCommand;
-import com.gdsc.jmt.domain.user.command.PersistRefreshTokenCommand;
 import com.gdsc.jmt.domain.user.command.dto.AndroidAppleLoginRequest;
-import com.gdsc.jmt.domain.user.command.info.Reissue;
 import com.gdsc.jmt.domain.user.common.RoleType;
-import com.gdsc.jmt.domain.user.common.SocialType;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.apple.AppleUtil;
+import com.gdsc.jmt.domain.user.query.entity.RefreshTokenEntity;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.domain.user.query.repository.RefreshTokenRepository;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
@@ -24,7 +21,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +30,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,10 +40,10 @@ public class AuthService {
     @Value("${apple.side.google.client.id}")
     private String appleSideGoogleClientId;
     private final TokenProvider tokenProvider;
-    private final CommandGateway commandGateway;
 
     // 인증 로직만 CQRS 예외
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public TokenResponse googleLogin(String idToken) {
@@ -64,8 +59,9 @@ public class AuthService {
             }
             else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
-                String userAggregateId = sendSignUpCommand(userInfo, SocialType.GOOGLE);
-                return sendGenerateJwtTokenCommend(userInfo.getEmail(), userAggregateId);
+
+                signUp(userInfo.createUserEntity());
+                return sendGenerateJwtTokenCommend(userInfo.getEmail());
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
@@ -79,77 +75,75 @@ public class AuthService {
 
         // TODO : 안드로이드에서 애플 로그인 Request는 현재 SUB가 존재하지 않음 (애초에 SUB 사용안하고 있음 지금)
         OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("이 sub는 없습니다", androidAppleLoginRequest.email());
-        String userAggregateId = sendSignUpCommand(userInfo, SocialType.APPLE);
-        return sendGenerateJwtTokenCommend(androidAppleLoginRequest.email(), userAggregateId);
+        signUp(userInfo.createUserEntity());
+        return sendGenerateJwtTokenCommend(androidAppleLoginRequest.email());
     }
 
     @Transactional
     public TokenResponse appleLogin(String idToken) {
         OAuth2UserInfo userInfo = AppleUtil.getAppleUserInfo(idToken);
-
-        String userAggregateId = sendSignUpCommand(userInfo, SocialType.APPLE);
-        return sendGenerateJwtTokenCommend(userInfo.getEmail(), userAggregateId);
+        signUp(userInfo.createUserEntity());
+        return sendGenerateJwtTokenCommend(userInfo.getEmail());
     }
 
     @Transactional
     public TokenResponse loginForTest() {
-        OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("test", "test@naver.com");;
-        String userAggregateId = sendSignUpCommand(userInfo, SocialType.APPLE);
-        return sendGenerateJwtTokenCommend(userInfo.getEmail(), userAggregateId);
+        OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("test", "test@naver.com");
+        signUp(userInfo.createUserEntity());
+        return sendGenerateJwtTokenCommend(userInfo.getEmail());
     }
 
     @Transactional
-    public TokenResponse reissue(String email, String userAggregateId, String refreshToken) {
+    public TokenResponse reissue(String email, String refreshToken) {
         validateRefreshToken(refreshToken);
-
-        String refreshTokenAggregateId = UUID.randomUUID().toString();
-        TokenResponse tokenResponse = createToken(email, userAggregateId, refreshTokenAggregateId);
-        Reissue reissue = new Reissue(true, refreshToken, tokenResponse.refreshToken());
-        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
-                refreshTokenAggregateId,
-                email,
-                null,
-                reissue
-        ));
-
-        return tokenResponse;
+        return sendGenerateJwtTokenCommend(email);
     }
 
     @Transactional
     public void logout(String email, String refreshToken) {
         validateRefreshToken(refreshToken);
-
-        Claims claims = tokenProvider.parseClaims(refreshToken);
-        commandGateway.sendAndWait(new LogoutCommand(
-                claims.getSubject(),
-                email,
-                refreshToken)
-        );
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshTokenByEmail(email);
+        if(refreshTokenEntity == null || !refreshToken.equals(refreshTokenEntity.getRefreshToken()))
+            throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
+        refreshTokenRepository.delete(refreshTokenEntity);
     }
 
-    private String sendSignUpCommand(OAuth2UserInfo userInfo, SocialType socialType) {
-        String userAggregateId = UUID.randomUUID().toString();
-        commandGateway.sendAndWait(new SignUpCommand(
-                userAggregateId,
-                userInfo,
-                socialType));
+    private TokenResponse sendGenerateJwtTokenCommend(String email) {
+        TokenResponse tokenResponse = createToken(email);
 
-        Optional<UserEntity> user = userRepository.findByEmail(userInfo.getEmail());
-        if(user.isPresent())
-            userAggregateId = user.get().getUserAggregateId();
-        return userAggregateId;
-    }
+        UserEntity userEntity = checkExistingUserByUserEmail(email);
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(userEntity.getId());
 
-    private TokenResponse sendGenerateJwtTokenCommend(String email, String userAggregateId) {
-        String refreshTokenAggregateId = UUID.randomUUID().toString();
-        TokenResponse tokenResponse = createToken(email, userAggregateId, refreshTokenAggregateId);
-        commandGateway.sendAndWait(new PersistRefreshTokenCommand(
-                refreshTokenAggregateId,
-                email,
-                tokenResponse.refreshToken(),
-                null
-        ));
+        if(refreshTokenEntity == null) {
+            RefreshTokenEntity newRefreshTokenEntity = new RefreshTokenEntity(
+                    userEntity.getId(),
+                    tokenResponse.refreshToken()
+            );
+            refreshTokenRepository.save(newRefreshTokenEntity);
+        }
+        else {
+            refreshTokenEntity.setRefreshToken(tokenResponse.refreshToken());
+        }
+
         return tokenResponse;
+    }
+
+    private RefreshTokenEntity checkExistingRefreshTokenByEmail(String email) {
+        UserEntity userEntity = checkExistingUserByUserEmail(email);
+        return checkExistingRefreshToken(userEntity.getId());
+    }
+
+    private UserEntity checkExistingUserByUserEmail(String email) {
+        Optional<UserEntity> result = userRepository.findByEmail(email);
+        if(result.isPresent())
+            return result.get();
+        else
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+    }
+
+    private RefreshTokenEntity checkExistingRefreshToken(Long userId) {
+        Optional<RefreshTokenEntity> result = refreshTokenRepository.findByUserId(userId);
+        return result.orElse(null);
     }
 
     private void validateRefreshToken(String refreshToken) {
@@ -157,15 +151,14 @@ public class AuthService {
             throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
 
-    private TokenResponse createToken(String email, String userAggregateId, String refreshTokenAggregateId) {
-        return tokenProvider.generateJwtToken(email, userAggregateId, refreshTokenAggregateId, RoleType.MEMBER);
+    private TokenResponse createToken(String email) {
+        return tokenProvider.generateJwtToken(email, RoleType.MEMBER);
     }
 
-    public String createAccessToken(String userAggregateId) {
-        Optional<UserEntity> user = userRepository.findByUserAggregateId(userAggregateId);
-        if(user.isEmpty())
-            throw new ApiException(UserMessage.USER_NOT_FOUND);
-        TokenResponse response = tokenProvider.generateJwtToken(user.get().getEmail(), userAggregateId, "", RoleType.MEMBER);
-        return response.accessToken();
+    private void signUp(UserEntity user) {
+        if(user == null)
+            return;
+
+        userRepository.save(user);
     }
 }

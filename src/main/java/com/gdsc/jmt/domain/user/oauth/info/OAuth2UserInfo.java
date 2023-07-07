@@ -1,5 +1,8 @@
 package com.gdsc.jmt.domain.user.oauth.info;
 
+import com.gdsc.jmt.domain.user.common.SocialType;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+
 import java.util.Map;
 
 public abstract class OAuth2UserInfo {
@@ -10,4 +13,14 @@ public abstract class OAuth2UserInfo {
     public abstract String getEmail();
 
     public abstract String getImageUrl();
+
+    public abstract SocialType getSocialType();
+
+
+    public UserEntity createUserEntity() {
+        UserEntity user = new UserEntity();
+        user.setEmail(getEmail());
+        user.setSocialType(getSocialType());
+        return user;
+    }
 }

@@ -34,7 +34,7 @@ public class UserQueryController {
     @GetMapping("/user/info")
     @GetUserInfoSpringDocs
     public JMTApiResponse<UserResponse> getUserInfo(@AuthenticationPrincipal UserInfo user) {
-        UserResponse userInfo = userQueryService.getUserInfo(user.getAggreagatedId());
+        UserResponse userInfo = userQueryService.getUserInfo(user.getEmail());
         return JMTApiResponse.createResponseWithMessage(userInfo, UserMessage.GET_USER_SUCCESS);
     }
 }

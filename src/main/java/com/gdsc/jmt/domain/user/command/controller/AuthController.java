@@ -16,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "사용자 인증 관련 컨트롤러")
 @FirstVersionRestController
@@ -54,7 +53,7 @@ public class AuthController {
     @PostMapping("/token")
     @ReissueSpringDocs
     public JMTApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
-        TokenResponse tokenResponse = authService.reissue(user.getEmail(), user.getAggreagatedId(),logoutRequest.refreshToken());
+        TokenResponse tokenResponse = authService.reissue(user.getEmail(),logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.REISSUE_SUCCESS);
     }
 
@@ -63,12 +62,5 @@ public class AuthController {
     public JMTApiResponse<?> logout(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
         authService.logout(user.getEmail() , logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.LOGOUT_SUCCESS);
-    }
-
-
-    @PostMapping("/user/createAccessToken/{userAggregateId}")
-    public JMTApiResponse<?> createAccessToken(@RequestParam String userAggregateId) {
-        String accessToken = authService.createAccessToken(userAggregateId);
-        return JMTApiResponse.createResponseWithMessage(accessToken, UserMessage.LOGIN_SUCCESS);
     }
 }

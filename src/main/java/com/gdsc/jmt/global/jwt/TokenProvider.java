@@ -40,12 +40,11 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenResponse generateJwtToken(String email, String userAggregateId, String refreshTokenAggregateId, RoleType role) {
+    public TokenResponse generateJwtToken(String email, RoleType role) {
         long now = (new Date()).getTime();
 
         Map<String, Object> payloads = Map.of(
                 "email", email,
-                "aggregateId", userAggregateId,
                 AUTHORITIES_KEY, role);
 
 
@@ -57,7 +56,6 @@ public class TokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .setSubject(refreshTokenAggregateId)
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
