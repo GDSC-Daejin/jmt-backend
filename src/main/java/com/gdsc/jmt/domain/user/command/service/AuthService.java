@@ -13,13 +13,13 @@ import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
+import com.gdsc.jmt.global.jwt.dto.UserLoginAction;
 import com.gdsc.jmt.global.messege.AuthMessage;
 import com.gdsc.jmt.global.messege.UserMessage;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -60,8 +60,10 @@ public class AuthService {
             else {
                 GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
 
-                signUp(userInfo.createUserEntity());
-                return sendGenerateJwtTokenCommend(userInfo.getEmail());
+                UserLoginAction action = signUpOrSignIn(userInfo.createUserEntity());
+                TokenResponse tokenResponse = sendGenerateJwtTokenCommend(userInfo.getEmail());
+                tokenResponse.updateLoginActionFlag(action);
+                return tokenResponse;
             }
         } catch (IllegalArgumentException | HttpClientErrorException | GeneralSecurityException | IOException e) {
             throw new ApiException(AuthMessage.INVALID_TOKEN);
@@ -75,22 +77,28 @@ public class AuthService {
 
         // TODO : 안드로이드에서 애플 로그인 Request는 현재 SUB가 존재하지 않음 (애초에 SUB 사용안하고 있음 지금)
         OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("이 sub는 없습니다", androidAppleLoginRequest.email());
-        signUp(userInfo.createUserEntity());
-        return sendGenerateJwtTokenCommend(androidAppleLoginRequest.email());
+        UserLoginAction action = signUpOrSignIn(userInfo.createUserEntity());
+        TokenResponse tokenResponse = sendGenerateJwtTokenCommend(androidAppleLoginRequest.email());
+        tokenResponse.updateLoginActionFlag(action);
+        return tokenResponse;
     }
 
     @Transactional
     public TokenResponse appleLogin(String idToken) {
         OAuth2UserInfo userInfo = AppleUtil.getAppleUserInfo(idToken);
-        signUp(userInfo.createUserEntity());
-        return sendGenerateJwtTokenCommend(userInfo.getEmail());
+        UserLoginAction action = signUpOrSignIn(userInfo.createUserEntity());
+        TokenResponse tokenResponse = sendGenerateJwtTokenCommend(userInfo.getEmail());
+        tokenResponse.updateLoginActionFlag(action);
+        return tokenResponse;
     }
 
     @Transactional
     public TokenResponse loginForTest() {
         OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("test", "test@naver.com");
-        signUp(userInfo.createUserEntity());
-        return sendGenerateJwtTokenCommend(userInfo.getEmail());
+        UserLoginAction action = signUpOrSignIn(userInfo.createUserEntity());
+        TokenResponse tokenResponse = sendGenerateJwtTokenCommend(userInfo.getEmail());
+        tokenResponse.updateLoginActionFlag(action);
+        return tokenResponse;
     }
 
     @Transactional
@@ -155,10 +163,18 @@ public class AuthService {
         return tokenProvider.generateJwtToken(email, RoleType.MEMBER);
     }
 
-    private void signUp(UserEntity user) {
+    private UserLoginAction signUpOrSignIn(UserEntity user) {
         if(user == null)
-            return;
-
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        UserLoginAction userLoginAction = UserLoginAction.LOG_IN;
+        Optional<UserEntity> origin = userRepository.findByEmail(user.getEmail());
+        origin.ifPresent(
+                userEntity -> user.setId(userEntity.getId())
+        );
+        if (origin.isEmpty()){
+            userLoginAction = UserLoginAction.SIGN_UP;
+        }
         userRepository.save(user);
+        return userLoginAction;
     }
 }
