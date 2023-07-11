@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.restaurant.command.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ public class CreateRecommendRestaurantRequestFromClient {
     private Long categoryId;
 
     @Schema(description = "사진 데이터", nullable = true)
+    @Nullable
     private List<MultipartFile> pictures;
 
     @Schema(description = "주류 유무", example = "true")

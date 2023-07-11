@@ -47,7 +47,9 @@ public class RestaurantService {
         RecommendRestaurantEntity recommendRestaurant = validateCreation(email, createRecommendRestaurantRequest);
 
         Long id = recommendRestaurantRepository.save(recommendRestaurant).getId();
-        uploadImages(request.getPictures());
+        if(request.getPictures() != null) {
+            uploadImages(request.getPictures());
+        }
         return new CreatedRestaurantResponse(request.getRestaurantLocationId(), id);
     }
 
