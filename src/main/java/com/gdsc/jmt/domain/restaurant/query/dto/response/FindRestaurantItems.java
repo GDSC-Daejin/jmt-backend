@@ -9,7 +9,8 @@ public record FindRestaurantItems(
         String address,
 
         String roadAddress,
-
+        Double x,
+        Double y,
         String introduce,
         String category
 ) { }

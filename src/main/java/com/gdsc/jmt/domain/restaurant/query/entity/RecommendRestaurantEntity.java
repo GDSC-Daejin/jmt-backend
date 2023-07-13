@@ -96,6 +96,8 @@ public class RecommendRestaurantEntity {
                 this.restaurant.getPhone(),
                 this.restaurant.getAddress(),
                 this.restaurant.getRoadAddress(),
+                this.restaurant.getLocation().getX(),
+                this.restaurant.getLocation().getY(),
                 this.introduce,
                 this.category.getName()
         );
