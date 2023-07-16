@@ -169,7 +169,11 @@ public class AuthService {
         UserLoginAction userLoginAction = UserLoginAction.LOG_IN;
         Optional<UserEntity> origin = userRepository.findByEmail(user.getEmail());
         origin.ifPresent(
-                userEntity -> user.setId(userEntity.getId())
+                userEntity ->  {
+                    user.setId(userEntity.getId());
+                    user.setNickname(userEntity.getNickname());
+                    user.setProfileImageUrl(userEntity.getProfileImageUrl());
+                }
         );
         if (origin.isEmpty()){
             userLoginAction = UserLoginAction.SIGN_UP;
