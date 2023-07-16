@@ -82,9 +82,12 @@ public class RecommendRestaurantEntity {
                 restaurant.getRoadAddress(),
                 restaurant.getLocation().getX(),
                 restaurant.getLocation().getY(),
+                introduce,
                 canDrinkLiquor,
                 goWellWithLiquor,
-                recommendMenu
+                recommendMenu,
+                pictures.stream().map(RestaurantPhotoEntity::getImageUrl).toList(),
+                user.getId()
         );
     }
 

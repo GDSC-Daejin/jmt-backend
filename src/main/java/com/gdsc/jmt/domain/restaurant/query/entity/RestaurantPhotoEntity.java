@@ -2,8 +2,10 @@ package com.gdsc.jmt.domain.restaurant.query.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @Entity @Table(name = "tb_restaurant_photo")
 public class RestaurantPhotoEntity {
