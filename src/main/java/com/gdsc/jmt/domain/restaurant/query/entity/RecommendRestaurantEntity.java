@@ -36,7 +36,7 @@ public class RecommendRestaurantEntity {
     @JoinColumn(name="restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "recommend_restaurant_id")
     private List<RestaurantPhotoEntity> pictures = new ArrayList<>();
 
@@ -66,11 +66,9 @@ public class RecommendRestaurantEntity {
         this.recommendMenu = recommendMenu;
     }
 
-//    private void initPictures(List<RestaurantPhotoEntity> pictures) {
-//        for(RestaurantPhotoEntity picture : pictures) {
-//            picture.initRecommendRestaurant(this);
-//        }
-//    }
+    public void initPictures(List<RestaurantPhotoEntity> pictures) {
+        this.pictures = pictures;
+    }
 
     public FindDetailRestaurantItem toResponse() {
         return new FindDetailRestaurantItem(

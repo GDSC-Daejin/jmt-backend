@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ public class RestaurantService {
 
         Long id = recommendRestaurantRepository.save(recommendRestaurant).getId();
         if(request.getPictures() != null) {
-            uploadImages(request.getPictures());
+            uploadImages(recommendRestaurant, request.getPictures());
         }
         return new CreatedRestaurantResponse(request.getRestaurantLocationId(), id);
     }
@@ -82,7 +83,8 @@ public class RestaurantService {
         recommendRestaurantRepository.delete(recommendRestaurant);
     }
 
-    private void uploadImages(List<MultipartFile> images) {
+    private void uploadImages(RecommendRestaurantEntity recommendRestaurant, List<MultipartFile> images) {
+        List<RestaurantPhotoEntity> photoEntities = new ArrayList<>();
         for(MultipartFile image : images) {
             try {
                 String imageUrl = s3FileService.upload(image,"restaurantPhoto");
@@ -91,11 +93,14 @@ public class RestaurantService {
                         .imageSize(image.getSize())
                         .build();
                 restaurantPhotoRepository.save(photoEntity);
+                photoEntities.add(photoEntity);
             }
             catch (IOException e) {
                 throw new ApiException(RestaurantMessage.RESTAURANT_IMAGE_UPLOAD_FAIL);
             }
         }
+        recommendRestaurant.initPictures(photoEntities);
+        recommendRestaurantRepository.save(recommendRestaurant);
     }
 
     private RecommendRestaurantEntity validateCreation(final String email, CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
