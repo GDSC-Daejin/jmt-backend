@@ -12,5 +12,7 @@ public record FindRestaurantItems(
         Double x,
         Double y,
         String introduce,
-        String category
+        String category,
+        String userNickName,
+        String userProfileImageUrl
 ) { }
