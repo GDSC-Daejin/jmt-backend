@@ -5,6 +5,7 @@ import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
@@ -66,6 +67,12 @@ public class RestaurantQueryController {
     @GetMapping("restaurant/search")
     public JMTApiResponse<FindRestaurantResponse> restaurantSearch(@RequestParam String keyword, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
         FindRestaurantResponse response = restaurantQueryService.search(keyword, pageable);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND);
+    }
+
+    @GetMapping("restaurant/search/map")
+    public JMTApiResponse<FindRestaurantResponse> restaurantSearchInMap(@ModelAttribute RestaurantSearchMapRequest request, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
+        FindRestaurantResponse response = restaurantQueryService.searchInMap(request, pageable);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
 }

@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
 import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
@@ -17,6 +18,12 @@ import com.gdsc.jmt.global.dto.PageResponse;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -92,6 +99,28 @@ public class RestaurantQueryService {
                 recommendRestaurantPage.getContent().stream().map(RecommendRestaurantEntity::convertToFindItems).toList(),
                 pageResponse
         );
+    }
+
+    public void searchInMap(RestaurantSearchMapRequest request, Pageable pageable) throws ParseException {
+        String pointWKT = String.format("POINT(%s %s)", request.x(), request.y());
+        Point userLocation = (Point) new WKTReader().read(pointWKT);
+        List<RestaurantEntity> nearlyRestaurants = findRestaurantInRadius(userLocation, (double) request.radius());
+        // 찾은 맛집 위치 정보에서 실제로 사용자가 등록한 맛집으로 보여주는 로직 필요
+    }
+
+    private List<RestaurantEntity> findRestaurantInRadius(Point userLocation, double radiusInMeters) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Coordinate[] coordinates = new Coordinate[5];
+        double distanceInDegrees = radiusInMeters / 111320.0; // 1도 당 약 111320m
+        coordinates[0] = new Coordinate(userLocation.getX() - distanceInDegrees, userLocation.getY() - distanceInDegrees);
+        coordinates[1] = new Coordinate(userLocation.getX() + distanceInDegrees, userLocation.getY() - distanceInDegrees);
+        coordinates[2] = new Coordinate(userLocation.getX() + distanceInDegrees, userLocation.getY() + distanceInDegrees);
+        coordinates[3] = new Coordinate(userLocation.getX() - distanceInDegrees, userLocation.getY() + distanceInDegrees);
+        coordinates[4] = coordinates[0];
+
+        Polygon searchRectangle = geometryFactory.createPolygon(coordinates);
+        // 사각형 내에 포함되는 데이터 조회
+        return restaurantRepository.findByLocationWithin(searchRectangle);
     }
 
 
