@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.user.command.service;
 
 import com.gdsc.jmt.domain.user.command.dto.AndroidAppleLoginRequest;
 import com.gdsc.jmt.domain.user.common.RoleType;
+import com.gdsc.jmt.domain.user.common.Status;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.AppleOAuth2UserInfo;
 import com.gdsc.jmt.domain.user.oauth.info.impl.GoogleOAuth2UserInfo;
@@ -164,8 +165,9 @@ public class AuthService {
     }
 
     private UserLoginAction signUpOrSignIn(UserEntity user) {
-        if(user == null)
+        if(user == null) {
             throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
         UserLoginAction userLoginAction = UserLoginAction.LOG_IN;
         Optional<UserEntity> origin = userRepository.findByEmail(user.getEmail());
         origin.ifPresent(
@@ -180,5 +182,11 @@ public class AuthService {
         }
         userRepository.save(user);
         return userLoginAction;
+    }
+
+    public void removeUser(String userEmail) {
+        UserEntity user = checkExistingUserByUserEmail(userEmail);
+        user.setStatus(Status.SUSPEND);
+        userRepository.save(user);
     }
 }

@@ -63,4 +63,11 @@ public class AuthController {
         authService.logout(user.getEmail() , logoutRequest.refreshToken());
         return JMTApiResponse.createResponseWithMessage(null, UserMessage.LOGOUT_SUCCESS);
     }
+
+    @DeleteMapping("/user")
+    @RemoveSpringDocs
+    public JMTApiResponse<?> removeUser(@AuthenticationPrincipal UserInfo user) {
+        authService.removeUser(user.getEmail());
+        return JMTApiResponse.createResponseWithMessage(null, UserMessage.USER_REMOVE_SUCCESS);
+    }
 }
