@@ -72,20 +72,21 @@ public class RecommendRestaurantEntity {
 
     public FindDetailRestaurantItem toResponse() {
         return new FindDetailRestaurantItem(
-                restaurant.getName(),
-                restaurant.getPlaceUrl(),
-                category.getName(),
-                restaurant.getPhone(),
-                restaurant.getAddress(),
-                restaurant.getRoadAddress(),
-                restaurant.getLocation().getX(),
-                restaurant.getLocation().getY(),
-                introduce,
-                canDrinkLiquor,
-                goWellWithLiquor,
-                recommendMenu,
-                pictures.stream().map(RestaurantPhotoEntity::getImageUrl).toList(),
-                user.getId()
+                this.restaurant.getName(),
+                this.restaurant.getPlaceUrl(),
+                this.category.getName(),
+                this.restaurant.getPhone(),
+                this.restaurant.getAddress(),
+                this.restaurant.getRoadAddress(),
+                this.restaurant.getLocation().getX(),
+                this.restaurant.getLocation().getY(),
+                this.introduce,
+                this.canDrinkLiquor,
+                this.goWellWithLiquor,
+                this.recommendMenu,
+                this.pictures.stream().map(RestaurantPhotoEntity::getImageUrl).toList(),
+                this.user.getNickname(),
+                this.user.getProfileImageUrl()
         );
     }
 
@@ -100,7 +101,9 @@ public class RecommendRestaurantEntity {
                 this.restaurant.getLocation().getX(),
                 this.restaurant.getLocation().getY(),
                 this.introduce,
-                this.category.getName()
+                this.category.getName(),
+                this.user.getNickname(),
+                this.user.getProfileImageUrl()
         );
     }
 
