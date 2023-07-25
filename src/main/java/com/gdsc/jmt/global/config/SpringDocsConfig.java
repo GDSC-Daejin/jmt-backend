@@ -7,11 +7,14 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.http.HttpHeaders;
+
+import java.util.Arrays;
 
 @Configuration
 public class SpringDocsConfig {
@@ -41,7 +44,13 @@ public class SpringDocsConfig {
         SecurityRequirement addSecurityItem = new SecurityRequirement();
         addSecurityItem.addList("JWT");
 
+        Server localServer = new Server();
+        localServer.setUrl("http://localhost:8080");
+        Server domainServer = new Server();
+        domainServer.setUrl("https://api.jmt-matzip.dev");
+
         return new OpenAPI()
+                .servers(Arrays.asList(localServer, domainServer))
                 // Security 인증 컴포넌트 설정
                 .components(new Components().addSecuritySchemes("JWT", bearerAuth))
                 // API 마다 Security 인증 컴포넌트 설정
