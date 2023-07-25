@@ -27,7 +27,9 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,27 +103,38 @@ public class RestaurantQueryService {
         );
     }
 
-    public void searchInMap(RestaurantSearchMapRequest request, Pageable pageable) throws ParseException {
-        String pointWKT = String.format("POINT(%s %s)", request.x(), request.y());
-        Point userLocation = (Point) new WKTReader().read(pointWKT);
-        List<RestaurantEntity> nearlyRestaurants = findRestaurantInRadius(userLocation, (double) request.radius());
-        // 찾은 맛집 위치 정보에서 실제로 사용자가 등록한 맛집으로 보여주는 로직 필요
+    @Transactional(readOnly = true)
+    public List<FindRestaurantItems> searchInMap(RestaurantSearchMapRequest request) {
+        Point userLocation = null;
+        try {
+            String pointWKT = String.format("POINT(%s %s)", request.x(), request.y());
+            userLocation = (Point) new WKTReader().read(pointWKT);
+        }
+        catch (ParseException e) {
+            throw new ApiException(RestaurantMessage.LOCATION_PARSE_FAIL);
+        }
+
+        List<RestaurantEntity> nearlyRestaurants = findRestaurantInRadius(userLocation, request.radius());
+        // TODO : 이거... 일단 이렇게 하긴했는데... 성능적으로 좋지는 않을 듯.. 차라리 RecommendRestaurant 엔티티에 위치정보 넣는게 훨~~씬 나을듯
+        List<RecommendRestaurantEntity> recommendRestaurantEntities = new ArrayList<>();
+        for(RestaurantEntity restaurant : nearlyRestaurants) {
+            RecommendRestaurantEntity recommendRestaurant = findRecommendRestaurantByRestaurant(restaurant);
+            if(recommendRestaurant != null) {
+                recommendRestaurantEntities.add(recommendRestaurant);
+            }
+        }
+
+        return recommendRestaurantEntities.stream().map(RecommendRestaurantEntity::convertToFindItems).toList();
     }
 
-    private List<RestaurantEntity> findRestaurantInRadius(Point userLocation, double radiusInMeters) {
-        GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate[] coordinates = new Coordinate[5];
-        double distanceInDegrees = radiusInMeters / 111320.0; // 1도 당 약 111320m
-        coordinates[0] = new Coordinate(userLocation.getX() - distanceInDegrees, userLocation.getY() - distanceInDegrees);
-        coordinates[1] = new Coordinate(userLocation.getX() + distanceInDegrees, userLocation.getY() - distanceInDegrees);
-        coordinates[2] = new Coordinate(userLocation.getX() + distanceInDegrees, userLocation.getY() + distanceInDegrees);
-        coordinates[3] = new Coordinate(userLocation.getX() - distanceInDegrees, userLocation.getY() + distanceInDegrees);
-        coordinates[4] = coordinates[0];
-
-        Polygon searchRectangle = geometryFactory.createPolygon(coordinates);
+    private List<RestaurantEntity> findRestaurantInRadius(Point userLocation, Integer radiusInMeters) {
         // 사각형 내에 포함되는 데이터 조회
-        return restaurantRepository.findByLocationWithin(searchRectangle);
+        return restaurantRepository.findByLocationWithinDistance(userLocation.getX(), userLocation.getY(), radiusInMeters);
     }
 
+    private RecommendRestaurantEntity findRecommendRestaurantByRestaurant(RestaurantEntity restaurant) {
+        Optional<RecommendRestaurantEntity> result = recommendRestaurantRepository.findByRestaurant(restaurant);
+        return result.orElse(null);
+    }
 
 }

@@ -57,7 +57,7 @@ public class AuthController {
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.REISSUE_SUCCESS);
     }
 
-    @DeleteMapping("/user")
+    @DeleteMapping("/auth/user")
     @LogoutSpringDocs
     public JMTApiResponse<?> logout(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
         authService.logout(user.getEmail() , logoutRequest.refreshToken());

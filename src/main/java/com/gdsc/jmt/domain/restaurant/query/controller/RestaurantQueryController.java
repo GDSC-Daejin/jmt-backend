@@ -7,6 +7,7 @@ import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurant
 import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -71,8 +72,8 @@ public class RestaurantQueryController {
     }
 
     @GetMapping("restaurant/search/map")
-    public JMTApiResponse<FindRestaurantResponse> restaurantSearchInMap(@ModelAttribute RestaurantSearchMapRequest request, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
-        FindRestaurantResponse response = restaurantQueryService.searchInMap(request, pageable);
-        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND);
+    public JMTApiResponse<List<FindRestaurantItems>> restaurantSearchInMap(@ModelAttribute RestaurantSearchMapRequest request) {
+        List<FindRestaurantItems> restaurants = restaurantQueryService.searchInMap(request);
+        return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
 }
