@@ -20,9 +20,19 @@ public class UserQueryService {
     }
 
     public UserResponse getUserInfo(String email) {
-        UserEntity user =  userRepository.findByEmail(email)
+        return new UserResponse(findByEmail(email));
+    }
+    private UserEntity findByEmail(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
+    }
 
-        return new UserResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
+    public UserResponse findUser(Long userId) {
+        return new UserResponse(findByUserId(userId));
+    }
+
+    private UserEntity findByUserId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
     }
 }
