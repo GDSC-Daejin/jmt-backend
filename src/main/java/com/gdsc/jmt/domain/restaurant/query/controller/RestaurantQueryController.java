@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.controller;
 
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindAllRestaurantSpringDocs;
+import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantsByUserIdSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
@@ -79,6 +80,7 @@ public class RestaurantQueryController {
     }
 
     @GetMapping("restaurant/search/{userid}")
+    @FindRestaurantsByUserIdSpringDocs
     public JMTApiResponse<FindRestaurantResponse> restaurantSearchInUserId(@PathVariable("userid") Long userId, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
         FindRestaurantResponse restaurants = restaurantQueryService.searchInUserId(userId, pageable);
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
