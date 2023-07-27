@@ -5,8 +5,8 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +16,6 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity, Lo
     Optional<RestaurantEntity> findByKakaoSubId(String kakaoSubId);
 
     @Query("SELECT restaurant FROM RestaurantEntity restaurant " +
-            "WHERE ST_Distance(ST_Point(:userLongitude, :user_latitude), restaurant.location) <= :distance")
-    List<RestaurantEntity> findByLocationWithinDistance(double userLongitude, double user_latitude, Integer distance);
+            "WHERE ST_DISTANCE_SPHERE(restaurant.location, ST_GeomFromText(:userLocation)) <= :distance")
+    List<RestaurantEntity> findByLocationWithinDistance(String userLocation, Integer distance);
 }
