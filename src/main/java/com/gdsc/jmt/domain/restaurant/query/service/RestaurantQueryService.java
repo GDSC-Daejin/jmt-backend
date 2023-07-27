@@ -124,12 +124,17 @@ public class RestaurantQueryService {
             }
         }
 
+        // 술 유무 필터
+        recommendRestaurantEntities = recommendRestaurantEntities.stream().filter(recommendRestaurant -> recommendRestaurant.getCanDrinkLiquor() == request.isCanDrinkLiquor()).toList();
+
         return recommendRestaurantEntities.stream().map(RecommendRestaurantEntity::convertToFindItems).toList();
     }
 
     private List<RestaurantEntity> findRestaurantInRadius(Point userLocation, Integer radiusInMeters) {
         // 사각형 내에 포함되는 데이터 조회
-        return restaurantRepository.findByLocationWithinDistance(userLocation.getX(), userLocation.getY(), radiusInMeters);
+        String userLocationPoint = "POINT(" + userLocation.getX() + " " + userLocation.getY() + ")";
+        // 사각형 내에 포함되는 데이터 조회
+        return restaurantRepository.findByLocationWithinDistance(userLocationPoint, radiusInMeters);
     }
 
     private RecommendRestaurantEntity findRecommendRestaurantByRestaurant(RestaurantEntity restaurant) {
