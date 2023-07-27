@@ -21,6 +21,7 @@ public record FindDetailRestaurantItem(
 
 
         //식당 등록한 유저 정보
+        Long userId,
         String userNickName,
         String userProfileImageUrl
 

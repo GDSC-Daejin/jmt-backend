@@ -37,4 +37,10 @@ public class UserQueryController {
         UserResponse userInfo = userQueryService.getUserInfo(user.getEmail());
         return JMTApiResponse.createResponseWithMessage(userInfo, UserMessage.GET_USER_SUCCESS);
     }
+
+    @GetMapping("/user/info/{id}")
+    public JMTApiResponse<UserResponse> findUserInfo(@PathVariable("id") Long id) {
+        UserResponse userInfo = userQueryService.findUser(id);
+        return JMTApiResponse.createResponseWithMessage(userInfo, UserMessage.GET_USER_SUCCESS);
+    }
 }

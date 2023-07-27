@@ -85,6 +85,7 @@ public class RecommendRestaurantEntity {
                 this.goWellWithLiquor,
                 this.recommendMenu,
                 this.pictures.stream().map(RestaurantPhotoEntity::getImageUrl).toList(),
+                this.user.getId(),
                 this.user.getNickname(),
                 this.user.getProfileImageUrl()
         );
