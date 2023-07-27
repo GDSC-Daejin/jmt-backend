@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -76,4 +77,11 @@ public class RestaurantQueryController {
         List<FindRestaurantItems> restaurants = restaurantQueryService.searchInMap(request);
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
+
+    @GetMapping("restaurant/search/{userid}")
+    public JMTApiResponse<FindRestaurantResponse> restaurantSearchInUserId(@PathVariable("userid") Long userId, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
+        FindRestaurantResponse restaurants = restaurantQueryService.searchInUserId(userId, pageable);
+        return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
+    }
+
 }
