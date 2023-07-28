@@ -142,4 +142,16 @@ public class RestaurantQueryService {
         return result.orElse(null);
     }
 
+    public FindRestaurantResponse searchInUserId(Long userId, Pageable pageable) {
+        Page<RecommendRestaurantEntity> recommendRestaurantPage = findRecommendRestaurantByUserId(userId, pageable);
+        PageResponse pageResponse = new PageResponse(recommendRestaurantPage);
+        return new FindRestaurantResponse(
+                recommendRestaurantPage.getContent().stream().map(RecommendRestaurantEntity::convertToFindItems).toList(),
+                pageResponse
+        );
+    }
+
+    private Page<RecommendRestaurantEntity> findRecommendRestaurantByUserId(Long userId, Pageable pageable) {
+        return recommendRestaurantRepository.findByUserId(userId, pageable);
+    }
 }
