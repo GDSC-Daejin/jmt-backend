@@ -80,8 +80,10 @@ public class RestaurantQueryController {
     }
 
     @GetMapping("restaurant/search/{userid}")
+    @PageableAsQueryParam
     @FindRestaurantsByUserIdSpringDocs
-    public JMTApiResponse<FindRestaurantResponse> restaurantSearchInUserId(@PathVariable("userid") Long userId, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
+    public JMTApiResponse<FindRestaurantResponse> restaurantSearchInUserId(@PathVariable("userid") Long userId,
+            @PageableDefault @Parameter(hidden = true) Pageable pageable) {
         FindRestaurantResponse restaurants = restaurantQueryService.searchInUserId(userId, pageable);
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
