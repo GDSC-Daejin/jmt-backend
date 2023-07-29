@@ -14,5 +14,6 @@ public record FindRestaurantItems(
         String introduce,
         String category,
         String userNickName,
-        String userProfileImageUrl
+        String userProfileImageUrl,
+        Boolean canDrinkLiquor
 ) { }

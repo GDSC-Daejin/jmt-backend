@@ -1,6 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.util;
 
-import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.http.KakaoRestServerAPI;
 import com.gdsc.jmt.global.messege.DefaultMessage;

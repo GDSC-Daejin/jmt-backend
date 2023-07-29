@@ -1,10 +1,10 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
-import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
-import com.gdsc.jmt.domain.restaurant.query.dto.RestaurantSearchMapRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindAllRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
-import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
@@ -18,10 +18,7 @@ import com.gdsc.jmt.global.dto.PageResponse;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.data.domain.Page;
@@ -123,10 +120,6 @@ public class RestaurantQueryService {
                 recommendRestaurantEntities.add(recommendRestaurant);
             }
         }
-
-        // 술 유무 필터
-        recommendRestaurantEntities = recommendRestaurantEntities.stream().filter(recommendRestaurant -> recommendRestaurant.getCanDrinkLiquor() == request.isCanDrinkLiquor()).toList();
-
         return recommendRestaurantEntities.stream().map(RecommendRestaurantEntity::convertToFindItems).toList();
     }
 

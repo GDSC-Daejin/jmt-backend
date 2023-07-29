@@ -2,14 +2,15 @@ package com.gdsc.jmt.domain.restaurant.query.controller;
 
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindAllRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantsByUserIdSpringDocs;
-import com.gdsc.jmt.domain.restaurant.query.dto.FindAllRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindAllRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
-import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.RestaurantSearchMapRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.service.RestaurantFilterService;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.FindDetailRestaurantSpringDocs;
@@ -23,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springdoc.core.converters.models.PageableAsQueryParam;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +35,7 @@ import java.util.List;
 @Tag(name = "맛집 조회 컨트롤러")
 public class RestaurantQueryController {
     private final RestaurantQueryService restaurantQueryService;
+    private final RestaurantFilterService restaurantFilterService;
 
 
     @GetMapping("/restaurant")
@@ -72,9 +73,10 @@ public class RestaurantQueryController {
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
 
-    @GetMapping("restaurant/search/map")
-    public JMTApiResponse<List<FindRestaurantItems>> restaurantSearchInMap(@ModelAttribute RestaurantSearchMapRequest request) {
+    @PostMapping("restaurant/search/map")
+    public JMTApiResponse<List<FindRestaurantItems>> restaurantSearchInMap(@RequestBody RestaurantSearchMapRequest request) {
         List<FindRestaurantItems> restaurants = restaurantQueryService.searchInMap(request);
+        restaurants = restaurantFilterService.applyFilter(request.filter(), restaurants);
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
 
