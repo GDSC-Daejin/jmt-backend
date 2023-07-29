@@ -2,7 +2,7 @@ package com.gdsc.jmt.domain.restaurant.query.service;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.restaurant.MockKakaoMaker;
-import com.gdsc.jmt.domain.restaurant.query.dto.FindRestaurantLocationListRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;

@@ -104,7 +104,8 @@ public class RecommendRestaurantEntity {
                 this.introduce,
                 this.category.getName(),
                 this.user.getNickname(),
-                this.user.getProfileImageUrl()
+                this.user.getProfileImageUrl(),
+                this.canDrinkLiquor
         );
     }
 

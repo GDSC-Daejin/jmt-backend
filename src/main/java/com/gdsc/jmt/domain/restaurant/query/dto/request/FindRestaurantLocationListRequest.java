@@ -1,4 +1,4 @@
-package com.gdsc.jmt.domain.restaurant.query.dto;
+package com.gdsc.jmt.domain.restaurant.query.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -6,5 +6,8 @@ public record CategoryResponse(
         @Schema(description = "카테고리 Id 입니다.", example = "1")
         Long id,
         @Schema(description = "카테고리 이름입니다.", example = "양식")
-        String name
+        String name,
+
+        @Schema(description = "카테고리 코드입니다..", example = "FUSION")
+        String codeName
 ) { }
