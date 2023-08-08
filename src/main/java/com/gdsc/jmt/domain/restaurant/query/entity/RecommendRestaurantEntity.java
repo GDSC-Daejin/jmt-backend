@@ -92,6 +92,10 @@ public class RecommendRestaurantEntity {
     }
 
     public FindRestaurantItems convertToFindItems() {
+        String restaurantImageUrl = null;
+        if(!this.pictures.isEmpty()) {
+            restaurantImageUrl = this.pictures.get(0).getImageUrl();
+        }
         return new FindRestaurantItems(
                 this.id,
                 this.restaurant.getName(),
@@ -101,6 +105,7 @@ public class RecommendRestaurantEntity {
                 this.restaurant.getRoadAddress(),
                 this.restaurant.getLocation().getX(),
                 this.restaurant.getLocation().getY(),
+                restaurantImageUrl,
                 this.introduce,
                 this.category.getName(),
                 this.user.getNickname(),

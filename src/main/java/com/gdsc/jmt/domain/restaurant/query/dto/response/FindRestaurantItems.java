@@ -11,6 +11,7 @@ public record FindRestaurantItems(
         String roadAddress,
         Double x,
         Double y,
+        String restaurantImageUrl,
         String introduce,
         String category,
         String userNickName,
