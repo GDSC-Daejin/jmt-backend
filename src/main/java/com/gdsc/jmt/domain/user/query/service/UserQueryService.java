@@ -1,11 +1,14 @@
 package com.gdsc.jmt.domain.user.query.service;
 
-import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.user.query.dto.FindLocationListRequest;
-import com.gdsc.jmt.domain.user.query.dto.KakaoLocationResponse;
+import com.gdsc.jmt.domain.user.query.dto.KakaoSearchLocationResponse;
+import com.gdsc.jmt.domain.user.query.dto.KakaoUserLocationResponse;
+import com.gdsc.jmt.domain.user.query.dto.UserLocationRequest;
 import com.gdsc.jmt.domain.user.query.dto.UserResponse;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
+import com.gdsc.jmt.domain.user.util.KakaoLocationDocument;
+import com.gdsc.jmt.domain.user.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.user.util.LocationAPIUtil;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.UserMessage;
@@ -43,7 +46,12 @@ public class UserQueryService {
     }
 
     public List<KakaoSearchDocument> findLocation(final FindLocationListRequest findLocationListRequest) {
-        KakaoLocationResponse kakaoLocationResponse = locationAPIUtil.findLocation(findLocationListRequest);
-        return kakaoLocationResponse.getDocuments();
+        KakaoSearchLocationResponse kakaoSearchLocationResponse = locationAPIUtil.findLocation(findLocationListRequest);
+        return kakaoSearchLocationResponse.getDocuments();
+    }
+
+    public List<KakaoLocationDocument> getCurrentLocation(UserLocationRequest request) {
+        KakaoUserLocationResponse kakaoSearchLocationResponse = locationAPIUtil.getCurrentLocation(request);
+        return kakaoSearchLocationResponse.getDocuments();
     }
 }

@@ -1,7 +1,9 @@
 package com.gdsc.jmt.domain.user.util;
 
 import com.gdsc.jmt.domain.user.query.dto.FindLocationListRequest;
-import com.gdsc.jmt.domain.user.query.dto.KakaoLocationResponse;
+import com.gdsc.jmt.domain.user.query.dto.KakaoSearchLocationResponse;
+import com.gdsc.jmt.domain.user.query.dto.KakaoUserLocationResponse;
+import com.gdsc.jmt.domain.user.query.dto.UserLocationRequest;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.http.KakaoRestServerAPI;
 import com.gdsc.jmt.global.messege.DefaultMessage;
@@ -19,16 +21,16 @@ public class LocationAPIUtil {
     @Value("${kakao.rest.api.key}")
     private String kakaoRestAPIKey;
 
-    public KakaoLocationResponse findLocation(final FindLocationListRequest request) {
+    public KakaoSearchLocationResponse findLocation(final FindLocationListRequest request) {
         try {
-            Call<KakaoLocationResponse> call = kakaoRestServerAPI.sendSearchAPI(
+            Call<KakaoSearchLocationResponse> call = kakaoRestServerAPI.sendSearchAPI(
                     "KakaoAK " + kakaoRestAPIKey,
                     request.query(),
                     request.page() != null ? request.page() : 1,
                     10
             );
 
-            Response<KakaoLocationResponse> response = call.execute();
+            Response<KakaoSearchLocationResponse> response = call.execute();
             return response.body();
         }
         catch (Exception ex) {
@@ -36,4 +38,19 @@ public class LocationAPIUtil {
         }
     }
 
+    public KakaoUserLocationResponse getCurrentLocation(final UserLocationRequest request) {
+        try {
+            Call<KakaoUserLocationResponse> call = kakaoRestServerAPI.sendCurrentLocationAPI(
+                    "KakaoAK " + kakaoRestAPIKey,
+                    request.x() != null ? request.x() : "",
+                    request.y() != null ? request.y() : ""
+            );
+
+            Response<KakaoUserLocationResponse> response = call.execute();
+            return response.body();
+        }
+        catch (Exception ex) {
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
