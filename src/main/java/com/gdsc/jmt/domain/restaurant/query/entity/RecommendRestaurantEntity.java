@@ -96,7 +96,7 @@ public class RecommendRestaurantEntity {
         if(!this.pictures.isEmpty()) {
             restaurantImageUrl = this.pictures.get(0).getImageUrl();
         }
-        return new FindRestaurantItems(
+        return FindRestaurantItems.createDefault(
                 this.id,
                 this.restaurant.getName(),
                 this.restaurant.getPlaceUrl(),
