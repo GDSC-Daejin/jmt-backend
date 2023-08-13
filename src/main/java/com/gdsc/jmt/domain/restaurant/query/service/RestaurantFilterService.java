@@ -33,7 +33,7 @@ public class RestaurantFilterService {
     }
 
     private List<FindRestaurantItems> applyCategoryFilter(RestaurantFilter restaurantFilter, List<FindRestaurantItems> restaurantItems) {
-        if(restaurantFilter.categoryFilter().isEmpty()) {
+        if(restaurantFilter.categoryFilter() == null || restaurantFilter.categoryFilter().isEmpty()) {
             return restaurantItems;
         }
 
