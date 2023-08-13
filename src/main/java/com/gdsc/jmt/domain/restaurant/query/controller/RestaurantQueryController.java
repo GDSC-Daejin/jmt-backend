@@ -76,6 +76,7 @@ public class RestaurantQueryController {
     }
 
     @PostMapping("restaurant/search/map")
+    @PageableAsQueryParam
     public JMTApiResponse<FindRestaurantResponse> restaurantSearchInMap(@RequestBody RestaurantSearchMapRequest request, @PageableDefault @Parameter(hidden = true) Pageable pageable) {
         FindRestaurantResponse restaurants = restaurantQueryService.searchInMap(request, pageable);
         return JMTApiResponse.createResponseWithMessage(restaurants, RestaurantMessage.RESTAURANT_SEARCH_FIND);
