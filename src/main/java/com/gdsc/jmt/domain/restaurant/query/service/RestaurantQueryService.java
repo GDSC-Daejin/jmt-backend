@@ -103,15 +103,8 @@ public class RestaurantQueryService {
     @Transactional(readOnly = true)
     public List<FindRestaurantItems> searchInMap(RestaurantSearchMapRequest request) {
         Point userLocation = null;
-        try {
-            String pointWKT = String.format("POINT(%s %s)", request.x(), request.y());
-            userLocation = (Point) new WKTReader().read(pointWKT);
-        }
-        catch (ParseException e) {
-            throw new ApiException(RestaurantMessage.LOCATION_PARSE_FAIL);
-        }
 
-        List<RestaurantEntity> nearlyRestaurants = findRestaurantInRadius(userLocation, request.radius());
+        List<RestaurantEntity> nearlyRestaurants = findRestaurantInRadius(request);
         // TODO : 이거... 일단 이렇게 하긴했는데... 성능적으로 좋지는 않을 듯.. 차라리 RecommendRestaurant 엔티티에 위치정보 넣는게 훨~~씬 나을듯
         List<RecommendRestaurantEntity> recommendRestaurantEntities = new ArrayList<>();
         for(RestaurantEntity restaurant : nearlyRestaurants) {
@@ -123,11 +116,16 @@ public class RestaurantQueryService {
         return recommendRestaurantEntities.stream().map(RecommendRestaurantEntity::convertToFindItems).toList();
     }
 
-    private List<RestaurantEntity> findRestaurantInRadius(Point userLocation, Integer radiusInMeters) {
+    private List<RestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request) {
+        String userLocationRange = "POLYGON((";
+        userLocationRange += request.startLocation().x() + " " + request.startLocation().y() + ", ";
+        userLocationRange += request.endLocation().x() + " " + request.startLocation().y() + ", ";
+        userLocationRange += request.endLocation().x() + " " + request.endLocation().y() + ", ";
+        userLocationRange += request.startLocation().x() + " " + request.endLocation().y() + ", ";
+        userLocationRange += request.startLocation().x() + " " + request.startLocation().y() + "))";
+
         // 사각형 내에 포함되는 데이터 조회
-        String userLocationPoint = "POINT(" + userLocation.getX() + " " + userLocation.getY() + ")";
-        // 사각형 내에 포함되는 데이터 조회
-        return restaurantRepository.findByLocationWithinDistance(userLocationPoint, radiusInMeters);
+        return restaurantRepository.findByLocationWithinDistance(userLocationRange);
     }
 
     private RecommendRestaurantEntity findRecommendRestaurantByRestaurant(RestaurantEntity restaurant) {
