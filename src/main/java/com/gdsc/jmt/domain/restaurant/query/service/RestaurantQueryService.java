@@ -44,6 +44,8 @@ public class RestaurantQueryService {
     // 혹시 해당 조회 기능이 늘어나는 경우 서비스 분리 필요
     private final RecommendRestaurantRepository recommendRestaurantRepository;
 
+    private final RestaurantFilterService restaurantFilterService;
+
 
     public List<KakaoSearchDocument> findRestaurantLocationList(final FindRestaurantLocationListRequest findRestaurantLocationListRequest) {
         KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(findRestaurantLocationListRequest);
@@ -104,22 +106,18 @@ public class RestaurantQueryService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindRestaurantItems> searchInMap(RestaurantSearchMapRequest request) {
-        Point userLocation = null;
+    public FindRestaurantResponse searchInMap(RestaurantSearchMapRequest request, Pageable pageable) {
+        List<Long> categoryIds = restaurantFilterService.findCategoryIdsByFilter(request.filter());
+        Page<RecommendRestaurantEntity> nearlyRestaurants = findRestaurantInRadius(request, categoryIds, request.filter().isCanDrinkLiquor() ,pageable);
 
-        List<RestaurantEntity> nearlyRestaurants = findRestaurantInRadius(request);
-        // TODO : 이거... 일단 이렇게 하긴했는데... 성능적으로 좋지는 않을 듯.. 차라리 RecommendRestaurant 엔티티에 위치정보 넣는게 훨~~씬 나을듯
-        List<RecommendRestaurantEntity> recommendRestaurantEntities = new ArrayList<>();
-        for(RestaurantEntity restaurant : nearlyRestaurants) {
-            RecommendRestaurantEntity recommendRestaurant = findRecommendRestaurantByRestaurant(restaurant);
-            if(recommendRestaurant != null) {
-                recommendRestaurantEntities.add(recommendRestaurant);
-            }
-        }
-        return recommendRestaurantEntities.stream().map(RecommendRestaurantEntity::convertToFindItems).toList();
+        PageResponse pageResponse = new PageResponse(nearlyRestaurants);
+        return new FindRestaurantResponse(
+                nearlyRestaurants.getContent().stream().map(RecommendRestaurantEntity::convertToFindItems).toList(),
+                pageResponse
+        );
     }
 
-    private List<RestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request) {
+    private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Boolean isCanDrinkLiquor, Pageable pageable) {
         String userLocationRange = "POLYGON((";
         userLocationRange += request.startLocation().x() + " " + request.startLocation().y() + ", ";
         userLocationRange += request.endLocation().x() + " " + request.startLocation().y() + ", ";
@@ -128,7 +126,7 @@ public class RestaurantQueryService {
         userLocationRange += request.startLocation().x() + " " + request.startLocation().y() + "))";
 
         // 사각형 내에 포함되는 데이터 조회
-        return restaurantRepository.findByLocationWithinDistance(userLocationRange);
+        return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, isCanDrinkLiquor, pageable);
     }
 
     private RecommendRestaurantEntity findRecommendRestaurantByRestaurant(RestaurantEntity restaurant) {
