@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
+import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchInUserIdRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindAllRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
@@ -9,6 +10,7 @@ import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantIte
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -23,6 +25,7 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,16 +136,18 @@ public class RestaurantQueryService {
         return result.orElse(null);
     }
 
-    public FindRestaurantResponse searchInUserId(Long userId, Pageable pageable) {
-        Page<RecommendRestaurantEntity> recommendRestaurantPage = findRecommendRestaurantByUserId(userId, pageable);
+    public FindRestaurantResponse searchInUserId(Long userId, RestaurantSearchInUserIdRequest request, Pageable pageable) {
+        Page<RecommendRestaurantWithDistanceDTO> recommendRestaurantPage = findRecommendRestaurantByUserId(userId, request, pageable);
         PageResponse pageResponse = new PageResponse(recommendRestaurantPage);
         return new FindRestaurantResponse(
-                recommendRestaurantPage.getContent().stream().map(RecommendRestaurantEntity::convertToFindItems).toList(),
+                recommendRestaurantPage.getContent().stream().map(RecommendRestaurantWithDistanceDTO::convertToFindItems).toList(),
                 pageResponse
         );
     }
 
-    private Page<RecommendRestaurantEntity> findRecommendRestaurantByUserId(Long userId, Pageable pageable) {
-        return recommendRestaurantRepository.findByUserId(userId, pageable);
+    @Query()
+    private Page<RecommendRestaurantWithDistanceDTO> findRecommendRestaurantByUserId(Long userId, RestaurantSearchInUserIdRequest request, Pageable pageable) {
+        String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+        return recommendRestaurantRepository.findByUserId(userId, userLocation, pageable);
     }
 }
