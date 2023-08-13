@@ -40,3 +40,5 @@ out/
 
 *dev.properties
 *prod.properties
+
+/logs
