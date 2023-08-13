@@ -14,8 +14,4 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity, Lo
     Optional<RestaurantEntity> findByName(String name);
 
     Optional<RestaurantEntity> findByKakaoSubId(String kakaoSubId);
-
-    @Query("SELECT restaurant FROM RestaurantEntity restaurant " +
-            "WHERE ST_Within(restaurant.location, ST_GeomFromText(:locationRange))")
-    List<RestaurantEntity> findByLocationWithinDistance(String locationRange);
 }

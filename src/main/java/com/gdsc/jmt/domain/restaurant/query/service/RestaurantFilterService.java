@@ -42,4 +42,14 @@ public class RestaurantFilterService {
         List<String> categoryNames = categories.stream().map(CategoryEntity::getName).toList();
         return restaurantItems.stream().filter(restaurant -> categoryNames.contains(restaurant.category())).toList();
     }
+
+    public List<Long> findCategoryIdsByFilter(RestaurantFilter restaurantFilter) {
+        if(restaurantFilter.categoryFilter() == null || restaurantFilter.categoryFilter().isEmpty()) {
+            return categoryRepository.findAll().stream().map(CategoryEntity::getId).toList();
+        }
+
+        List<CategoryEntity> categories = categoryRepository.findByCodeNames(Arrays.stream(restaurantFilter.categoryFilter().split(",")).toList());
+        List<Long> categoryIds = categories.stream().map(CategoryEntity::getId).toList();
+        return categoryIds;
+    }
 }
