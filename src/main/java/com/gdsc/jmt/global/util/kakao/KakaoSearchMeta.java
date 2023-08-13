@@ -1,4 +1,4 @@
-package com.gdsc.jmt.domain.restaurant.util;
+package com.gdsc.jmt.global.util.kakao;
 
 import lombok.Getter;
 
