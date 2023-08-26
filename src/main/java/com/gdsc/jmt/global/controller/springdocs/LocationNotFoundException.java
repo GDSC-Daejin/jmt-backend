@@ -9,9 +9,9 @@ public class LocationNotFoundException {
     @Schema(description = "", nullable = true)
     String data = null;
 
-    @Schema(description = "", example = "user 정보를 찾을 수 없습니다.")
+    @Schema(description = "", example = "위치 정보를 찾을 수 없습니다.")
     String message = LocationMessage.LOCATION_NOT_FOUND.getMessage();
 
-    @Schema(description = "", example = "USER_NOT_FOUND")
+    @Schema(description = "", example = "LOCATION_NOT_FOUND")
     String code = LocationMessage.LOCATION_NOT_FOUND.toString();
 }
