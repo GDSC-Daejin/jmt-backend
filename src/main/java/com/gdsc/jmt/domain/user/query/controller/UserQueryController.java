@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.user.query.controller;
 
 import com.gdsc.jmt.domain.user.query.controller.springdocs.CheckDuplicateNicknameSpringDocs;
+import com.gdsc.jmt.domain.user.query.controller.springdocs.GetCurrentLocationSpringDocs;
 import com.gdsc.jmt.domain.user.query.controller.springdocs.GetUserInfoSpringDocs;
 import com.gdsc.jmt.domain.user.query.dto.FindLocationListRequest;
 import com.gdsc.jmt.domain.user.query.dto.UserLocationRequest;
@@ -58,7 +59,8 @@ public class UserQueryController {
     }
 
     @GetMapping("/loaction/current")
-    public JMTApiResponse<?> getCurrentLocation(@ModelAttribute UserLocationRequest request) {
+    @GetCurrentLocationSpringDocs
+    public JMTApiResponse<UserLocationResponse> getCurrentLocation(@ModelAttribute UserLocationRequest request) {
         List<KakaoLocationDocument> locations = userQueryService.getCurrentLocation(request);
         UserLocationResponse response = new UserLocationResponse(locations.get(0).getAddress(), locations.get(0).getRoad_address());
         return JMTApiResponse.createResponseWithMessage(response, UserMessage.GET_LOCATION_FIND_SUCCESS);
