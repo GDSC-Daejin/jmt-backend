@@ -5,7 +5,7 @@ import com.gdsc.jmt.domain.user.util.dto.RoadAddress;
 
 public record UserLocationResponse (
     String address,
-    String road_address
+    String roadAddress
 ) {
     public UserLocationResponse(Address address, RoadAddress roadAddress) {
         this(address.getAddress_name(), roadAddress.getAddress_name());
