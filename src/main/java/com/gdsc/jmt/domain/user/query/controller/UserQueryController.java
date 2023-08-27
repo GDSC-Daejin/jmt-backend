@@ -58,7 +58,7 @@ public class UserQueryController {
         return JMTApiResponse.createResponseWithMessage(locations, UserMessage.GET_LOCATION_FIND_SUCCESS);
     }
 
-    @GetMapping("/loaction/current")
+    @GetMapping("/location/current")
     @GetCurrentLocationSpringDocs
     public JMTApiResponse<UserLocationResponse> getCurrentLocation(@ModelAttribute UserLocationRequest request) {
         List<KakaoLocationDocument> locations = userQueryService.getCurrentLocation(request);
