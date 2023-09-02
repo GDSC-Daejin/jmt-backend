@@ -27,7 +27,7 @@ public class LocationAPIUtil {
                     "KakaoAK " + kakaoRestAPIKey,
                     request.query(),
                     request.page() != null ? request.page() : 1,
-                    20
+                    15
             );
 
             Response<KakaoSearchLocationResponse> response = call.execute();
