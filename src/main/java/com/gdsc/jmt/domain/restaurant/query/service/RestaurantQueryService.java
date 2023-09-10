@@ -14,6 +14,7 @@ import com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurant
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
+import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentResponse;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchResponse;
 import com.gdsc.jmt.domain.restaurant.util.RestaurantAPIUtil;
 import com.gdsc.jmt.global.dto.PageResponse;
@@ -47,9 +48,9 @@ public class RestaurantQueryService {
     private final RestaurantFilterService restaurantFilterService;
 
 
-    public List<KakaoSearchDocument> findRestaurantLocationList(final FindRestaurantLocationListRequest findRestaurantLocationListRequest) {
+    public List<KakaoSearchDocumentResponse> findRestaurantLocationList(final FindRestaurantLocationListRequest findRestaurantLocationListRequest) {
         KakaoSearchResponse response = restaurantAPIUtil.findRestaurantLocation(findRestaurantLocationListRequest);
-        return response.getDocuments();
+        return response.getDocuments().stream().map(KakaoSearchDocument::convertResponse).toList();
     }
 
     public void checkRecommendRestaurantExisting(final String kakaoSubId) {

@@ -70,4 +70,21 @@ public class KakaoSearchDocument {
                 .location(location)
                 .build();
     }
+
+    public KakaoSearchDocumentResponse convertResponse() {
+        return new KakaoSearchDocumentResponse(
+                place_name,
+                distance,
+                place_url,
+                category_name,
+                address_name,
+                road_address_name,
+                id,
+                phone,
+                category_group_code,
+                category_group_name,
+                x,
+                y
+        );
+    }
 }
