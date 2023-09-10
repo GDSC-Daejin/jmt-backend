@@ -13,6 +13,7 @@ import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantReposi
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantPhotoRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
+import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentRequest;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -55,7 +56,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public Long createRestaurantLocation(KakaoSearchDocument kakaoSearchDocumentRequest) {
+    public Long createRestaurantLocation(KakaoSearchDocumentRequest kakaoSearchDocumentRequest) {
         Optional<RestaurantEntity> checkExisting = restaurantRepository.findByKakaoSubId(kakaoSearchDocumentRequest.getId());
         if(checkExisting.isPresent()) {
             throw new ApiException(RestaurantMessage.RESTAURANT_LOCATION_CONFLICT);

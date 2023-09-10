@@ -2,12 +2,11 @@ package com.gdsc.jmt.domain.restaurant.command.controller;
 
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecommendRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
-import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
+import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentRequest;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
@@ -29,7 +28,7 @@ public class RestaurantController {
     @PostMapping(value = "/restaurant/location")
     @CreateRestaurantLocationSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
-    public JMTApiResponse<Long> createRestaurantLocation(@RequestBody KakaoSearchDocument kakaoSearchDocumentRequest) {
+    public JMTApiResponse<Long> createRestaurantLocation(@RequestBody KakaoSearchDocumentRequest kakaoSearchDocumentRequest) {
         Long restaurantLocationId = restaurantService.createRestaurantLocation(kakaoSearchDocumentRequest);
         return JMTApiResponse.createResponseWithMessage(restaurantLocationId, RestaurantMessage.RESTAURANT_LOCATION_CREATED);
     }
