@@ -9,7 +9,7 @@ import com.gdsc.jmt.domain.user.query.dto.UserLocationResponse;
 import com.gdsc.jmt.domain.user.query.dto.UserResponse;
 import com.gdsc.jmt.domain.user.query.service.UserQueryService;
 import com.gdsc.jmt.domain.user.util.KakaoLocationDocument;
-import com.gdsc.jmt.domain.user.util.KakaoSearchDocument;
+import com.gdsc.jmt.domain.user.util.KakaoSearchDocumentResponse;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -54,7 +54,7 @@ public class UserQueryController {
 
     @GetMapping("/location/search")
     public JMTApiResponse<?> findLocation(@ModelAttribute FindLocationListRequest findLocationListRequest) {
-        List<KakaoSearchDocument> locations = userQueryService.findLocation(findLocationListRequest);
+        List<KakaoSearchDocumentResponse> locations = userQueryService.findLocation(findLocationListRequest);
         return JMTApiResponse.createResponseWithMessage(locations, UserMessage.GET_LOCATION_FIND_SUCCESS);
     }
 

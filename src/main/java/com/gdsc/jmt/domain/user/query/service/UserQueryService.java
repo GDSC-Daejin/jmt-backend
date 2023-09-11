@@ -9,6 +9,7 @@ import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.domain.user.util.KakaoLocationDocument;
 import com.gdsc.jmt.domain.user.util.KakaoSearchDocument;
+import com.gdsc.jmt.domain.user.util.KakaoSearchDocumentResponse;
 import com.gdsc.jmt.domain.user.util.LocationAPIUtil;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.UserMessage;
@@ -45,9 +46,9 @@ public class UserQueryService {
                 .orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
     }
 
-    public List<KakaoSearchDocument> findLocation(final FindLocationListRequest findLocationListRequest) {
+    public List<KakaoSearchDocumentResponse> findLocation(final FindLocationListRequest findLocationListRequest) {
         KakaoSearchLocationResponse kakaoSearchLocationResponse = locationAPIUtil.findLocation(findLocationListRequest);
-        return kakaoSearchLocationResponse.getDocuments();
+        return kakaoSearchLocationResponse.getDocuments().stream().map(KakaoSearchDocument::convertResponse).toList();
     }
 
     public List<KakaoLocationDocument> getCurrentLocation(UserLocationRequest request) {
