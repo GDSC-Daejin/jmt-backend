@@ -18,6 +18,8 @@ public class RetrofitConfig {
 
     private static final String KAKAO_URL = "https://dapi.kakao.com/v2/";
 
+    private static final String NAVER_URL = "https://naveropenapi.apigw.ntruss.com/";
+
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS)
@@ -42,6 +44,14 @@ public class RetrofitConfig {
                 .build();
     }
 
+    @Bean(name = "naverRetrofit")
+    public Retrofit naverRetrofit(OkHttpClient client) {
+        return new Retrofit.Builder().baseUrl(NAVER_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+    }
+
     @Bean
     public AppleRestServerAPI appleRestServerAPI(@Qualifier("appleRetrofit") Retrofit retrofit) {
         return retrofit.create(AppleRestServerAPI.class);
@@ -50,5 +60,10 @@ public class RetrofitConfig {
     @Bean
     public KakaoRestServerAPI kakaoRestServerAPI(@Qualifier("kakaoRetrofit") Retrofit retrofit) {
         return retrofit.create(KakaoRestServerAPI.class);
+    }
+
+    @Bean
+    public NaverRestServerAPI naverRestServerAPI(@Qualifier("naverRetrofit") Retrofit retrofit) {
+        return retrofit.create(NaverRestServerAPI.class);
     }
 }
