@@ -168,18 +168,35 @@ public class AuthService {
         if(user == null) {
             throw new ApiException(UserMessage.USER_NOT_FOUND);
         }
-        UserLoginAction userLoginAction = UserLoginAction.LOG_IN;
+        UserLoginAction userLoginAction = UserLoginAction.SIGN_UP;
         Optional<UserEntity> origin = userRepository.findByEmail(user.getEmail());
-        origin.ifPresent(
-                userEntity ->  {
-                    user.setId(userEntity.getId());
-                    user.setNickname(userEntity.getNickname());
-                    user.setProfileImageUrl(userEntity.getProfileImageUrl());
-                }
-        );
-        if (origin.isEmpty()){
-            userLoginAction = UserLoginAction.SIGN_UP;
+        if(origin.isPresent()) {
+            userLoginAction = UserLoginAction.LOG_IN;
+            UserEntity userEntity = origin.get();
+            if(userEntity.getNickname() == null) {
+                userLoginAction = UserLoginAction.NICKNAME_PROCESS;
+            } else if (userEntity.getProfileImageUrl() == null) {
+                userLoginAction = UserLoginAction.PROFILE_IMAGE_PROCESS;
+            }
+            user.setId(userEntity.getId());
+            user.setNickname(userEntity.getNickname());
+            user.setProfileImageUrl(userEntity.getProfileImageUrl());
         }
+//        origin.ifPresent(
+//                userEntity ->  {
+//                    if(userEntity.getNickname() == null) {
+//                        userLoginAction = UserLoginAction.NICKNAME_PROCESS;
+//                    } else if (userEntity.getProfileImageUrl() == null) {
+//                        userLoginAction = UserLoginAction.PROFILE_IMAGE_PROCESS;
+//                    }
+//                    user.setId(userEntity.getId());
+//                    user.setNickname(userEntity.getNickname());
+//                    user.setProfileImageUrl(userEntity.getProfileImageUrl());
+//                }
+//        );
+//        if (origin.isEmpty()){
+//            userLoginAction = UserLoginAction.SIGN_UP;
+//        }
         userRepository.save(user);
         return userLoginAction;
     }
