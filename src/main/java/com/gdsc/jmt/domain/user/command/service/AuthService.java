@@ -168,37 +168,30 @@ public class AuthService {
         if(user == null) {
             throw new ApiException(UserMessage.USER_NOT_FOUND);
         }
+
         UserLoginAction userLoginAction = UserLoginAction.SIGN_UP;
         Optional<UserEntity> origin = userRepository.findByEmail(user.getEmail());
+
         if(origin.isPresent()) {
-            userLoginAction = UserLoginAction.LOG_IN;
             UserEntity userEntity = origin.get();
-            if(userEntity.getNickname() == null) {
-                userLoginAction = UserLoginAction.NICKNAME_PROCESS;
-            } else if (userEntity.getProfileImageUrl() == null) {
-                userLoginAction = UserLoginAction.PROFILE_IMAGE_PROCESS;
-            }
+            userLoginAction = setLoginAction(userEntity);
+
             user.setId(userEntity.getId());
             user.setNickname(userEntity.getNickname());
             user.setProfileImageUrl(userEntity.getProfileImageUrl());
         }
-//        origin.ifPresent(
-//                userEntity ->  {
-//                    if(userEntity.getNickname() == null) {
-//                        userLoginAction = UserLoginAction.NICKNAME_PROCESS;
-//                    } else if (userEntity.getProfileImageUrl() == null) {
-//                        userLoginAction = UserLoginAction.PROFILE_IMAGE_PROCESS;
-//                    }
-//                    user.setId(userEntity.getId());
-//                    user.setNickname(userEntity.getNickname());
-//                    user.setProfileImageUrl(userEntity.getProfileImageUrl());
-//                }
-//        );
-//        if (origin.isEmpty()){
-//            userLoginAction = UserLoginAction.SIGN_UP;
-//        }
+
         userRepository.save(user);
         return userLoginAction;
+    }
+
+    private UserLoginAction setLoginAction(UserEntity userEntity) {
+        if(userEntity.getNickname() == null) {
+            return UserLoginAction.NICKNAME_PROCESS;
+        } else if (userEntity.getProfileImageUrl() == null) {
+            return UserLoginAction.PROFILE_IMAGE_PROCESS;
+        }
+        return UserLoginAction.LOG_IN;
     }
 
     public void removeUser(String userEmail) {
