@@ -2,5 +2,5 @@ package com.gdsc.jmt.global.jwt.dto;
 
 public enum UserLoginAction {
     SIGN_UP,
-    LOG_IN
+    NICKNAME_PROCESS, PROFILE_IMAGE_PROCESS, LOG_IN
 }
