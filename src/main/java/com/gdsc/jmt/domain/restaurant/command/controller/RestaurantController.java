@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.restaurant.command.controller;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecommendRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.ReportRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.command.service.RestaurantService;
@@ -53,5 +54,12 @@ public class RestaurantController {
     public JMTApiResponse<?> removeRecommendRestaurant(@PathVariable Long id, @AuthenticationPrincipal UserInfo user) {
         restaurantService.removeRecommendRestaurant(id, user.getEmail());
         return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_DELETED);
+    }
+
+    @PostMapping(value = "/restaurant/{id}/report")
+    @Operation(summary = "맛집 신고 API", description = "맛집 정보 신고")
+    public JMTApiResponse<?> reportRecommendRestaurant(@PathVariable Long id, @AuthenticationPrincipal UserInfo reporter, @RequestBody ReportRecommendRestaurantRequest request) {
+        restaurantService.reportRecommendRestaurant(id, reporter, request);
+        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_REPORTED);
     }
 }

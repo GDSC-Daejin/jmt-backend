@@ -4,12 +4,15 @@ import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.category.query.repository.CategoryRepository;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.ReportRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.entity.ReportEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
+import com.gdsc.jmt.domain.restaurant.query.repository.ReportRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantPhotoRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
@@ -17,6 +20,7 @@ import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentRequest;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.CategoryMessage;
 import com.gdsc.jmt.global.messege.DefaultMessage;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
@@ -40,6 +44,7 @@ public class RestaurantService {
     private final RestaurantPhotoRepository restaurantPhotoRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final ReportRepository reportRepository;
 
     private final S3FileService s3FileService;
 
@@ -82,6 +87,27 @@ public class RestaurantService {
     public void removeRecommendRestaurant(final Long id, final String email) {
         RecommendRestaurantEntity recommendRestaurant = validateIsWriteRecommendRestaurantByUser(id, email);
         recommendRestaurantRepository.delete(recommendRestaurant);
+    }
+
+    @Transactional
+    public void reportRecommendRestaurant(final Long recommendRestaurantId, final UserInfo userInfo, final ReportRecommendRestaurantRequest request) {
+        Optional<RecommendRestaurantEntity> findResult = recommendRestaurantRepository.findById(recommendRestaurantId);
+        Optional<UserEntity> findUserResult = userRepository.findByEmail(userInfo.getEmail());
+
+        if(findResult.isEmpty()) {
+            throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
+        }
+
+        if(findResult.isPresent() && findUserResult.isPresent()) {
+            ReportEntity reportEntity = ReportEntity.builder()
+                    .reportRestaurant(findResult.get())
+                    .reportUser(findResult.get().getUser())
+                    .reporterUser(findUserResult.get())
+                    .reportReason(request.getReportReason())
+                    .build();
+
+            reportRepository.save(reportEntity);
+        }
     }
 
     private void uploadImages(RecommendRestaurantEntity recommendRestaurant, List<MultipartFile> images) {
