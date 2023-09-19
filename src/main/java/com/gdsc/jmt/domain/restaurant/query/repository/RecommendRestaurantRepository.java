@@ -17,9 +17,12 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
 
     @Query("select reRestaurant from RecommendRestaurantEntity reRestaurant " +
             "where reRestaurant.restaurant.name LIKE %:keyword%")
-//            "or reRestaurant.introduce LIKE %:keyword% " +
-//            "or reRestaurant.recommendMenu LIKE %:keyword% ")
     Page<RecommendRestaurantEntity> findSearch(String keyword, Pageable pageable);
+
+    @Query("select reRestaurant from RecommendRestaurantEntity reRestaurant " +
+            "WHERE ST_Within(reRestaurant.restaurant.location, ST_GeomFromText(:locationRange))" +
+            "AND reRestaurant.restaurant.name LIKE %:keyword%")
+    Page<RecommendRestaurantEntity> findSearchWithinDistance(String keyword, String locationRange, Pageable pageable);
 
     @Query("select NEW com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO(reRestaurant, ST_DISTANCE_SPHERE(reRestaurant.restaurant.location, ST_GeomFromText(:userLocation))) " +
             "from RecommendRestaurantEntity reRestaurant " +
@@ -32,6 +35,4 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
             "AND reRestaurant.category.id IN (:categoryIds)" +
             "AND reRestaurant.canDrinkLiquor = :isCanDrinkLiquor")
     Page<RecommendRestaurantEntity> findByLocationWithinDistance(String locationRange, List<Long> categoryIds, boolean isCanDrinkLiquor , Pageable pageable);
-//    @EntityGraph(attributePaths = {"category", "restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
-//    Page<RecommendRestaurantEntity> findAllWithPage(Pageable pageable);
 }

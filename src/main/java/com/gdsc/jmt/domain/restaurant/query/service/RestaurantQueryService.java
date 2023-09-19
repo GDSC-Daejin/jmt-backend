@@ -1,11 +1,9 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchInUserIdRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.*;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindAllRestaurantResponse;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
@@ -96,8 +94,15 @@ public class RestaurantQueryService {
         return new FindAllRestaurantResponse(restaurants , pageMeta);
     }
 
-    public FindRestaurantResponse search(final String keyword, Pageable pageable) {
-        Page<RecommendRestaurantEntity> recommendRestaurantPage = recommendRestaurantRepository.findSearch(keyword, pageable);
+    public FindRestaurantResponse search(final RestaurantSearchRequest request, Pageable pageable) {
+        Page<RecommendRestaurantEntity> recommendRestaurantPage;
+        if(request.startLocation() == null || request.endLocation() == null) {
+            recommendRestaurantPage = recommendRestaurantRepository.findSearch(request.keyword(), pageable);
+        }
+        else {
+            String userLocationRagne = makeLocationRange(request.startLocation(), request.endLocation());
+            recommendRestaurantPage = recommendRestaurantRepository.findSearchWithinDistance(request.keyword(), userLocationRagne, pageable);
+        }
 
         PageResponse pageResponse = new PageResponse(recommendRestaurantPage);
         return new FindRestaurantResponse(
@@ -119,13 +124,7 @@ public class RestaurantQueryService {
     }
 
     private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Boolean isCanDrinkLiquor, Pageable pageable) {
-        String userLocationRange = "POLYGON((";
-        userLocationRange += request.startLocation().x() + " " + request.startLocation().y() + ", ";
-        userLocationRange += request.endLocation().x() + " " + request.startLocation().y() + ", ";
-        userLocationRange += request.endLocation().x() + " " + request.endLocation().y() + ", ";
-        userLocationRange += request.startLocation().x() + " " + request.endLocation().y() + ", ";
-        userLocationRange += request.startLocation().x() + " " + request.startLocation().y() + "))";
-
+        String userLocationRange = makeLocationRange(request.startLocation(), request.endLocation());
         // 사각형 내에 포함되는 데이터 조회
         return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, isCanDrinkLiquor, pageable);
     }
@@ -144,9 +143,19 @@ public class RestaurantQueryService {
         );
     }
 
-    @Query()
     private Page<RecommendRestaurantWithDistanceDTO> findRecommendRestaurantByUserId(Long userId, RestaurantSearchInUserIdRequest request, Pageable pageable) {
         String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
         return recommendRestaurantRepository.findByUserId(userId, userLocation, pageable);
+    }
+
+    private String makeLocationRange(MapLocation startLocation, MapLocation endLocation) {
+        String userLocationRange = "POLYGON((";
+        userLocationRange += startLocation.x() + " " + startLocation.y() + ", ";
+        userLocationRange += endLocation.x() + " " + startLocation.y() + ", ";
+        userLocationRange += endLocation.x() + " " + endLocation.y() + ", ";
+        userLocationRange += startLocation.x() + " " + endLocation.y() + ", ";
+        userLocationRange += startLocation.x() + " " + startLocation.y() + "))";
+
+        return userLocationRange;
     }
 }
