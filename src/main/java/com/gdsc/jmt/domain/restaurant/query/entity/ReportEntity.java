@@ -31,5 +31,9 @@ public class ReportEntity {
     @JoinColumn(name="reporter_user_id", nullable = false)
     private UserEntity reporterUser;
 
-    private String reportReason;
+    @OneToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name="report_reason_id", nullable = false)
+    private ReportReasonEntity reportReason;
+
+    private String reportReasonText;
 }

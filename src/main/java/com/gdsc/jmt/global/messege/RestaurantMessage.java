@@ -16,6 +16,7 @@ public enum RestaurantMessage implements ResponseMessage {
     RECOMMEND_RESTAURANT_REGISTERABLE("해당 맛집을 등록할 수 있습니다." , HttpStatus.OK),
     RECOMMEND_RESTAURANT_DELETED("맛집이 삭제되었습니다." , HttpStatus.OK),
     RECOMMEND_RESTAURANT_REPORTED("맛집이 신고되었습니다." , HttpStatus.OK),
+    FIND_ALL_REPORT_REASON("신고 사유를 조회하였습니다." , HttpStatus.OK),
     RECOMMEND_RESTAURANT_NOT_MATCH_OWNER("해당 맛집의 작성자가 아닙니다." , HttpStatus.OK),
     RECOMMEND_RESTAURANT_UPDATED("맛집을 수정하였습니다." , HttpStatus.OK),
 

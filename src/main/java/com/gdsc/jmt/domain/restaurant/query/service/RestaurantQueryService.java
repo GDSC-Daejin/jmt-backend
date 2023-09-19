@@ -1,15 +1,14 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
 import com.gdsc.jmt.domain.restaurant.query.dto.request.*;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindAllRestaurantResponse;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.*;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.entity.ReportReasonEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
+import com.gdsc.jmt.domain.restaurant.query.repository.ReportReasonRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentResponse;
@@ -19,16 +18,11 @@ import com.gdsc.jmt.global.dto.PageResponse;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +36,7 @@ public class RestaurantQueryService {
 
     // 혹시 해당 조회 기능이 늘어나는 경우 서비스 분리 필요
     private final RecommendRestaurantRepository recommendRestaurantRepository;
+    private final ReportReasonRepository reportReasonRepository;
 
     private final RestaurantFilterService restaurantFilterService;
 
@@ -141,6 +136,11 @@ public class RestaurantQueryService {
                 recommendRestaurantPage.getContent().stream().map(RecommendRestaurantWithDistanceDTO::convertToFindItems).toList(),
                 pageResponse
         );
+    }
+
+    public List<FindReportReasonResponse> findAllReportReason() {
+        List<ReportReasonEntity> reportReasonEntities = reportReasonRepository.findAll();
+        return reportReasonEntities.stream().map(ReportReasonEntity::convertResponse).toList();
     }
 
     private Page<RecommendRestaurantWithDistanceDTO> findRecommendRestaurantByUserId(Long userId, RestaurantSearchInUserIdRequest request, Pageable pageable) {

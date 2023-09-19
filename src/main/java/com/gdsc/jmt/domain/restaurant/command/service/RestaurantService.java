@@ -7,14 +7,8 @@ import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaur
 import com.gdsc.jmt.domain.restaurant.command.dto.request.ReportRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
-import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
-import com.gdsc.jmt.domain.restaurant.query.entity.ReportEntity;
-import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
-import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
-import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
-import com.gdsc.jmt.domain.restaurant.query.repository.ReportRepository;
-import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantPhotoRepository;
-import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
+import com.gdsc.jmt.domain.restaurant.query.entity.*;
+import com.gdsc.jmt.domain.restaurant.query.repository.*;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentRequest;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
@@ -45,6 +39,7 @@ public class RestaurantService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
+    private final ReportReasonRepository reportReasonRepository;
 
     private final S3FileService s3FileService;
 
@@ -93,17 +88,19 @@ public class RestaurantService {
     public void reportRecommendRestaurant(final Long recommendRestaurantId, final UserInfo userInfo, final ReportRecommendRestaurantRequest request) {
         Optional<RecommendRestaurantEntity> findResult = recommendRestaurantRepository.findById(recommendRestaurantId);
         Optional<UserEntity> findUserResult = userRepository.findByEmail(userInfo.getEmail());
+        Optional<ReportReasonEntity> findReportReasonResult = reportReasonRepository.findById(request.getReportReasonId());
 
         if(findResult.isEmpty()) {
             throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
         }
 
-        if(findResult.isPresent() && findUserResult.isPresent()) {
+        if(findResult.isPresent() && findUserResult.isPresent() && findReportReasonResult.isPresent()) {
             ReportEntity reportEntity = ReportEntity.builder()
                     .reportRestaurant(findResult.get())
                     .reportUser(findResult.get().getUser())
                     .reporterUser(findUserResult.get())
-                    .reportReason(request.getReportReason())
+                    .reportReason(findReportReasonResult.get())
+                    .reportReasonText(request.getReportReason())
                     .build();
 
             reportRepository.save(reportEntity);
