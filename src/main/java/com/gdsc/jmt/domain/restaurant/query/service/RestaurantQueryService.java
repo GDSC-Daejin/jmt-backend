@@ -120,8 +120,14 @@ public class RestaurantQueryService {
 
     private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Boolean isCanDrinkLiquor, Pageable pageable) {
         String userLocationRange = makeLocationRange(request.startLocation(), request.endLocation());
-        // 사각형 내에 포함되는 데이터 조회
-        return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, isCanDrinkLiquor, pageable);
+
+        if(request.filter().isCanDrinkLiquor() != null) {
+            // 사각형 내에 포함되는 데이터 조회
+            return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, isCanDrinkLiquor, pageable);
+        }
+        else {
+            return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, pageable);
+        }
     }
 
     private RecommendRestaurantEntity findRecommendRestaurantByRestaurant(RestaurantEntity restaurant) {

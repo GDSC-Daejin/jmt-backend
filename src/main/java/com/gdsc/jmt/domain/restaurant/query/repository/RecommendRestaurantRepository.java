@@ -35,4 +35,10 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
             "AND reRestaurant.category.id IN (:categoryIds)" +
             "AND reRestaurant.canDrinkLiquor = :isCanDrinkLiquor")
     Page<RecommendRestaurantEntity> findByLocationWithinDistance(String locationRange, List<Long> categoryIds, boolean isCanDrinkLiquor , Pageable pageable);
+
+    @EntityGraph(attributePaths = {"restaurant", "category"})
+    @Query("SELECT reRestaurant FROM RecommendRestaurantEntity reRestaurant " +
+            "WHERE ST_Within(reRestaurant.restaurant.location, ST_GeomFromText(:locationRange))" +
+            "AND reRestaurant.category.id IN (:categoryIds)")
+    Page<RecommendRestaurantEntity> findByLocationWithinDistance(String locationRange, List<Long> categoryIds, Pageable pageable);
 }
