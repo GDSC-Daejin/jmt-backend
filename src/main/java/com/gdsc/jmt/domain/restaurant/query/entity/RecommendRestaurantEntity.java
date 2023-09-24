@@ -6,6 +6,7 @@ import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantIte
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
