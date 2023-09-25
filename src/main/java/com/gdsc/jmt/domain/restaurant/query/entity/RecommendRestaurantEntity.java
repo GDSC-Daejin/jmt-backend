@@ -15,9 +15,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.annotations.Formula;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
+
 
 @NoArgsConstructor
 @Getter
@@ -51,17 +49,6 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
     private String goWellWithLiquor;
 
     private String recommendMenu;
-
-    @Formula("select ST_DISTANCE_SPHERE(reRestaurant.restaurant.location, ST_GeomFromText(reRestaurant.userLocation))"
-            + " from RecommendRestaurantEntity reRestaurant")
-    private String distance;
-
-    @Transient
-    private Point userLocation;
-
-    public void setUserLocation(Double x, Double y) throws ParseException {
-        this.userLocation = (Point)  new WKTReader().read(String.format("POINT(%s %s)", x, y));
-    }
 
     @Builder
     RecommendRestaurantEntity(String introduce,

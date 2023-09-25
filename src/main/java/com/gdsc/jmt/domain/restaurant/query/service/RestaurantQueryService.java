@@ -20,6 +20,7 @@ import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class RestaurantQueryService {
     private final ReportReasonRepository reportReasonRepository;
 
     private final RestaurantFilterService restaurantFilterService;
+    private final RestaurantDynamicSearchService restaurantDynamicSearchService;
 
 
     public List<KakaoSearchDocumentResponse> findRestaurantLocationList(final FindRestaurantLocationListRequest findRestaurantLocationListRequest) {
@@ -91,13 +93,9 @@ public class RestaurantQueryService {
 
     public FindRestaurantResponse search(final RestaurantSearchRequest request, Pageable pageable) {
         Page<RecommendRestaurantEntity> recommendRestaurantPage;
-        if(request.startLocation() == null || request.endLocation() == null) {
-            recommendRestaurantPage = recommendRestaurantRepository.findSearch(request.keyword(), pageable);
-        }
-        else {
-            String userLocationRagne = makeLocationRange(request.startLocation(), request.endLocation());
-            recommendRestaurantPage = recommendRestaurantRepository.findSearchWithinDistance(request.keyword(), userLocationRagne, pageable);
-        }
+
+        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchKeywordRestaurant(request);
+        recommendRestaurantPage = recommendRestaurantRepository.findAll(specification, pageable);
 
         PageResponse pageResponse = new PageResponse(recommendRestaurantPage);
         return new FindRestaurantResponse(
@@ -119,15 +117,8 @@ public class RestaurantQueryService {
     }
 
     private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Boolean isCanDrinkLiquor, Pageable pageable) {
-        String userLocationRange = makeLocationRange(request.startLocation(), request.endLocation());
-
-        if(request.filter().isCanDrinkLiquor() != null) {
-            // 사각형 내에 포함되는 데이터 조회
-            return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, isCanDrinkLiquor, pageable);
-        }
-        else {
-            return recommendRestaurantRepository.findByLocationWithinDistance(userLocationRange, categoryIds, pageable);
-        }
+        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchMapRestaurant(request, categoryIds);
+        return recommendRestaurantRepository.findAll(specification, pageable);
     }
 
     private RecommendRestaurantEntity findRecommendRestaurantByRestaurant(RestaurantEntity restaurant) {
@@ -152,16 +143,5 @@ public class RestaurantQueryService {
     private Page<RecommendRestaurantWithDistanceDTO> findRecommendRestaurantByUserId(Long userId, RestaurantSearchInUserIdRequest request, Pageable pageable) {
         String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
         return recommendRestaurantRepository.findByUserId(userId, userLocation, pageable);
-    }
-
-    private String makeLocationRange(MapLocation startLocation, MapLocation endLocation) {
-        String userLocationRange = "POLYGON((";
-        userLocationRange += startLocation.x() + " " + startLocation.y() + ", ";
-        userLocationRange += endLocation.x() + " " + startLocation.y() + ", ";
-        userLocationRange += endLocation.x() + " " + endLocation.y() + ", ";
-        userLocationRange += startLocation.x() + " " + endLocation.y() + ", ";
-        userLocationRange += startLocation.x() + " " + startLocation.y() + "))";
-
-        return userLocationRange;
     }
 }
