@@ -59,16 +59,24 @@ public class RestaurantDynamicSearchService {
                 predicates.add(builder.like(root.join("restaurant").get("name"), "%"+ request.keyword() + "%"));
             }
 
-            if (request.startLocation() != null && request.endLocation() != null) {
-                String locationRange = makeLocationRange(request.startLocation(), request.endLocation());
-                Expression<Boolean> distanceWithin = builder.function("ST_Within", Boolean.class,
+//            if (request.startLocation() != null && request.endLocation() != null) {
+//                String locationRange = makeLocationRange(request.startLocation(), request.endLocation());
+//                Expression<Boolean> distanceWithin = builder.function("ST_Within", Boolean.class,
+//                        root.join("restaurant").get("location"),
+//                        builder.function("ST_GeomFromText", Double.class,
+//                                builder.literal(locationRange)
+//                        ));
+//                predicates.add(builder.isTrue(distanceWithin));
+//            }
+            if (request.userLocation() != null) {
+                String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+                query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
                         root.join("restaurant").get("location"),
                         builder.function("ST_GeomFromText", Double.class,
-                                builder.literal(locationRange)
-                        ));
-                predicates.add(builder.isTrue(distanceWithin));
+                                builder.literal(userLocation)
+                        )
+                )));
             }
-
             return builder.and(predicates.toArray(new Predicate[0]));
         });
     }

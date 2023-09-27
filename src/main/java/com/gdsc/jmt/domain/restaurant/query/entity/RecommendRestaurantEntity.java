@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hibernate.annotations.Formula;
 
 
 @NoArgsConstructor
@@ -99,7 +98,7 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
         if(!this.pictures.isEmpty()) {
             restaurantImageUrl = this.pictures.get(0).getImageUrl();
         }
-        return FindRestaurantItems.createDefault(
+        return FindRestaurantItems.createWithDistance(
                 this.id,
                 this.restaurant.getName(),
                 this.restaurant.getPlaceUrl(),
