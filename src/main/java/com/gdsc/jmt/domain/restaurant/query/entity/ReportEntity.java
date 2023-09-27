@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.entity;
 
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "tb_report")
-public class ReportEntity {
+public class ReportEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter

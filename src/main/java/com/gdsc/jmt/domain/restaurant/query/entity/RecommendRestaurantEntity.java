@@ -6,6 +6,7 @@ import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantIte
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +15,11 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @NoArgsConstructor
 @Getter
 @Entity @Table(name = "tb_recommend_restaurant")
-public class RecommendRestaurantEntity {
+public class RecommendRestaurantEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -96,7 +98,7 @@ public class RecommendRestaurantEntity {
         if(!this.pictures.isEmpty()) {
             restaurantImageUrl = this.pictures.get(0).getImageUrl();
         }
-        return FindRestaurantItems.createDefault(
+        return FindRestaurantItems.createWithDistance(
                 this.id,
                 this.restaurant.getName(),
                 this.restaurant.getPlaceUrl(),

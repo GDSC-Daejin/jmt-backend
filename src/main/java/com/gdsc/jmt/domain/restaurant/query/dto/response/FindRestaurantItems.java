@@ -21,20 +21,20 @@ public record FindRestaurantItems(
 
         String differenceInDistance
 ) {
-    public static FindRestaurantItems createDefault(Long id,
-                               String name,
-                               String placeUrl,
-                               String phone,
-                               String address,
-                               String roadAddress,
-                               Double x,
-                               Double y,
-                               String restaurantImageUrl,
-                               String introduce,
-                               String category,
-                               String userNickName,
-                               String userProfileImageUrl,
-                               Boolean canDrinkLiquor) {
+    public static FindRestaurantItems createWithDistance(Long id,
+                                                         String name,
+                                                         String placeUrl,
+                                                         String phone,
+                                                         String address,
+                                                         String roadAddress,
+                                                         Double x,
+                                                         Double y,
+                                                         String restaurantImageUrl,
+                                                         String introduce,
+                                                         String category,
+                                                         String userNickName,
+                                                         String userProfileImageUrl,
+                                                         Boolean canDrinkLiquor) {
         return new FindRestaurantItems(
                 id,
                 name,
