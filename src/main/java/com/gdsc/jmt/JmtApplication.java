@@ -9,5 +9,4 @@ public class JmtApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JmtApplication.class, args);
 	}
-
 }
