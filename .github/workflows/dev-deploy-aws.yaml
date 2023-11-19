@@ -47,7 +47,7 @@ jobs:
 
       - name: Docker Build
         run: |
-          docker build --tag boo10500/$DOCKER_REPO_NAME:jmt-image-$GITHUB_SHA .
+          docker build --tag boo10500/$DOCKER_REPO_NAME:jmt-image-$GITHUB_SHA . -f Dockerfile-dev
 
       - name: Docker Push
         run: |
