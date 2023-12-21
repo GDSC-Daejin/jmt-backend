@@ -23,11 +23,11 @@ public class GroupEntity {
     @Column(name = "group_introduce")
     public String groupIntroduce;
 
-    @Column(name = "group_profile_image")
-    public String groupProfileImage;
+    @Column(name = "group_profile_image_url")
+    public String groupProfileImageUrl;
 
-    @Column(name = "group_background_image")
-    public String groupBackgroundImage;
+    @Column(name = "group_background_image_url")
+    public String groupBackgroundImageUrl;
 
     @Column(name = "private_flag")
     public boolean privateFlag;
