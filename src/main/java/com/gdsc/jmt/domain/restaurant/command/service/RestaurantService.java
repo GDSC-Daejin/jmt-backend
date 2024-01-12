@@ -2,6 +2,8 @@ package com.gdsc.jmt.domain.restaurant.command.service;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.category.query.repository.CategoryRepository;
+import com.gdsc.jmt.domain.group.entity.GroupEntity;
+import com.gdsc.jmt.domain.group.repository.GroupRepository;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.ReportRecommendRestaurantRequest;
@@ -40,6 +42,7 @@ public class RestaurantService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
     private final ReportReasonRepository reportReasonRepository;
+    private final GroupRepository groupRepository;
 
     private final S3FileService s3FileService;
 
@@ -130,6 +133,7 @@ public class RestaurantService {
     private RecommendRestaurantEntity validateCreation(final String email, CreateRecommendRestaurantRequest createRecommendRestaurantRequest) {
         RestaurantEntity restaurant = validateRestaurant(createRecommendRestaurantRequest.getRestaurantLocationId());
         CategoryEntity category = validateCategory(createRecommendRestaurantRequest.getCategoryId());
+        GroupEntity group = validateGroup(createRecommendRestaurantRequest.getGroupId());
         UserEntity user = validateUser(email);
         validateConflict(restaurant);
 
@@ -141,7 +145,15 @@ public class RestaurantService {
                 .canDrinkLiquor(createRecommendRestaurantRequest.getCanDrinkLiquor())
                 .goWellWithLiquor(createRecommendRestaurantRequest.getGoWellWithLiquor())
                 .recommendMenu(createRecommendRestaurantRequest.getRecommendMenu())
+                .group(group)
                 .build();
+    }
+
+    private GroupEntity validateGroup(final Long groupId) {
+        Optional<GroupEntity> group = groupRepository.findById(groupId);
+        if(group.isEmpty())
+            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+        return group.get();
     }
 
     private RestaurantEntity validateRestaurant(final Long restaurantLocationId) {
