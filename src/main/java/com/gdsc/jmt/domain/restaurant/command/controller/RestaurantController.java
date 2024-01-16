@@ -37,7 +37,7 @@ public class RestaurantController {
     @PostMapping(value = "/restaurant", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @CreateRecommendRestaurantSpringDocs
     @ResponseStatus(HttpStatus.CREATED)
-    public JMTApiResponse<?> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequestFromClient request, @AuthenticationPrincipal UserInfo user) {
+    public JMTApiResponse<CreatedRestaurantResponse> createRecommendRestaurant(@ModelAttribute CreateRecommendRestaurantRequestFromClient request, @AuthenticationPrincipal UserInfo user) {
         CreatedRestaurantResponse response = restaurantService.createRecommendRestaurant(request, user.getEmail());
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_CREATED);
     }
