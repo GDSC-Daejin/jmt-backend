@@ -137,6 +137,26 @@ public class AuthService {
         return tokenResponse;
     }
 
+    private TokenResponse sendGenerateJwtTokenCommendForTest(String email) {
+        TokenResponse tokenResponse = tokenProvider.generateJwtTokenForTest(email, RoleType.MEMBER, 1000 * 60);
+
+        UserEntity userEntity = checkExistingUserByUserEmail(email);
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(userEntity.getId());
+
+        if(refreshTokenEntity == null) {
+            RefreshTokenEntity newRefreshTokenEntity = new RefreshTokenEntity(
+                    userEntity.getId(),
+                    tokenResponse.refreshToken()
+            );
+            refreshTokenRepository.save(newRefreshTokenEntity);
+        }
+        else {
+            refreshTokenEntity.setRefreshToken(tokenResponse.refreshToken());
+        }
+
+        return tokenResponse;
+    }
+
     private RefreshTokenEntity checkExistingRefreshTokenByEmail(String email) {
         UserEntity userEntity = checkExistingUserByUserEmail(email);
         return checkExistingRefreshToken(userEntity.getId());

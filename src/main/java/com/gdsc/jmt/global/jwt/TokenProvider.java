@@ -63,6 +63,29 @@ public class TokenProvider {
         return new TokenResponse(BEARER_TYPE, accessToken, refreshToken, accessTokenExpiresIn.getTime());
     }
 
+    public TokenResponse generateJwtTokenForTest(String email, RoleType role, long expireTime) {
+        long now = (new Date()).getTime();
+
+        Map<String, Object> payloads = Map.of(
+                "email", email,
+                AUTHORITIES_KEY, role);
+
+
+        Date accessTokenExpiresIn = new Date(now + expireTime);
+        String accessToken = Jwts.builder() // payload "email": "email"
+                .setClaims(payloads)           // payload "aggregatedId : "userAggregateId" , "auth": "ROLE_USER"
+                .setExpiration(accessTokenExpiresIn)        // payload "exp": 1516239022 (예시)
+                .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
+                .compact();
+
+        String refreshToken = Jwts.builder()
+                .setExpiration(new Date(now + expireTime))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+
+        return new TokenResponse(BEARER_TYPE, accessToken, refreshToken, accessTokenExpiresIn.getTime());
+    }
+
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 

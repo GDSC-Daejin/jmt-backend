@@ -37,4 +37,7 @@ public class CreateRecommendRestaurantRequestFromClient {
 
     @Schema(description = "맛집 위치정보 ID", example = "1")
     private Long restaurantLocationId;
+
+    @Schema(description = "그룹 ID", example = "1")
+    private Long groupId;
 }

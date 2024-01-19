@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.entity;
 
 import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
+import com.gdsc.jmt.domain.group.entity.GroupEntity;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
@@ -38,7 +39,7 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
     @JoinColumn(name="restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "recommend_restaurant_id")
     private List<RestaurantPhotoEntity> pictures = new ArrayList<>();
 
@@ -49,6 +50,10 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
 
     private String recommendMenu;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private GroupEntity group;
+
     @Builder
     RecommendRestaurantEntity(String introduce,
                               CategoryEntity category,
@@ -57,7 +62,8 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
                               List<RestaurantPhotoEntity> pictures,
                               Boolean canDrinkLiquor,
                               String goWellWithLiquor,
-                              String recommendMenu) {
+                              String recommendMenu,
+                              GroupEntity group) {
         this.introduce = introduce;
         this.category = category;
         this.user = user;
@@ -66,6 +72,7 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
         this.canDrinkLiquor = canDrinkLiquor;
         this.goWellWithLiquor = goWellWithLiquor;
         this.recommendMenu = recommendMenu;
+        this.group = group;
     }
 
     public void initPictures(List<RestaurantPhotoEntity> pictures) {
