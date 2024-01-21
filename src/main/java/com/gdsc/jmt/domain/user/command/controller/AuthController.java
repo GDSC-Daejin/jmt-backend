@@ -52,8 +52,8 @@ public class AuthController {
 
     @PostMapping("/token")
     @ReissueSpringDocs
-    public JMTApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest) {
-        TokenResponse tokenResponse = authService.reissue(user.getEmail(),logoutRequest.refreshToken());
+    public JMTApiResponse<TokenResponse> reissue(@RequestBody LogoutRequest logoutRequest) {
+        TokenResponse tokenResponse = authService.reissue(logoutRequest);
         return JMTApiResponse.createResponseWithMessage(tokenResponse, UserMessage.REISSUE_SUCCESS);
     }
 

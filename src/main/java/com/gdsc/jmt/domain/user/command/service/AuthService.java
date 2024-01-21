@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.user.command.service;
 
 import com.gdsc.jmt.domain.user.command.dto.AndroidAppleLoginRequest;
+import com.gdsc.jmt.domain.user.command.dto.LogoutRequest;
 import com.gdsc.jmt.domain.user.common.RoleType;
 import com.gdsc.jmt.domain.user.common.Status;
 import com.gdsc.jmt.domain.user.oauth.info.OAuth2UserInfo;
@@ -14,6 +15,7 @@ import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.TokenProvider;
 import com.gdsc.jmt.global.jwt.dto.TokenResponse;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.jwt.dto.UserLoginAction;
 import com.gdsc.jmt.global.messege.AuthMessage;
 import com.gdsc.jmt.global.messege.UserMessage;
@@ -23,6 +25,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -103,9 +106,11 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse reissue(String email, String refreshToken) {
-        validateRefreshToken(refreshToken);
-        return sendGenerateJwtTokenCommend(email);
+    public TokenResponse reissue(LogoutRequest logoutRequest) {
+        validateRefreshToken(logoutRequest.refreshToken());
+        Authentication authentication = tokenProvider.getAuthentication(logoutRequest.accessToken());
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        return sendGenerateJwtTokenCommend(userInfo.getEmail());
     }
 
     @Transactional
