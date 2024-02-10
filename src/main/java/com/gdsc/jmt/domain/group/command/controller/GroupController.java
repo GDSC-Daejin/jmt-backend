@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,8 +30,8 @@ public class GroupController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
     })
-    @PostMapping("/group")
-    public JMTApiResponse<Null> createGroup(@RequestBody CreateGroupRequest createGroupRequest, @AuthenticationPrincipal UserInfo user) {
+    @PostMapping(value = "/group", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public JMTApiResponse<Null> createGroup(@ModelAttribute CreateGroupRequest createGroupRequest, @AuthenticationPrincipal UserInfo user) {
         groupService.createGroup(createGroupRequest, user);
         return JMTApiResponse.createResponseWithMessage(null, GroupMessage.CREATED_GROUP);
     }

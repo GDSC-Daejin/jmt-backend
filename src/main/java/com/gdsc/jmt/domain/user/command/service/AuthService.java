@@ -100,7 +100,7 @@ public class AuthService {
     public TokenResponse loginForTest() {
         OAuth2UserInfo userInfo = new AppleOAuth2UserInfo("test", "test@naver.com");
         UserLoginAction action = signUpOrSignIn(userInfo.createUserEntity());
-        TokenResponse tokenResponse = sendGenerateJwtTokenCommendForTest(userInfo.getEmail());
+        TokenResponse tokenResponse = sendGenerateJwtTokenCommend(userInfo.getEmail());
         tokenResponse.updateLoginActionFlag(action);
         return tokenResponse;
     }
