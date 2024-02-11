@@ -64,10 +64,14 @@ public class GroupService {
 
     private void uploadImages(GroupEntity.GroupEntityBuilder groupEntityBuilder, MultipartFile groupProfileImage, MultipartFile groupBackgroundImage) {
         try {
-            String groupProfileImageUrl = s3FileService.upload(groupProfileImage,"groupProfileUser");
-            String groupBackgroundImageUrl = s3FileService.upload(groupBackgroundImage,"groupBackgroundUser");
-            groupEntityBuilder.groupProfileImageUrl(groupProfileImageUrl);
-            groupEntityBuilder.groupBackgroundImageUrl(groupBackgroundImageUrl);
+            if(groupProfileImage != null) {
+                String groupProfileImageUrl = s3FileService.upload(groupProfileImage,"groupProfileUser");
+                groupEntityBuilder.groupProfileImageUrl(groupProfileImageUrl);
+            }
+            else if(groupBackgroundImage != null) {
+                String groupBackgroundImageUrl = s3FileService.upload(groupBackgroundImage,"groupBackgroundUser");
+                groupEntityBuilder.groupBackgroundImageUrl(groupBackgroundImageUrl);
+            }
         }
         catch (IOException e) {
             throw new ApiException(RestaurantMessage.RESTAURANT_IMAGE_UPLOAD_FAIL);
