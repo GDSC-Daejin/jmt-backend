@@ -35,7 +35,11 @@ public class LoggingAspect {
         try {
             result = joinPoint.proceed(joinPoint.getArgs());
             return result;
-        } finally {
+        }
+        catch (Exception e) {
+            logger.error("error trace : ", e);
+        }
+        finally {
             try {
                 logger.info(getRequestUrl(joinPoint));
                 logger.info("request : " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(params(joinPoint)));
