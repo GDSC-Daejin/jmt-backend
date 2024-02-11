@@ -38,6 +38,7 @@ public class LoggingAspect {
         }
         catch (Exception e) {
             logger.error("error trace : ", e);
+            return e;
         }
         finally {
             try {
