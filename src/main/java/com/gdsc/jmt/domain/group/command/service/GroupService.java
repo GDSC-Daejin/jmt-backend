@@ -38,7 +38,7 @@ public class GroupService {
     private final S3FileService s3FileService;
 
     @Transactional
-    public void createGroup(CreateGroupRequest request, UserInfo userInfo) {
+    public Long createGroup(CreateGroupRequest request, UserInfo userInfo) {
         Optional<UserEntity> userResult = userRepository.findByEmail(userInfo.getEmail());
         if(userResult.isEmpty()) {
             throw new ApiException(UserMessage.USER_NOT_FOUND);
@@ -60,6 +60,8 @@ public class GroupService {
                 .role(ownerRole)
                 .build();
         groupUserRepository.save(groupUsersEntity);
+
+        return groupEntity.getGid();
     }
 
     private void uploadImages(GroupEntity.GroupEntityBuilder groupEntityBuilder, MultipartFile groupProfileImage, MultipartFile groupBackgroundImage) {

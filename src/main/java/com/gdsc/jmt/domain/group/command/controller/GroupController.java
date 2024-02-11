@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.group.command.controller;
 
 import com.gdsc.jmt.domain.category.query.dto.CategoriesResponse;
 import com.gdsc.jmt.domain.group.command.controller.request.CreateGroupRequest;
+import com.gdsc.jmt.domain.group.command.controller.response.CreateGroupResponse;
 import com.gdsc.jmt.domain.group.command.service.GroupService;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
@@ -31,8 +32,8 @@ public class GroupController {
             @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
     })
     @PostMapping(value = "/group", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public JMTApiResponse<Null> createGroup(@ModelAttribute CreateGroupRequest createGroupRequest, @AuthenticationPrincipal UserInfo user) {
-        groupService.createGroup(createGroupRequest, user);
-        return JMTApiResponse.createResponseWithMessage(null, GroupMessage.CREATED_GROUP);
+    public JMTApiResponse<CreateGroupResponse> createGroup(@ModelAttribute CreateGroupRequest createGroupRequest, @AuthenticationPrincipal UserInfo user) {
+        Long groupCode = groupService.createGroup(createGroupRequest, user);
+        return JMTApiResponse.createResponseWithMessage(new CreateGroupResponse(groupCode), GroupMessage.CREATED_GROUP);
     }
 }
