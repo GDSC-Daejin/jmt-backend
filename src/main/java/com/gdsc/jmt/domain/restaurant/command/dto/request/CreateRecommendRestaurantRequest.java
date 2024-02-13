@@ -44,5 +44,6 @@ public class CreateRecommendRestaurantRequest {
                 this.goWellWithLiquor = request.getGoWellWithLiquor();
                 this.recommendMenu = request.getRecommendMenu();
                 this.restaurantLocationId = request.getRestaurantLocationId();
+                this.groupId = request.getGroupId();
         }
 }

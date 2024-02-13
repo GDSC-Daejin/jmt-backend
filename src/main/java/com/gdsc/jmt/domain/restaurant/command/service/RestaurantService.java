@@ -17,10 +17,7 @@ import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
-import com.gdsc.jmt.global.messege.CategoryMessage;
-import com.gdsc.jmt.global.messege.DefaultMessage;
-import com.gdsc.jmt.global.messege.RestaurantMessage;
-import com.gdsc.jmt.global.messege.UserMessage;
+import com.gdsc.jmt.global.messege.*;
 import com.gdsc.jmt.global.service.S3FileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -152,28 +149,28 @@ public class RestaurantService {
     private GroupEntity validateGroup(final Long groupId) {
         Optional<GroupEntity> group = groupRepository.findById(groupId);
         if(group.isEmpty())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+            throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
         return group.get();
     }
 
     private RestaurantEntity validateRestaurant(final Long restaurantLocationId) {
         Optional<RestaurantEntity> restaurant = restaurantRepository.findById(restaurantLocationId);
         if(restaurant.isEmpty())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+            throw new ApiException(LocationMessage.LOCATION_NOT_FOUND);
         return  restaurant.get();
     }
 
     private CategoryEntity validateCategory(final Long categoryId) {
         Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
         if(category.isEmpty())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+            throw new ApiException(CategoryMessage.CATEGORY_FIND_FAIL);
         return category.get();
     }
 
     private void validateConflict(RestaurantEntity restaurant) {
         Optional<RecommendRestaurantEntity> recommendRestaurant = recommendRestaurantRepository.findByRestaurant(restaurant);
         if(recommendRestaurant.isPresent())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+            throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_CONFLICT);
     }
 
     private UserEntity validateUser(String email) {
