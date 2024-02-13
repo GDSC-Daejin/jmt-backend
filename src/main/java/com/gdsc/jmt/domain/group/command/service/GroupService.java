@@ -2,6 +2,7 @@ package com.gdsc.jmt.domain.group.command.service;
 
 import com.gdsc.jmt.domain.group.code.GroupUserRole;
 import com.gdsc.jmt.domain.group.command.controller.request.CreateGroupRequest;
+import com.gdsc.jmt.domain.group.command.controller.response.FindGroupResponse;
 import com.gdsc.jmt.domain.group.entity.GroupEntity;
 import com.gdsc.jmt.domain.group.entity.GroupUsersEntity;
 import com.gdsc.jmt.domain.group.repository.GroupRepository;
@@ -12,6 +13,7 @@ import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
+import com.gdsc.jmt.global.messege.GroupMessage;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import com.gdsc.jmt.global.messege.UserMessage;
 import com.gdsc.jmt.global.service.S3FileService;
@@ -62,6 +64,24 @@ public class GroupService {
         groupUserRepository.save(groupUsersEntity);
 
         return groupEntity.getGid();
+    }
+
+    @Transactional(readOnly = true)
+    public FindGroupResponse findGroupById(long groupId) {
+        Optional<GroupEntity> groupEntityResult = groupRepository.findById(groupId);
+        if(groupEntityResult.isEmpty()) {
+            throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
+        }
+        GroupEntity groupEntity = groupEntityResult.get();
+
+        return FindGroupResponse.builder()
+                .groupId(groupEntity.getGid())
+                .groupName(groupEntity.getGroupName())
+                .groupIntroduce(groupEntity.getGroupIntroduce())
+                .isPrivateGroup(groupEntity.isPrivateFlag())
+                .groupBackgroundImageUrl(groupEntity.getGroupBackgroundImageUrl())
+                .groupProfileImageUrl(groupEntity.getGroupProfileImageUrl())
+                .build();
     }
 
     private void uploadImages(GroupEntity.GroupEntityBuilder groupEntityBuilder, MultipartFile groupProfileImage, MultipartFile groupBackgroundImage) {
