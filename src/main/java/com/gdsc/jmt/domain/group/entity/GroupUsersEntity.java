@@ -21,7 +21,7 @@ public class GroupUsersEntity {
     public Long guid;
 
     @Column(name = "gid")
-    public Long gId;
+    public Long groupId;
 
     @Column(name = "user_id")
     public Long userId;

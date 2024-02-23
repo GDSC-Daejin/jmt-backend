@@ -19,6 +19,7 @@ import com.gdsc.jmt.global.messege.UserMessage;
 import com.gdsc.jmt.global.service.S3FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,7 +58,7 @@ public class GroupService {
 
         GroupUserRole ownerRole = GroupUserRole.OWNER;
         GroupUsersEntity groupUsersEntity = GroupUsersEntity.builder()
-                .gId(groupEntity.getGid())
+                .groupId(groupEntity.getGid())
                 .userId(userEntity.getId())
                 .role(ownerRole)
                 .build();
@@ -82,6 +83,65 @@ public class GroupService {
                 .groupBackgroundImageUrl(groupEntity.getGroupBackgroundImageUrl())
                 .groupProfileImageUrl(groupEntity.getGroupProfileImageUrl())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<FindGroupResponse> findUserGroupList(UserInfo user) {
+        Optional<UserEntity> userResult = userRepository.findByEmail(user.getEmail());
+        if(userResult.isEmpty()) {
+             throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+
+        List<Long> groupIds = groupUserRepository.findByUserId(userResult.get().getId())
+                .stream()
+                .map(GroupUsersEntity::getGroupId)
+                .toList();
+        List<GroupEntity> groupEntities = groupRepository.findByGidIn(groupIds);
+
+        return groupEntities
+                .stream()
+                .map(GroupEntity::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public void leaveGroup(long groupId, UserInfo user) {
+        Optional<UserEntity> userResult = userRepository.findByEmail(user.getEmail());
+        if(userResult.isEmpty()) {
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+        Optional<GroupUsersEntity> groupUserResult = groupUserRepository.findByGroupIdAndUserId(groupId, userResult.get().getId());
+
+        if(groupUserResult.isEmpty()) {
+            throw new ApiException(GroupMessage.USER_NOT_FOUND_IN_GROUP);
+        }
+        groupUserRepository.delete(groupUserResult.get());
+    }
+
+    @Transactional
+    public void joinGroup(long groupId, UserInfo user) {
+        Optional<UserEntity> userResult = userRepository.findByEmail(user.getEmail());
+        if(userResult.isEmpty()) {
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+
+        Optional<GroupEntity> groupResult = groupRepository.findById(groupId);
+        if(groupResult.isEmpty()) {
+            throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
+        }
+
+        Optional<GroupUsersEntity> groupUserResult = groupUserRepository.findByGroupIdAndUserId(groupId, userResult.get().getId());
+        if(groupUserResult.isPresent()) {
+            throw new ApiException(GroupMessage.USER_ALREADY_EXISTS_IN_GROUP);
+        }
+
+        GroupUsersEntity joinGroupUsersEntity = GroupUsersEntity.builder()
+                .userId(userResult.get().getId())
+                .groupId(groupId)
+                .role(GroupUserRole.MEMBER)
+                .build();
+
+        groupUserRepository.save(joinGroupUsersEntity);
     }
 
     private void uploadImages(GroupEntity.GroupEntityBuilder groupEntityBuilder, MultipartFile groupProfileImage, MultipartFile groupBackgroundImage) {
