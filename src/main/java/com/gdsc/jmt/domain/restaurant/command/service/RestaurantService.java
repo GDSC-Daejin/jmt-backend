@@ -4,14 +4,10 @@ import com.gdsc.jmt.domain.category.query.entity.CategoryEntity;
 import com.gdsc.jmt.domain.category.query.repository.CategoryRepository;
 import com.gdsc.jmt.domain.group.entity.GroupEntity;
 import com.gdsc.jmt.domain.group.repository.GroupRepository;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequest;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.ReportRecommendRestaurantRequest;
-import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.*;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.entity.*;
 import com.gdsc.jmt.domain.restaurant.query.repository.*;
-import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentRequest;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
@@ -40,6 +36,9 @@ public class RestaurantService {
     private final ReportRepository reportRepository;
     private final ReportReasonRepository reportReasonRepository;
     private final GroupRepository groupRepository;
+
+    private final RestaurantReviewRepository restaurantReviewRepository;
+    private final RestaurantReviewPhotoRepository restaurantReviewPhotoRepository;
 
     private final S3FileService s3FileService;
 
@@ -160,6 +159,13 @@ public class RestaurantService {
         return  restaurant.get();
     }
 
+    private RecommendRestaurantEntity validateRecommendRestaurant(final Long recommendRestaurantId) {
+        Optional<RecommendRestaurantEntity> restaurant = recommendRestaurantRepository.findById(recommendRestaurantId);
+        if(restaurant.isEmpty())
+            throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
+        return  restaurant.get();
+    }
+
     private CategoryEntity validateCategory(final Long categoryId) {
         Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
         if(category.isEmpty())
@@ -176,7 +182,7 @@ public class RestaurantService {
     private UserEntity validateUser(String email) {
         Optional<UserEntity> result = userRepository.findByEmail(email);
         if(result.isEmpty())
-            throw new ApiException(DefaultMessage.INTERNAL_SERVER_ERROR);
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
         return  result.get();
     }
 
@@ -197,5 +203,38 @@ public class RestaurantService {
             throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_MATCH_OWNER);
         }
         return recommendRestaurant;
+    }
+
+    @Transactional
+    public void createRestaurantReview(Long recommendRestaurantId, UserInfo user, CreateRestaurantReviewRequest request) {
+        UserEntity userEntity = validateUser(user.getEmail());
+        validateRecommendRestaurant(recommendRestaurantId);
+
+        RestaurantReviewEntity restaurantReviewEntity = RestaurantReviewEntity
+                .builder()
+                .userId(userEntity.getId())
+                .recommendRestaurantId(recommendRestaurantId)
+                .reviewContent(request.getReviewContent())
+                .build();
+
+        restaurantReviewRepository.save(restaurantReviewEntity);
+        uploadReviewImages(restaurantReviewEntity.getId(), request.getReviewImages());
+    }
+
+    @Transactional
+    private void uploadReviewImages(Long restaurantReviewId, List<MultipartFile> images) {
+        for(MultipartFile image : images) {
+            try {
+                String imageUrl = s3FileService.upload(image,"restaurantReviewPhoto");
+                RestaurantReviewPhotoEntity photoEntity = RestaurantReviewPhotoEntity.builder()
+                        .imageUrl(imageUrl)
+                        .restaurantReviewId(restaurantReviewId)
+                        .build();
+                restaurantReviewPhotoRepository.save(photoEntity);
+            }
+            catch (IOException e) {
+                throw new ApiException(RestaurantMessage.RESTAURANT_IMAGE_UPLOAD_FAIL);
+            }
+        }
     }
 }

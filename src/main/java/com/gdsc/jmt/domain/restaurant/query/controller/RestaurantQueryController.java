@@ -1,23 +1,22 @@
 package com.gdsc.jmt.domain.restaurant.query.controller;
 
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantReviewRequest;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindAllRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantsByUserIdSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchInUserIdRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindReportReasonResponse;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindAllRestaurantResponse;
+import com.gdsc.jmt.domain.restaurant.query.dto.response.*;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
-import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantResponse;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantFilterService;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentResponse;
 import com.gdsc.jmt.domain.user.command.controller.springdocs.FindDetailRestaurantSpringDocs;
 import com.gdsc.jmt.global.controller.FirstVersionRestController;
 import com.gdsc.jmt.global.dto.JMTApiResponse;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +28,9 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -102,5 +104,13 @@ public class RestaurantQueryController {
     public JMTApiResponse<List<FindReportReasonResponse>> reportRecommendRestaurant() {
         List<FindReportReasonResponse> reportReasonResponseList = restaurantQueryService.findAllReportReason();
         return JMTApiResponse.createResponseWithMessage(reportReasonResponseList, RestaurantMessage.FIND_ALL_REPORT_REASON);
+    }
+
+    @GetMapping(value = "/restaurant/{recommendRestaurantId}/review")
+    @Operation(summary = "맛집 후기 조회 API", description = "맛집 후기 조회")
+    public JMTApiResponse<FindRestaurantReviewResponse> restaurantReview(@PathVariable Long recommendRestaurantId,
+                                              @PageableDefault @Parameter(hidden = true) Pageable pageable) {
+        FindRestaurantReviewResponse response = restaurantQueryService.findAllReview(recommendRestaurantId, pageable);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_REVIEW_FIND_ALL);
     }
 }

@@ -3,6 +3,7 @@ package com.gdsc.jmt.domain.restaurant.command.controller;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRecommendRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.controller.springdocs.CreateRestaurantLocationSpringDocs;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRecommendRestaurantRequestFromClient;
+import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantReviewRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.ReportRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.UpdateRecommendRestaurantRequest;
 import com.gdsc.jmt.domain.restaurant.command.dto.response.CreatedRestaurantResponse;
@@ -61,5 +62,16 @@ public class RestaurantController {
     public JMTApiResponse<?> reportRecommendRestaurant(@PathVariable Long id, @AuthenticationPrincipal UserInfo reporter, @RequestBody ReportRecommendRestaurantRequest request) {
         restaurantService.reportRecommendRestaurant(id, reporter, request);
         return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RECOMMEND_RESTAURANT_REPORTED);
+    }
+
+
+    @PostMapping(value = "/restaurant/{recommendRestaurantId}/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "맛집 후기 작성 API", description = "맛집 후기 작성")
+    @ResponseStatus(HttpStatus.CREATED)
+    public JMTApiResponse<?> restaurantReview(@PathVariable Long recommendRestaurantId,
+                                              @AuthenticationPrincipal UserInfo user,
+                                              @ModelAttribute CreateRestaurantReviewRequest request) {
+        restaurantService.createRestaurantReview(recommendRestaurantId, user, request);
+        return JMTApiResponse.createResponseWithMessage(null, RestaurantMessage.RESTAURANT_REVIEW_CREATED);
     }
 }

@@ -6,10 +6,12 @@ import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.ReportReasonEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantReviewEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.ReportReasonRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantRepository;
+import com.gdsc.jmt.domain.restaurant.query.repository.RestaurantReviewRepository;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentResponse;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchResponse;
@@ -38,6 +40,8 @@ public class RestaurantQueryService {
     // 혹시 해당 조회 기능이 늘어나는 경우 서비스 분리 필요
     private final RecommendRestaurantRepository recommendRestaurantRepository;
     private final ReportReasonRepository reportReasonRepository;
+
+    private final RestaurantReviewRepository restaurantReviewRepository;
 
     private final RestaurantFilterService restaurantFilterService;
     private final RestaurantDynamicSearchService restaurantDynamicSearchService;
@@ -143,5 +147,15 @@ public class RestaurantQueryService {
     private Page<RecommendRestaurantWithDistanceDTO> findRecommendRestaurantByUserId(Long userId, RestaurantSearchInUserIdRequest request, Pageable pageable) {
         String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
         return recommendRestaurantRepository.findByUserId(userId, userLocation, pageable);
+    }
+
+    public FindRestaurantReviewResponse findAllReview(Long recommendRestaurantId, Pageable pageable) {
+        Page<RestaurantReviewEntity> result = restaurantReviewRepository.findByRecommendRestaurantId(recommendRestaurantId, pageable);
+
+        PageResponse pageResponse = new PageResponse(result);
+        return new FindRestaurantReviewResponse(
+                result.getContent().stream().map(RestaurantReviewEntity::toResponse).toList(),
+                pageResponse
+        );
     }
 }
