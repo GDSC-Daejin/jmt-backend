@@ -9,6 +9,7 @@ import com.gdsc.jmt.domain.group.repository.GroupRepository;
 import com.gdsc.jmt.domain.group.repository.GroupUserRepository;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
+import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.exception.ApiException;
@@ -37,6 +38,8 @@ public class GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final GroupUserRepository groupUserRepository;
+
+    private final RecommendRestaurantRepository recommendRestaurantRepository;
 
     private final S3FileService s3FileService;
 
@@ -75,6 +78,9 @@ public class GroupService {
         }
         GroupEntity groupEntity = groupEntityResult.get();
 
+        int memberCnt = groupUserRepository.countByGroupId(groupId);
+        int restaurantCnt = recommendRestaurantRepository.countByGroup(groupEntity);
+
         return FindGroupResponse.builder()
                 .groupId(groupEntity.getGid())
                 .groupName(groupEntity.getGroupName())
@@ -82,6 +88,8 @@ public class GroupService {
                 .isPrivateGroup(groupEntity.isPrivateFlag())
                 .groupBackgroundImageUrl(groupEntity.getGroupBackgroundImageUrl())
                 .groupProfileImageUrl(groupEntity.getGroupProfileImageUrl())
+                .memberCnt(memberCnt)
+                .restaurantCnt(restaurantCnt)
                 .build();
     }
 

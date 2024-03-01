@@ -16,4 +16,6 @@ public class FindGroupResponse {
     private boolean isPrivateGroup;
     private String groupProfileImageUrl;
     private String groupBackgroundImageUrl;
+    private int memberCnt;
+    private int restaurantCnt;
 }

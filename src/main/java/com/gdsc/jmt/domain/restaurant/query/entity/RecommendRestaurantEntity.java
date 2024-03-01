@@ -79,7 +79,7 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
         this.pictures = pictures;
     }
 
-    public FindDetailRestaurantItem toResponse() {
+    public FindDetailRestaurantItem toResponse(String differenceInDistance) {
         return new FindDetailRestaurantItem(
                 this.restaurant.getName(),
                 this.restaurant.getPlaceUrl(),
@@ -96,7 +96,8 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
                 this.pictures.stream().map(RestaurantPhotoEntity::getImageUrl).toList(),
                 this.user.getId(),
                 this.user.getNickname(),
-                this.user.getProfileImageUrl()
+                this.user.getProfileImageUrl(),
+                differenceInDistance
         );
     }
 

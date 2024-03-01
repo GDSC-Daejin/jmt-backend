@@ -71,12 +71,13 @@ public class RestaurantQueryService {
         return isExisting.orElse(null);
     }
 
-    public FindDetailRestaurantItem findDetailRestaurant(Long recommendRestaurantId) {
-        Optional<RecommendRestaurantEntity> isExisting = recommendRestaurantRepository.findById(recommendRestaurantId);
+    public FindDetailRestaurantItem findDetailRestaurant(Long recommendRestaurantId, FindDetailRestaurantRequest request) {
+        String userLocation = "POINT(" + request.getUserLocation().x() + " " + request.getUserLocation().y() + ")";
+        Optional<RecommendRestaurantWithDistanceDTO> isExisting = recommendRestaurantRepository.findByIdWithUserLocation(recommendRestaurantId, userLocation);
         if(isExisting.isEmpty()) {
             throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
         }
-        return isExisting.get().toResponse();
+        return isExisting.get().convertDetailItem();
     }
         
     public FindAllRestaurantResponse findAll(final Pageable pageable) {

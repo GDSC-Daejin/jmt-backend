@@ -10,4 +10,6 @@ public interface GroupUserRepository extends JpaRepository<GroupUsersEntity, Lon
     List<GroupUsersEntity> findByUserId(long userId);
 
     Optional<GroupUsersEntity> findByGroupIdAndUserId(long groupId, long userId);
+
+    int countByGroupId(long groupId);
 }

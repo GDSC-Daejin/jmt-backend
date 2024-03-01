@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.repository;
 
+import com.gdsc.jmt.domain.group.entity.GroupEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantEntity;
 import com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO;
@@ -16,6 +17,13 @@ import java.util.Optional;
 import org.springframework.lang.Nullable;
 
 public interface RecommendRestaurantRepository extends JpaRepository<RecommendRestaurantEntity, Long>, JpaSpecificationExecutor<RecommendRestaurantEntity> {
+
+
+    @Query("select NEW com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO(reRestaurant, ST_DISTANCE_SPHERE(reRestaurant.restaurant.location, ST_GeomFromText(:userLocation))) " +
+            "from RecommendRestaurantEntity reRestaurant " +
+            "where reRestaurant.id = :id")
+    Optional<RecommendRestaurantWithDistanceDTO> findByIdWithUserLocation(Long id, String userLocation);
+
     Optional<RecommendRestaurantEntity> findByRestaurant(RestaurantEntity restaurant);
 
     @Query("select NEW com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO(reRestaurant, ST_DISTANCE_SPHERE(reRestaurant.restaurant.location, ST_GeomFromText(:userLocation))) " +
@@ -27,4 +35,6 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
     @Override
     @EntityGraph(attributePaths = {"restaurant"})
     Page<RecommendRestaurantEntity> findAll(Specification<RecommendRestaurantEntity> spec, Pageable pageable);
+
+    int countByGroup(GroupEntity group);
 }

@@ -1,5 +1,6 @@
 package com.gdsc.jmt.domain.restaurant.query.entity.calculate;
 
+import com.gdsc.jmt.domain.restaurant.query.dto.response.FindDetailRestaurantItem;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.FindRestaurantItems;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 
@@ -20,5 +21,9 @@ public class RecommendRestaurantWithDistanceDTO {
 
     public FindRestaurantItems convertToFindItems() {
         return FindRestaurantItems.createWithDistance(recommendRestaurant.convertToFindItems(), differenceInDistance);
+    }
+
+    public FindDetailRestaurantItem convertDetailItem() {
+        return this.recommendRestaurant.toResponse(this.differenceInDistance);
     }
 }

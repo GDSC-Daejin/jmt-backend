@@ -3,13 +3,10 @@ package com.gdsc.jmt.domain.restaurant.query.controller;
 import com.gdsc.jmt.domain.restaurant.command.dto.request.CreateRestaurantReviewRequest;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindAllRestaurantSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantsByUserIdSpringDocs;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchInUserIdRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.*;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.*;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.CheckRecommendRestaurantExistingSpringDocs;
 import com.gdsc.jmt.domain.restaurant.query.controller.springdocs.FindRestaurantLocationSpringDocs;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.FindRestaurantLocationListRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantFilterService;
 import com.gdsc.jmt.domain.restaurant.query.service.RestaurantQueryService;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentResponse;
@@ -65,10 +62,10 @@ public class RestaurantQueryController {
         return JMTApiResponse.createResponseWithMessage(true, RestaurantMessage.RECOMMEND_RESTAURANT_REGISTERABLE);
     }
 
-    @GetMapping("restaurant/{recommendRestaurantId}")
+    @PostMapping("restaurant/{recommendRestaurantId}")
     @FindDetailRestaurantSpringDocs
-    public JMTApiResponse<?> getDetailRestaurant(@PathVariable Long recommendRestaurantId) {
-        FindDetailRestaurantItem response = restaurantQueryService.findDetailRestaurant(recommendRestaurantId);
+    public JMTApiResponse<FindDetailRestaurantItem> getDetailRestaurant(@PathVariable Long recommendRestaurantId, @RequestBody FindDetailRestaurantRequest request) {
+        FindDetailRestaurantItem response = restaurantQueryService.findDetailRestaurant(recommendRestaurantId, request);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.DETAIL_RESTAURANT_FIND_SUCCESS);
     }
 
