@@ -72,7 +72,7 @@ public class RestaurantQueryService {
     }
 
     public FindDetailRestaurantItem findDetailRestaurant(Long recommendRestaurantId, FindDetailRestaurantRequest request) {
-        String userLocation = "POINT(" + request.getUserLocation().x() + " " + request.getUserLocation().y() + ")";
+        String userLocation = "POINT(" + request.getX() + " " + request.getY() + ")";
         Optional<RecommendRestaurantWithDistanceDTO> isExisting = recommendRestaurantRepository.findByIdWithUserLocation(recommendRestaurantId, userLocation);
         if(isExisting.isEmpty()) {
             throw new ApiException(RestaurantMessage.RECOMMEND_RESTAURANT_NOT_FOUND);
