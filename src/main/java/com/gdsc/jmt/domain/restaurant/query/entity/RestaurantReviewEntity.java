@@ -48,6 +48,7 @@ public class RestaurantReviewEntity {
                 .userName(user.getNickname())
                 .reviewContent(this.reviewContent)
                 .reviewImages(pictures.stream().map(RestaurantReviewPhotoEntity::getImageUrl).toList())
+                .reviewerImageUrl(user.getProfileImageUrl())
                 .build();
     }
 }
