@@ -7,8 +7,6 @@ import com.gdsc.jmt.domain.group.entity.GroupEntity;
 import com.gdsc.jmt.domain.group.entity.GroupUsersEntity;
 import com.gdsc.jmt.domain.group.repository.GroupRepository;
 import com.gdsc.jmt.domain.group.repository.GroupUserRepository;
-import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
-import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantPhotoEntity;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
@@ -20,13 +18,11 @@ import com.gdsc.jmt.global.messege.UserMessage;
 import com.gdsc.jmt.global.service.S3FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

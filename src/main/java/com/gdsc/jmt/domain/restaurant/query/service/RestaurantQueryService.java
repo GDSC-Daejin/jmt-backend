@@ -111,8 +111,11 @@ public class RestaurantQueryService {
 
     @Transactional(readOnly = true)
     public FindRestaurantResponse searchInMap(RestaurantSearchMapRequest request, Pageable pageable) {
-        List<Long> categoryIds = restaurantFilterService.findCategoryIdsByFilter(request.filter());
-        Page<RecommendRestaurantEntity> nearlyRestaurants = findRestaurantInRadius(request, categoryIds, request.filter().isCanDrinkLiquor() ,pageable);
+        List<Long> categoryIds = null;
+        if(request.filter() != null && request.filter().categoryFilter() != null) {
+            categoryIds = restaurantFilterService.findCategoryIdsByFilter(request.filter());
+        }
+        Page<RecommendRestaurantEntity> nearlyRestaurants = findRestaurantInRadius(request, categoryIds ,pageable);
 
         PageResponse pageResponse = new PageResponse(nearlyRestaurants);
         return new FindRestaurantResponse(
@@ -121,7 +124,7 @@ public class RestaurantQueryService {
         );
     }
 
-    private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Boolean isCanDrinkLiquor, Pageable pageable) {
+    private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Pageable pageable) {
         Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchMapRestaurant(request, categoryIds);
         return recommendRestaurantRepository.findAll(specification, pageable);
     }

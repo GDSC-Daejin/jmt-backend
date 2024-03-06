@@ -19,6 +19,9 @@ public class RestaurantDynamicSearchService {
         return ((root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if(request.groupId() != null) {
+                predicates.add(builder.equal(root.get("group").get("gid"), request.groupId()));
+            }
 
             if (request.startLocation() != null && request.endLocation() != null) {
                 String locationRange = makeLocationRange(request.startLocation(), request.endLocation());
@@ -30,11 +33,13 @@ public class RestaurantDynamicSearchService {
                 predicates.add(builder.isTrue(distanceWithin));
             }
 
-            if (request.filter().isCanDrinkLiquor() != null) {
-                predicates.add(builder.equal(root.get("canDrinkLiquor"), request.filter().isCanDrinkLiquor()));
-            }
-            if(request.filter().categoryFilter() != null) {
-                predicates.add(root.join("category").get("id").in(categoryIds));
+            if(request.filter() != null) {
+                if (request.filter().isCanDrinkLiquor() != null) {
+                    predicates.add(builder.equal(root.get("canDrinkLiquor"), request.filter().isCanDrinkLiquor()));
+                }
+                if(request.filter().categoryFilter() != null) {
+                    predicates.add(root.join("category").get("id").in(categoryIds));
+                }
             }
 
             if (request.userLocation() != null) {
