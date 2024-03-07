@@ -4,9 +4,11 @@ import com.gdsc.jmt.domain.group.code.GroupUserRole;
 import com.gdsc.jmt.domain.group.command.controller.request.CreateGroupRequest;
 import com.gdsc.jmt.domain.group.command.controller.response.FindGroupResponse;
 import com.gdsc.jmt.domain.group.entity.GroupEntity;
+import com.gdsc.jmt.domain.group.entity.GroupUserSelectEntity;
 import com.gdsc.jmt.domain.group.entity.GroupUsersEntity;
 import com.gdsc.jmt.domain.group.repository.GroupRepository;
 import com.gdsc.jmt.domain.group.repository.GroupUserRepository;
+import com.gdsc.jmt.domain.group.repository.GroupUserSelectRepository;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
@@ -36,6 +38,7 @@ public class GroupService {
     private final GroupUserRepository groupUserRepository;
 
     private final RecommendRestaurantRepository recommendRestaurantRepository;
+    private final GroupUserSelectRepository groupUserSelectRepository;
 
     private final S3FileService s3FileService;
 
@@ -102,9 +105,15 @@ public class GroupService {
                 .toList();
         List<GroupEntity> groupEntities = groupRepository.findByGidIn(groupIds);
 
+        Optional<GroupUserSelectEntity> groupUserSelectResult = groupUserSelectRepository.findByUserId(userResult.get().getId());
         return groupEntities
                 .stream()
-                .map(GroupEntity::toResponse)
+                .map(group -> {
+                    boolean isSelected = groupUserSelectResult
+                            .map(groupUserSelectEntity ->
+                                    groupUserSelectEntity.groupId.equals(group.gid)).orElse(false);
+                    return group.toResponse(isSelected);
+                })
                 .toList();
     }
 
@@ -163,5 +172,29 @@ public class GroupService {
             throw new ApiException(RestaurantMessage.RESTAURANT_IMAGE_UPLOAD_FAIL);
         }
 
+    }
+
+    @Transactional
+    public void userSelectGroup(Long groupId, UserInfo user) {
+        Optional<UserEntity> userResult = userRepository.findByEmail(user.getEmail());
+        if(userResult.isEmpty()) {
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+        Optional<GroupEntity> groupEntityResult = groupRepository.findById(groupId);
+        if(groupEntityResult.isEmpty()) {
+            throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
+        }
+
+        Optional<GroupUserSelectEntity> result = groupUserSelectRepository.findByUserId(userResult.get().getId());
+
+        if(result.isPresent()) {
+            groupUserSelectRepository.delete(result.get());
+        }
+
+        GroupUserSelectEntity groupUserSelectEntity = GroupUserSelectEntity.builder()
+                .groupId(groupId)
+                .userId(userResult.get().getId())
+                .build();
+        groupUserSelectRepository.save(groupUserSelectEntity);
     }
 }

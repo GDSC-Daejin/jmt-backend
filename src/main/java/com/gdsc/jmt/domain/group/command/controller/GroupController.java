@@ -75,4 +75,14 @@ public class GroupController {
         groupService.leaveGroup(groupId, user);
         return JMTApiResponse.createResponseWithMessage(new LeaveGroupResponse(groupId), GroupMessage.LEAVE_GROUP);
     }
+
+    @Operation(summary = "그룹 선택 API", description = "그룹 선택 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
+    @PostMapping(value = "/group/{groupId}/select")
+    public JMTApiResponse<?> selectGroup(@PathVariable Long groupId, @AuthenticationPrincipal UserInfo user) {
+        groupService.userSelectGroup(groupId, user);
+        return JMTApiResponse.createResponseWithMessage(null, GroupMessage.SELECTED_GROUP);
+    }
 }
