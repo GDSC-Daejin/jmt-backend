@@ -21,6 +21,7 @@ import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -159,6 +160,18 @@ public class RestaurantQueryService {
         PageResponse pageResponse = new PageResponse(result);
         return new FindRestaurantReviewResponse(
                 result.getContent().stream().map(RestaurantReviewEntity::toResponse).toList(),
+                pageResponse
+        );
+    }
+
+    public FindRestaurantResponse searchFromOtherGroup(final RestaurantSearchFromOtherGroupRequest request) {
+        Pageable pageable = PageRequest.of(0, 3);
+        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchKeywordRestaurant(request);
+        Page<RecommendRestaurantEntity> result = recommendRestaurantRepository.findAll(specification, pageable);
+
+        PageResponse pageResponse = new PageResponse(result);
+        return new FindRestaurantResponse(
+                result.getContent().stream().map(RecommendRestaurantEntity::convertToFindItems).toList(),
                 pageResponse
         );
     }

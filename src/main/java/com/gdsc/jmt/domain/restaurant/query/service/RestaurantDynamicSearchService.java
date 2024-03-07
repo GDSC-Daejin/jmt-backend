@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
 import com.gdsc.jmt.domain.restaurant.query.dto.request.MapLocation;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchFromOtherGroupRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchRequest;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
@@ -82,6 +83,24 @@ public class RestaurantDynamicSearchService {
                         )
                 )));
             }
+            return builder.and(predicates.toArray(new Predicate[0]));
+        });
+    }
+
+    public Specification<RecommendRestaurantEntity> searchKeywordRestaurant(RestaurantSearchFromOtherGroupRequest request) {
+        return ((root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+
+            if(request.keyword() != null) {
+                predicates.add(builder.like(root.join("restaurant").get("name"), "%"+ request.keyword() + "%"));
+            }
+
+            if(request.currentGroupId() != null) {
+                predicates.add(builder.notEqual(root.join("group").get("gid"), request.currentGroupId()));
+            }
+
+            query.orderBy(builder.asc(builder.function("RAND", Double.class)));
             return builder.and(predicates.toArray(new Predicate[0]));
         });
     }

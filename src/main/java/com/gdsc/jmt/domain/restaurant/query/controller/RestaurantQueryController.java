@@ -110,4 +110,11 @@ public class RestaurantQueryController {
         FindRestaurantReviewResponse response = restaurantQueryService.findAllReview(recommendRestaurantId, pageable);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_REVIEW_FIND_ALL);
     }
+
+    @PostMapping(value = "/restaurant/search/outbound")
+    @Operation(summary = "맛집 후기 조회 API", description = "맛집 후기 조회")
+    public JMTApiResponse<FindRestaurantResponse> restaurantReview(@RequestBody RestaurantSearchFromOtherGroupRequest request) {
+        FindRestaurantResponse response = restaurantQueryService.searchFromOtherGroup(request);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND_FROM_OTHER_GROUP);
+    }
 }

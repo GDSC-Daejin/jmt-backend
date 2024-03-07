@@ -14,7 +14,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
-import org.springframework.lang.Nullable;
 
 public interface RecommendRestaurantRepository extends JpaRepository<RecommendRestaurantEntity, Long>, JpaSpecificationExecutor<RecommendRestaurantEntity> {
 
