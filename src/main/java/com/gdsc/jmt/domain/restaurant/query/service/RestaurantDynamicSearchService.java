@@ -53,7 +53,7 @@ public class RestaurantDynamicSearchService {
                 String checkDistanceSort = pageable.getSort().toString();
                 if(checkDistanceSort.contains("distance")) {
                     String sortProcess = null;
-                    Pattern pattern = Pattern.compile("[|](.*?)[:]");
+                    Pattern pattern = Pattern.compile(": (.*)");
                     Matcher matcher = pattern.matcher(checkDistanceSort);
                     while (matcher.find()) {
                         sortProcess = matcher.group(1);
@@ -61,7 +61,7 @@ public class RestaurantDynamicSearchService {
                     }
 
                     if(sortProcess != null) {
-                        if("asc".equals(sortProcess)) {
+                        if("ASC".equals(sortProcess)) {
                             String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
                             query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
                                     root.join("restaurant").get("location"),
