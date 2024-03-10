@@ -7,16 +7,21 @@ import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchRequest;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class RestaurantDynamicSearchService {
 
-    public Specification<RecommendRestaurantEntity> searchMapRestaurant(RestaurantSearchMapRequest request, List<Long> categoryIds) {
+    public Specification<RecommendRestaurantEntity> searchMapRestaurant(RestaurantSearchMapRequest request, List<Long> categoryIds, Pageable pageable) {
         return ((root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -44,13 +49,46 @@ public class RestaurantDynamicSearchService {
             }
 
             if (request.userLocation() != null) {
-                String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
-                query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
-                        root.join("restaurant").get("location"),
-                        builder.function("ST_GeomFromText", Double.class,
-                                builder.literal(userLocation)
-                        )
-                )));
+
+                String checkDistanceSort = pageable.getSort().toString();
+                if(checkDistanceSort.contains("distance")) {
+                    String sortProcess = null;
+                    Pattern pattern = Pattern.compile("[|](.*?)[:]");
+                    Matcher matcher = pattern.matcher(checkDistanceSort);
+                    while (matcher.find()) {
+                        sortProcess = matcher.group(1);
+                        if (matcher.group(1) == null) break;
+                    }
+
+                    if(sortProcess != null) {
+                        if("asc".equals(sortProcess)) {
+                            String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+                            query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
+                                    root.join("restaurant").get("location"),
+                                    builder.function("ST_GeomFromText", Double.class,
+                                            builder.literal(userLocation)
+                                    )
+                            )));
+                        }
+                        else {
+                            String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+                            query.orderBy(builder.desc(builder.function("ST_DISTANCE_SPHERE", Double.class,
+                                    root.join("restaurant").get("location"),
+                                    builder.function("ST_GeomFromText", Double.class,
+                                            builder.literal(userLocation)
+                                    )
+                            )));
+                        }
+                    }
+                }
+
+//                String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+//                query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
+//                        root.join("restaurant").get("location"),
+//                        builder.function("ST_GeomFromText", Double.class,
+//                                builder.literal(userLocation)
+//                        )
+//                )));
             }
             return builder.and(predicates.toArray(new Predicate[0]));
         });

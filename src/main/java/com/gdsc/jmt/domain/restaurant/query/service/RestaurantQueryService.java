@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,7 +127,11 @@ public class RestaurantQueryService {
     }
 
     private Page<RecommendRestaurantEntity> findRestaurantInRadius(RestaurantSearchMapRequest request, List<Long> categoryIds, Pageable pageable) {
-        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchMapRestaurant(request, categoryIds);
+        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchMapRestaurant(request, categoryIds, pageable);
+        String checkDistanceSort = pageable.getSort().toString();
+        if(checkDistanceSort.contains("distance")) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.unsorted());
+        }
         return recommendRestaurantRepository.findAll(specification, pageable);
     }
 
