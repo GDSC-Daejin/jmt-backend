@@ -1,6 +1,7 @@
 package com.gdsc.jmt.domain.group.entity;
 
-import com.gdsc.jmt.domain.group.command.controller.response.FindGroupResponse;
+import com.gdsc.jmt.domain.group.command.controller.response.FindGroupResponseItem;
+import com.gdsc.jmt.domain.group.command.controller.response.FindGroupTitleResponseItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +34,8 @@ public class GroupEntity {
     @Column(name = "private_flag")
     public boolean privateFlag;
 
-    public FindGroupResponse toResponse(boolean isSelected) {
-        return FindGroupResponse.builder()
+    public FindGroupResponseItem toResponse(boolean isSelected) {
+        return FindGroupResponseItem.builder()
                 .groupId(this.getGid())
                 .groupName(this.getGroupName())
                 .groupIntroduce(this.getGroupIntroduce())
@@ -42,6 +43,16 @@ public class GroupEntity {
                 .groupBackgroundImageUrl(this.getGroupBackgroundImageUrl())
                 .groupProfileImageUrl(this.getGroupProfileImageUrl())
                 .isSelected(isSelected)
+                .build();
+    }
+
+    public FindGroupTitleResponseItem toFindGroupTitleResponse(int memberCnt, int restaurantCnt) {
+        return FindGroupTitleResponseItem.builder()
+                .groupId(this.getGid())
+                .groupName(this.getGroupName())
+                .groupIntroduce(this.getGroupIntroduce())
+                .memberCnt(memberCnt)
+                .restaurantCnt(restaurantCnt)
                 .build();
     }
 }

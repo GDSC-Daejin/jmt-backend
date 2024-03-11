@@ -3,15 +3,18 @@ package com.gdsc.jmt.domain.group.command.service;
 import com.gdsc.jmt.domain.group.code.GroupUserRole;
 import com.gdsc.jmt.domain.group.command.controller.request.CreateGroupRequest;
 import com.gdsc.jmt.domain.group.command.controller.response.FindGroupResponse;
+import com.gdsc.jmt.domain.group.command.controller.response.FindGroupResponseItem;
 import com.gdsc.jmt.domain.group.entity.GroupEntity;
 import com.gdsc.jmt.domain.group.entity.GroupUserSelectEntity;
 import com.gdsc.jmt.domain.group.entity.GroupUsersEntity;
 import com.gdsc.jmt.domain.group.repository.GroupRepository;
 import com.gdsc.jmt.domain.group.repository.GroupUserRepository;
 import com.gdsc.jmt.domain.group.repository.GroupUserSelectRepository;
+import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
 import com.gdsc.jmt.domain.restaurant.query.repository.RecommendRestaurantRepository;
 import com.gdsc.jmt.domain.user.query.entity.UserEntity;
 import com.gdsc.jmt.domain.user.query.repository.UserRepository;
+import com.gdsc.jmt.global.dto.PageResponse;
 import com.gdsc.jmt.global.exception.ApiException;
 import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.GroupMessage;
@@ -20,6 +23,8 @@ import com.gdsc.jmt.global.messege.UserMessage;
 import com.gdsc.jmt.global.service.S3FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,7 +75,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public FindGroupResponse findGroupById(long groupId) {
+    public FindGroupResponseItem findGroupById(long groupId) {
         Optional<GroupEntity> groupEntityResult = groupRepository.findById(groupId);
         if(groupEntityResult.isEmpty()) {
             throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
@@ -80,7 +85,7 @@ public class GroupService {
         int memberCnt = groupUserRepository.countByGroupId(groupId);
         int restaurantCnt = recommendRestaurantRepository.countByGroup(groupEntity);
 
-        return FindGroupResponse.builder()
+        return FindGroupResponseItem.builder()
                 .groupId(groupEntity.getGid())
                 .groupName(groupEntity.getGroupName())
                 .groupIntroduce(groupEntity.getGroupIntroduce())
@@ -93,7 +98,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindGroupResponse> findUserGroupList(UserInfo user) {
+    public List<FindGroupResponseItem> findUserGroupList(UserInfo user) {
         Optional<UserEntity> userResult = userRepository.findByEmail(user.getEmail());
         if(userResult.isEmpty()) {
              throw new ApiException(UserMessage.USER_NOT_FOUND);
@@ -196,5 +201,21 @@ public class GroupService {
                 .userId(userResult.get().getId())
                 .build();
         groupUserSelectRepository.save(groupUserSelectEntity);
+    }
+
+    public FindGroupResponse searchByGroupName(String keyword, Pageable pageable) {
+        Page<GroupEntity> result = groupRepository.findByGroupName(keyword, pageable);
+        if(result.isEmpty()) {
+            throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
+        }
+        PageResponse pageResponse = new PageResponse(result);
+        return new FindGroupResponse(
+                result.getContent().stream().map(group -> {
+                    int memberCnt = groupUserRepository.countByGroupId(group.getGid());
+                    int restaurantCnt = recommendRestaurantRepository.countByGroup(group);
+                    return group.toFindGroupTitleResponse(memberCnt, restaurantCnt);
+                }).toList(),
+                pageResponse
+        );
     }
 }
