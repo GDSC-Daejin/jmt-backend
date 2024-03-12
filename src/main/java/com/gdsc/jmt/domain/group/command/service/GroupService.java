@@ -148,8 +148,11 @@ public class GroupService {
             throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
         }
 
-        Optional<GroupUsersEntity> groupUserResult = groupUserRepository.findByGroupIdAndUserId(groupId, userResult.get().getId());
-        if(groupUserResult.isPresent()) {
+        List<GroupUsersEntity> groupUsers = groupUserRepository.findByUserId(userResult.get().getId());
+        boolean isAlreadyExistsGroup = groupUsers
+                .stream()
+                .anyMatch(groupUser -> groupUser.getGroupId().equals(groupId));
+        if(isAlreadyExistsGroup) {
             throw new ApiException(GroupMessage.USER_ALREADY_EXISTS_IN_GROUP);
         }
 
@@ -158,6 +161,14 @@ public class GroupService {
                 .groupId(groupId)
                 .role(GroupUserRole.MEMBER)
                 .build();
+
+        if(groupUsers.isEmpty()) {
+            GroupUserSelectEntity groupUserSelectEntity = GroupUserSelectEntity.builder()
+                    .groupId(groupId)
+                    .userId(userResult.get().getId())
+                    .build();
+            groupUserSelectRepository.save(groupUserSelectEntity);
+        }
 
         groupUserRepository.save(joinGroupUsersEntity);
     }
