@@ -19,7 +19,11 @@ public record FindRestaurantItems(
         String userProfileImageUrl,
         Boolean canDrinkLiquor,
 
-        String differenceInDistance
+        String differenceInDistance,
+
+        Long groupId,
+
+        String groupName
 ) {
     public static FindRestaurantItems createWithDistance(Long id,
                                                          String name,
@@ -34,7 +38,9 @@ public record FindRestaurantItems(
                                                          String category,
                                                          String userNickName,
                                                          String userProfileImageUrl,
-                                                         Boolean canDrinkLiquor) {
+                                                         Boolean canDrinkLiquor,
+                                                         Long groupId,
+                                                         String groupName) {
         return new FindRestaurantItems(
                 id,
                 name,
@@ -50,7 +56,9 @@ public record FindRestaurantItems(
                 userNickName,
                 userProfileImageUrl,
                 canDrinkLiquor,
-                ""
+                "",
+                groupId,
+                groupName
         );
     }
 
@@ -71,7 +79,9 @@ public record FindRestaurantItems(
                 findRestaurantItems.userNickName,
                 findRestaurantItems.userProfileImageUrl,
                 findRestaurantItems.canDrinkLiquor,
-                differenceInDistance
+                differenceInDistance,
+                findRestaurantItems.groupId,
+                findRestaurantItems.groupName
         );
     }
 }

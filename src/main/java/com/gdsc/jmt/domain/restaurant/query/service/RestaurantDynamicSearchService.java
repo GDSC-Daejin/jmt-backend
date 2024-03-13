@@ -94,13 +94,17 @@ public class RestaurantDynamicSearchService {
         });
     }
 
-    public Specification<RecommendRestaurantEntity> searchKeywordRestaurant(RestaurantSearchRequest request) {
+    public Specification<RecommendRestaurantEntity> searchKeywordRestaurant(RestaurantSearchRequest request, List<Long> groupList) {
         return ((root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
 
             if(request.keyword() != null) {
                 predicates.add(builder.like(root.join("restaurant").get("name"), "%"+ request.keyword() + "%"));
+            }
+
+            if(!groupList.isEmpty()) {
+                predicates.add(root.join("group").get("gid").in(groupList));
             }
 
 //            if (request.startLocation() != null && request.endLocation() != null) {

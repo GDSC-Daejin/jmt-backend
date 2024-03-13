@@ -32,7 +32,7 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
 
     @NotNull
     @Override
-    @EntityGraph(attributePaths = {"restaurant"})
+    @EntityGraph(attributePaths = {"restaurant", "group"})
     Page<RecommendRestaurantEntity> findAll(Specification<RecommendRestaurantEntity> spec, Pageable pageable);
 
     int countByGroup(GroupEntity group);

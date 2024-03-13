@@ -120,7 +120,9 @@ public class RecommendRestaurantEntity extends BaseTimeEntity {
                 this.category.getName(),
                 this.user.getNickname(),
                 this.user.getProfileImageUrl(),
-                this.canDrinkLiquor
+                this.canDrinkLiquor,
+                this.group.gid,
+                this.group.groupName
         );
     }
 

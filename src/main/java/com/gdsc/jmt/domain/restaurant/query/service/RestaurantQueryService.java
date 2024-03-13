@@ -1,5 +1,7 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
+import com.gdsc.jmt.domain.group.entity.GroupUsersEntity;
+import com.gdsc.jmt.domain.group.repository.GroupUserRepository;
 import com.gdsc.jmt.domain.restaurant.query.dto.request.*;
 import com.gdsc.jmt.domain.restaurant.query.dto.response.*;
 import com.gdsc.jmt.domain.restaurant.query.dto.PageMeta;
@@ -16,9 +18,13 @@ import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocument;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchDocumentResponse;
 import com.gdsc.jmt.domain.restaurant.util.KakaoSearchResponse;
 import com.gdsc.jmt.domain.restaurant.util.RestaurantAPIUtil;
+import com.gdsc.jmt.domain.user.query.entity.UserEntity;
+import com.gdsc.jmt.domain.user.query.repository.UserRepository;
 import com.gdsc.jmt.global.dto.PageResponse;
 import com.gdsc.jmt.global.exception.ApiException;
+import com.gdsc.jmt.global.jwt.dto.UserInfo;
 import com.gdsc.jmt.global.messege.RestaurantMessage;
+import com.gdsc.jmt.global.messege.UserMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +50,9 @@ public class RestaurantQueryService {
     private final ReportReasonRepository reportReasonRepository;
 
     private final RestaurantReviewRepository restaurantReviewRepository;
+
+    private final UserRepository userRepository;
+    private final GroupUserRepository groupUserRepository;
 
     private final RestaurantFilterService restaurantFilterService;
     private final RestaurantDynamicSearchService restaurantDynamicSearchService;
@@ -98,10 +107,18 @@ public class RestaurantQueryService {
         return new FindAllRestaurantResponse(restaurants , pageMeta);
     }
 
-    public FindRestaurantResponse search(final RestaurantSearchRequest request, Pageable pageable) {
+    public FindRestaurantResponse search(final RestaurantSearchRequest request, Pageable pageable, UserInfo userInfo) {
         Page<RecommendRestaurantEntity> recommendRestaurantPage;
 
-        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchKeywordRestaurant(request);
+        UserEntity user = userRepository.findByEmail(userInfo.getEmail())
+                .orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
+
+        List<Long> userGroupList = groupUserRepository.findByUserId(user.getId())
+                .stream()
+                .map(GroupUsersEntity::getGroupId)
+                .toList();
+
+        Specification<RecommendRestaurantEntity> specification = restaurantDynamicSearchService.searchKeywordRestaurant(request, userGroupList);
         recommendRestaurantPage = recommendRestaurantRepository.findAll(specification, pageable);
 
         PageResponse pageResponse = new PageResponse(recommendRestaurantPage);

@@ -71,8 +71,9 @@ public class RestaurantQueryController {
 
     @PostMapping("restaurant/search")
     public JMTApiResponse<FindRestaurantResponse> restaurantSearch(@RequestBody RestaurantSearchRequest request,
-                                                                   @PageableDefault @Parameter(hidden = true) Pageable pageable) {
-        FindRestaurantResponse response = restaurantQueryService.search(request, pageable);
+                                                                   @PageableDefault @Parameter(hidden = true) Pageable pageable,
+                                                                   @AuthenticationPrincipal UserInfo userInfo) {
+        FindRestaurantResponse response = restaurantQueryService.search(request, pageable, userInfo);
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_SEARCH_FIND);
     }
 
