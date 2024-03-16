@@ -112,6 +112,15 @@ public class RestaurantQueryController {
         return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_REVIEW_FIND_ALL);
     }
 
+    @PostMapping(value = "/restaurant/my/review")
+    @Operation(summary = "나의 맛집 후기 조회 API", description = "내가 등록한 맛집 후기 조회")
+    public JMTApiResponse<FindRestaurantReviewResponse> restaurantReview(@AuthenticationPrincipal UserInfo userInfo,
+                                                                         @RequestBody FindMyReviewRequest request,
+                                                                         @PageableDefault @Parameter(hidden = true) Pageable pageable) {
+        FindRestaurantReviewResponse response = restaurantQueryService.findMyReview(request, userInfo, pageable);
+        return JMTApiResponse.createResponseWithMessage(response, RestaurantMessage.RESTAURANT_MY_REVIEW_FIND_ALL);
+    }
+
     @PostMapping(value = "/restaurant/search/outbound")
     @Operation(summary = "다른 그룹 맛집 조회 API", description = "다른 그룹 맛집 조회 API (랜덤 3개 제한)")
     public JMTApiResponse<FindRestaurantResponse> searchFromOtherGroup(@RequestBody RestaurantSearchFromOtherGroupRequest request) {

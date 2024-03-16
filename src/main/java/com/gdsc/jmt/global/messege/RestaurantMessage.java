@@ -25,6 +25,7 @@ public enum RestaurantMessage implements ResponseMessage {
 
     RESTAURANT_REVIEW_CREATED("맛집 후기가 등록되었습니다.", HttpStatus.CREATED),
     RESTAURANT_REVIEW_FIND_ALL("맛집 후기가 조회되었습니다..", HttpStatus.OK),
+    RESTAURANT_MY_REVIEW_FIND_ALL("나의 맛집 후기가 조회되었습니다..", HttpStatus.OK),
 
     RESTAURANT_SEARCH_FIND_FROM_OTHER_GROUP("다른 그룹에 대한 맛집을 조회하였습니다." , HttpStatus.OK),
 

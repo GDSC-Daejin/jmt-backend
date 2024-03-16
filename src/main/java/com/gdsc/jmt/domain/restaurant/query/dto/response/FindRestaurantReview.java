@@ -24,4 +24,7 @@ public class FindRestaurantReview {
     private List<String> reviewImages;
 
     private String reviewerImageUrl;
+
+    private Long groupId;
+    private String groupName;
 }
