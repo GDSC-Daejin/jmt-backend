@@ -34,7 +34,7 @@ public class GroupEntity {
     @Column(name = "private_flag")
     public boolean privateFlag;
 
-    public FindGroupResponseItem toResponse(boolean isSelected) {
+    public FindGroupResponseItem toResponse(int memberCnt, int restaurantCnt, boolean isSelected) {
         return FindGroupResponseItem.builder()
                 .groupId(this.getGid())
                 .groupName(this.getGroupName())
@@ -42,6 +42,8 @@ public class GroupEntity {
                 .isPrivateGroup(this.isPrivateFlag())
                 .groupBackgroundImageUrl(this.getGroupBackgroundImageUrl())
                 .groupProfileImageUrl(this.getGroupProfileImageUrl())
+                .memberCnt(memberCnt)
+                .restaurantCnt(restaurantCnt)
                 .isSelected(isSelected)
                 .build();
     }

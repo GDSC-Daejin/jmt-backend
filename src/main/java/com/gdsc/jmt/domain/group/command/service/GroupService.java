@@ -117,7 +117,9 @@ public class GroupService {
                     boolean isSelected = groupUserSelectResult
                             .map(groupUserSelectEntity ->
                                     groupUserSelectEntity.groupId.equals(group.gid)).orElse(false);
-                    return group.toResponse(isSelected);
+                    int memberCnt = groupUserRepository.countByGroupId(group.getGid());
+                    int restaurantCnt = recommendRestaurantRepository.countByGroup(group);
+                    return group.toResponse(memberCnt, restaurantCnt, isSelected);
                 })
                 .toList();
     }
