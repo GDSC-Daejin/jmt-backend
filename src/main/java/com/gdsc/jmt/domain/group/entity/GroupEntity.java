@@ -52,6 +52,7 @@ public class GroupEntity {
         return FindGroupTitleResponseItem.builder()
                 .groupId(this.getGid())
                 .groupName(this.getGroupName())
+                .groupProfileImageUrl(this.getGroupProfileImageUrl())
                 .groupIntroduce(this.getGroupIntroduce())
                 .memberCnt(memberCnt)
                 .restaurantCnt(restaurantCnt)
