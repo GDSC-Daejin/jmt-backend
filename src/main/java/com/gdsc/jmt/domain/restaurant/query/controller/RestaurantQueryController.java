@@ -114,6 +114,7 @@ public class RestaurantQueryController {
 
     @PostMapping(value = "/restaurant/my/review")
     @Operation(summary = "나의 맛집 후기 조회 API", description = "내가 등록한 맛집 후기 조회")
+    @PageableAsQueryParam
     public JMTApiResponse<FindRestaurantReviewResponse> restaurantReview(@AuthenticationPrincipal UserInfo userInfo,
                                                                          @RequestBody FindMyReviewRequest request,
                                                                          @PageableDefault @Parameter(hidden = true) Pageable pageable) {
