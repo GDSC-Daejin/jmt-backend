@@ -6,6 +6,7 @@ import lombok.Builder;
 public record FindGroupTitleResponseItem(
         Long groupId,
         String groupName,
+        String groupProfileImageUrl,
         String groupIntroduce,
         int memberCnt,
         int restaurantCnt
