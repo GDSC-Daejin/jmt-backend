@@ -219,7 +219,8 @@ public class GroupService {
     public FindGroupResponse searchByGroupName(String keyword, Pageable pageable) {
         Page<GroupEntity> result = groupRepository.findByGroupName(keyword, pageable);
         if(result.isEmpty()) {
-            throw new ApiException(GroupMessage.GROUP_NOT_FOUND);
+            Page<GroupEntity> page = Page.empty();
+            return new FindGroupResponse(List.of(), new PageResponse(page));
         }
         PageResponse pageResponse = new PageResponse(result);
         return new FindGroupResponse(
