@@ -28,6 +28,7 @@ public interface RecommendRestaurantRepository extends JpaRepository<RecommendRe
     @Query("select NEW com.gdsc.jmt.domain.restaurant.query.entity.calculate.RecommendRestaurantWithDistanceDTO(reRestaurant, ST_DISTANCE_SPHERE(reRestaurant.restaurant.location, ST_GeomFromText(:userLocation))) " +
             "from RecommendRestaurantEntity reRestaurant " +
             "where reRestaurant.user.id = :userId")
+    @EntityGraph(attributePaths = {"group"})
     Page<RecommendRestaurantWithDistanceDTO> findByUserId(Long userId, String userLocation, Pageable pageable);
 
     @NotNull
