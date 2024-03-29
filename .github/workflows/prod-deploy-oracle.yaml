@@ -38,6 +38,7 @@ jobs:
           touch src/main/resources/application-prod.properties
           echo "$PROD_SPRING_PROPERTIES" > application-prod.properties.b64
           base64 -d -i application-prod.properties.b64 > src/main/resources/application-prod.properties
+          cat src/main/resources/application-prod.properties
         env:
           PROD_SPRING_PROPERTIES: ${{ secrets.PROD_SPRING_PROPERTIES }}
 
