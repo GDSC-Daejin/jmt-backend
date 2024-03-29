@@ -197,4 +197,22 @@ public class RestaurantQueryService {
                 pageResponse
         );
     }
+
+    public FindRestaurantReviewResponse findMyReview(FindMyReviewRequest request, UserInfo userInfo, Pageable pageable) {
+        UserEntity user = userRepository.findByEmail(userInfo.getEmail())
+                .orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
+
+        List<Long> categoryIds = null;
+        if(request.filter() != null && request.filter().categoryFilter() != null) {
+            categoryIds = restaurantFilterService.findCategoryIdsByFilter(request.filter());
+        }
+        Specification<RestaurantReviewEntity> specification = restaurantDynamicSearchService.searchUserReview(request, categoryIds, user.getId(), pageable);
+        Page<RestaurantReviewEntity> result = restaurantReviewRepository.findAll(specification, pageable);
+
+        PageResponse pageResponse = new PageResponse(result);
+        return new FindRestaurantReviewResponse(
+                result.getContent().stream().map(RestaurantReviewEntity::toResponse).toList(),
+                pageResponse
+        );
+    }
 }

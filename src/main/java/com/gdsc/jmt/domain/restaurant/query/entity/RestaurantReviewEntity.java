@@ -37,9 +37,13 @@ public class RestaurantReviewEntity {
     @JoinColumn(name = "restaurant_review_id")
     private List<RestaurantReviewPhotoEntity> pictures;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id", insertable = false, updatable = false)
+    private RecommendRestaurantEntity recommendRestaurant;
 
     public FindRestaurantReview toResponse() {
         return FindRestaurantReview.builder()
@@ -49,6 +53,8 @@ public class RestaurantReviewEntity {
                 .reviewContent(this.reviewContent)
                 .reviewImages(pictures.stream().map(RestaurantReviewPhotoEntity::getImageUrl).toList())
                 .reviewerImageUrl(user.getProfileImageUrl())
+                .groupId(recommendRestaurant.getGroup().getGid())
+                .groupName(recommendRestaurant.getGroup().getGroupName())
                 .build();
     }
 }

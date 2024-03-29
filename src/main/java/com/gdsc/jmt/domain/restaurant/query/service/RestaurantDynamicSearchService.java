@@ -1,10 +1,8 @@
 package com.gdsc.jmt.domain.restaurant.query.service;
 
-import com.gdsc.jmt.domain.restaurant.query.dto.request.MapLocation;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchFromOtherGroupRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchMapRequest;
-import com.gdsc.jmt.domain.restaurant.query.dto.request.RestaurantSearchRequest;
+import com.gdsc.jmt.domain.restaurant.query.dto.request.*;
 import com.gdsc.jmt.domain.restaurant.query.entity.RecommendRestaurantEntity;
+import com.gdsc.jmt.domain.restaurant.query.entity.RestaurantReviewEntity;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Filter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,14 +80,6 @@ public class RestaurantDynamicSearchService {
                         }
                     }
                 }
-
-//                String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
-//                query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
-//                        root.join("restaurant").get("location"),
-//                        builder.function("ST_GeomFromText", Double.class,
-//                                builder.literal(userLocation)
-//                        )
-//                )));
             }
             return builder.and(predicates.toArray(new Predicate[0]));
         });
@@ -107,15 +98,6 @@ public class RestaurantDynamicSearchService {
                 predicates.add(root.join("group").get("gid").in(groupList));
             }
 
-//            if (request.startLocation() != null && request.endLocation() != null) {
-//                String locationRange = makeLocationRange(request.startLocation(), request.endLocation());
-//                Expression<Boolean> distanceWithin = builder.function("ST_Within", Boolean.class,
-//                        root.join("restaurant").get("location"),
-//                        builder.function("ST_GeomFromText", Double.class,
-//                                builder.literal(locationRange)
-//                        ));
-//                predicates.add(builder.isTrue(distanceWithin));
-//            }
             if (request.userLocation() != null) {
                 String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
                 query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
@@ -143,6 +125,64 @@ public class RestaurantDynamicSearchService {
             }
 
             query.orderBy(builder.asc(builder.function("RAND", Double.class)));
+            return builder.and(predicates.toArray(new Predicate[0]));
+        });
+    }
+
+    public Specification<RestaurantReviewEntity> searchUserReview(FindMyReviewRequest request, List<Long> categoryIds, Long userId, Pageable pageable) {
+        return ((root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(builder.equal(root.get("userId"), userId));
+
+            if(request.filter() != null) {
+                if (request.filter().isCanDrinkLiquor() != null) {
+                    predicates.add(builder.equal(
+                            root.join("recommendRestaurant").get("canDrinkLiquor"),
+                            request.filter().isCanDrinkLiquor()
+                        )
+                    );
+                }
+                if(request.filter().categoryFilter() != null) {
+                    predicates.add(
+                            root.join("recommendRestaurant").join("category").get("id").in(categoryIds)
+                    );
+                }
+            }
+
+            if (request.userLocation() != null) {
+                String checkDistanceSort = pageable.getSort().toString();
+                if(checkDistanceSort.contains("distance")) {
+                    String sortProcess = null;
+                    Pattern pattern = Pattern.compile(": (.*)");
+                    Matcher matcher = pattern.matcher(checkDistanceSort);
+                    while (matcher.find()) {
+                        sortProcess = matcher.group(1);
+                        if (matcher.group(1) == null) break;
+                    }
+
+                    if(sortProcess != null) {
+                        if("ASC".equals(sortProcess)) {
+                            String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+                            query.orderBy(builder.asc(builder.function("ST_DISTANCE_SPHERE", Double.class,
+                                    root.join("recommendRestaurant").join("restaurant").get("location"),
+                                    builder.function("ST_GeomFromText", Double.class,
+                                            builder.literal(userLocation)
+                                    )
+                            )));
+                        }
+                        else {
+                            String userLocation = "POINT(" + request.userLocation().x() + " " + request.userLocation().y() + ")";
+                            query.orderBy(builder.desc(builder.function("ST_DISTANCE_SPHERE", Double.class,
+                                    root.join("recommendRestaurant").join("restaurant").get("location"),
+                                    builder.function("ST_GeomFromText", Double.class,
+                                            builder.literal(userLocation)
+                                    )
+                            )));
+                        }
+                    }
+                }
+            }
             return builder.and(predicates.toArray(new Predicate[0]));
         });
     }
