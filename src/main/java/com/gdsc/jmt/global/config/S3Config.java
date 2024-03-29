@@ -24,12 +24,12 @@ public class S3Config {
         return () -> new AwsCredentials() {
             @Override
             public String accessKeyId() {
-                return accessKey == null ? "AKIAXYKJWZR6WSQGB54B" : accessKey;
+                return accessKey;
             }
 
             @Override
             public String secretAccessKey() {
-                return secretKey == null ? "IRL1c4Ubf0wBg4V2XrmEoqKTzoQQqdd7Hn7A8t1n" : secretKey;
+                return secretKey;
             }
         };
     }
@@ -37,10 +37,9 @@ public class S3Config {
     @Bean
     @Primary
     public S3Client s3Client() {
-        String regionTemp = this.region == null ? "ap-northeast-2" : this.region;
         return S3Client.builder()
                 .credentialsProvider(customAwsCredentialsProvider())
-                .region(Region.of(regionTemp))
+                .region(Region.of(region))
                 .build();
     }
 }
